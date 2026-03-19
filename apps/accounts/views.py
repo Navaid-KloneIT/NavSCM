@@ -198,3 +198,23 @@ def profile_view(request):
         'form': form,
         'profile_user': request.user,
     })
+
+
+@login_required
+def role_list_view(request):
+    tenant = request.tenant
+    roles = Role.objects.filter(tenant=tenant)
+
+    return render(request, 'accounts/role_list.html', {
+        'roles': roles,
+    })
+
+
+@login_required
+def permission_list_view(request):
+    tenant = request.tenant
+    roles = Role.objects.filter(tenant=tenant).prefetch_related('users')
+
+    return render(request, 'accounts/permission_list.html', {
+        'roles': roles,
+    })
