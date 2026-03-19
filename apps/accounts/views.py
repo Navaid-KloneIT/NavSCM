@@ -143,6 +143,7 @@ def forgot_password_view(request):
 def user_list_view(request):
     tenant = request.tenant
     users = User.objects.filter(tenant=tenant)
+    roles = Role.objects.filter(tenant=tenant)
 
     search_query = request.GET.get('q', '').strip()
     if search_query:
@@ -153,8 +154,19 @@ def user_list_view(request):
             | Q(username__icontains=search_query)
         )
 
+    role_filter = request.GET.get('role', '').strip()
+    if role_filter:
+        users = users.filter(role_id=role_filter)
+
+    status_filter = request.GET.get('status', '').strip()
+    if status_filter == 'active':
+        users = users.filter(is_active=True)
+    elif status_filter == 'inactive':
+        users = users.filter(is_active=False)
+
     return render(request, 'accounts/user_list.html', {
         'users': users,
+        'roles': roles,
         'search_query': search_query,
     })
 
