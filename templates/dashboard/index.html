@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Dashboard</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">NavHCM</a></li>
+                    <li class="breadcrumb-item active">Dashboard</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row">
+    <!-- Total Users -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-animate">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <p class="text-uppercase fw-medium text-muted mb-0">Total Users</p>
+                        <h4 class="fs-22 fw-semibold mb-0 mt-2">{{ total_users }}</h4>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <div class="avatar-sm rounded-circle bg-soft-primary d-flex align-items-center justify-content-center">
+                            <i class="ri-team-line fs-3 text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Users -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-animate">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <p class="text-uppercase fw-medium text-muted mb-0">Active Users</p>
+                        <h4 class="fs-22 fw-semibold mb-0 mt-2">{{ active_users }}</h4>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <div class="avatar-sm rounded-circle bg-soft-success d-flex align-items-center justify-content-center">
+                            <i class="ri-user-follow-line fs-3 text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Invites -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-animate">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <p class="text-uppercase fw-medium text-muted mb-0">Pending Invites</p>
+                        <h4 class="fs-22 fw-semibold mb-0 mt-2">{{ pending_invites }}</h4>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <div class="avatar-sm rounded-circle bg-soft-warning d-flex align-items-center justify-content-center">
+                            <i class="ri-mail-send-line fs-3 text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Roles -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-animate">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <p class="text-uppercase fw-medium text-muted mb-0">Total Roles</p>
+                        <h4 class="fs-22 fw-semibold mb-0 mt-2">{{ total_roles }}</h4>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <div class="avatar-sm rounded-circle bg-soft-info d-flex align-items-center justify-content-center">
+                            <i class="ri-shield-user-line fs-3 text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="#" class="btn btn-primary">
+                        <i class="ri-user-add-line me-1"></i> Add User
+                    </a>
+                    <a href="{% url 'accounts:user_invite' %}" class="btn btn-warning">
+                        <i class="ri-mail-send-line me-1"></i> Invite User
+                    </a>
+                    <a href="{% url 'accounts:user_list' %}" class="btn btn-info">
+                        <i class="ri-team-line me-1"></i> View Users
+                    </a>
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">
+                        <i class="ri-user-line me-1"></i> My Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Users & Invites -->
+<div class="row">
+    <!-- Recent Users -->
+    <div class="col-xl-7">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h5 class="card-title mb-0 flex-grow-1">Recent Users</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-borderless table-nowrap align-middle mb-0">
+                        <thead class="table-light text-muted">
+                            <tr>
+                                <th scope="col">User</th>
+                                <th scope="col">Role</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in recent_users %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if user.avatar %}
+                                        <img src="{{ user.avatar.url }}" alt="" class="avatar-xs rounded-circle me-2">
+                                        {% else %}
+                                        <div class="avatar-xs me-2">
+                                            <div class="avatar-title rounded-circle bg-soft-primary text-primary">
+                                                {{ user.get_initials }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <h5 class="fs-13 mb-0">{{ user.get_full_name }}</h5>
+                                            <p class="fs-12 mb-0 text-muted">{{ user.email }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ user.get_display_role }}</td>
+                                <td>
+                                    {% if user.is_active %}
+                                    <span class="badge bg-success-subtle text-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="ri-user-line fs-1 d-block mb-2"></i>
+                                    No users found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Invites -->
+    <div class="col-xl-5">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h5 class="card-title mb-0 flex-grow-1">Recent Invites</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-borderless table-nowrap align-middle mb-0">
+                        <thead class="table-light text-muted">
+                            <tr>
+                                <th scope="col">Email</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Invited By</th>
+                                <th scope="col">Expires</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invite in recent_invites %}
+                            <tr>
+                                <td>
+                                    <span class="fs-13">{{ invite.email }}</span>
+                                </td>
+                                <td>
+                                    {% if invite.status == 'pending' %}
+                                    <span class="badge bg-warning-subtle text-warning">Pending</span>
+                                    {% elif invite.status == 'accepted' %}
+                                    <span class="badge bg-success-subtle text-success">Accepted</span>
+                                    {% elif invite.status == 'expired' %}
+                                    <span class="badge bg-danger-subtle text-danger">Expired</span>
+                                    {% elif invite.status == 'cancelled' %}
+                                    <span class="badge bg-secondary-subtle text-secondary">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if invite.invited_by %}
+                                    {{ invite.invited_by.get_full_name }}
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ invite.expires_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="ri-mail-line fs-1 d-block mb-2"></i>
+                                    No invites found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
