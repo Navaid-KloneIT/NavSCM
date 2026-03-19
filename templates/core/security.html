@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Security Settings{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Security Settings</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">Audit & Security</a></li>
+                    <li class="breadcrumb-item active">Security</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Security Settings -->
+<div class="row">
+    <div class="col-12">
+        <!-- Password Policy -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-lock-password-line me-2 text-primary"></i>Password Policy
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar-sm me-3 flex-shrink-0">
+                                <div class="avatar-title bg-soft-primary text-primary rounded-circle">
+                                    <i class="ri-text fs-5"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-muted mb-0">Minimum Length</p>
+                                <h6 class="mb-0">8 characters</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar-sm me-3 flex-shrink-0">
+                                <div class="avatar-title bg-soft-success text-success rounded-circle">
+                                    <i class="ri-font-size fs-5"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-muted mb-0">Require Uppercase</p>
+                                <h6 class="mb-0"><span class="badge bg-success-subtle text-success">Enabled</span></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar-sm me-3 flex-shrink-0">
+                                <div class="avatar-title bg-soft-warning text-warning rounded-circle">
+                                    <i class="ri-hashtag fs-5"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-muted mb-0">Require Numbers</p>
+                                <h6 class="mb-0"><span class="badge bg-success-subtle text-success">Enabled</span></h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Session Settings -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-timer-line me-2 text-info"></i>Session Settings
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-sm me-3 flex-shrink-0">
+                                <div class="avatar-title bg-soft-info text-info rounded-circle">
+                                    <i class="ri-time-line fs-5"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-muted mb-0">Session Timeout</p>
+                                <h6 class="mb-0">30 minutes of inactivity</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two-Factor Authentication -->
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <h5 class="card-title mb-0 flex-grow-1">
+                    <i class="ri-shield-check-line me-2 text-success"></i>Two-Factor Authentication
+                </h5>
+                <span class="badge bg-warning-subtle text-warning">Coming Soon</span>
+            </div>
+            <div class="card-body">
+                <div class="text-center py-3">
+                    <div class="avatar-md mx-auto mb-3">
+                        <div class="avatar-title bg-light text-secondary rounded-circle fs-1">
+                            <i class="ri-shield-keyhole-line"></i>
+                        </div>
+                    </div>
+                    <h5 class="text-muted mb-1">Two-Factor Authentication</h5>
+                    <p class="text-muted mb-0">Two-factor authentication support is coming soon. This will add an extra layer of security to your accounts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
