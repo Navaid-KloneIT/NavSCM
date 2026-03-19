@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Subscription Plans{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Subscription Plans</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">Subscriptions</a></li>
+                    <li class="breadcrumb-item active">Plans</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Subscription -->
+{% if subscription %}
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-vip-crown-line me-2 text-warning"></i>Current Subscription
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <p class="text-muted mb-1">Plan</p>
+                        <span class="badge bg-primary-subtle text-primary fs-12">{{ subscription.plan_name }}</span>
+                    </div>
+                    <div class="col-md-2">
+                        <p class="text-muted mb-1">Status</p>
+                        {% if subscription.is_active %}
+                            <span class="badge bg-success-subtle text-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-2">
+                        <p class="text-muted mb-1">Max Users</p>
+                        <h6 class="mb-0">{{ subscription.max_users }}</h6>
+                    </div>
+                    <div class="col-md-2">
+                        <p class="text-muted mb-1">Max Storage</p>
+                        <h6 class="mb-0">{{ subscription.max_storage }}</h6>
+                    </div>
+                    <div class="col-md-2">
+                        <p class="text-muted mb-1">Start Date</p>
+                        <h6 class="mb-0">{{ subscription.start_date|date:"M d, Y" }}</h6>
+                    </div>
+                    <div class="col-md-2">
+                        <p class="text-muted mb-1">End Date</p>
+                        <h6 class="mb-0">{{ subscription.end_date|date:"M d, Y"|default:"N/A" }}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Pricing Plans -->
+<div class="row">
+    <!-- Free Plan -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card{% if subscription.plan_name == 'Free' %} border border-primary{% endif %}">
+            <div class="card-body text-center p-4">
+                {% if subscription.plan_name == 'Free' %}
+                <span class="badge bg-primary position-absolute top-0 end-0 m-3">Current Plan</span>
+                {% endif %}
+                <div class="avatar-md mx-auto mb-3">
+                    <div class="avatar-title bg-soft-secondary text-secondary rounded-circle fs-1">
+                        <i class="ri-gift-line"></i>
+                    </div>
+                </div>
+                <h5 class="mb-1">Free</h5>
+                <p class="text-muted">For individuals getting started</p>
+                <h2 class="fw-bold mb-3">$0<small class="fs-13 text-muted fw-normal">/mo</small></h2>
+                <ul class="list-unstyled text-start mb-4">
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Up to 5 users</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>1 GB storage</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Basic reports</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Email support</li>
+                    <li class="py-1 text-muted"><i class="ri-close-line text-danger me-2"></i>Advanced analytics</li>
+                    <li class="py-1 text-muted"><i class="ri-close-line text-danger me-2"></i>Custom integrations</li>
+                </ul>
+                {% if subscription.plan_name == 'Free' %}
+                <button class="btn btn-soft-primary w-100" disabled>Current Plan</button>
+                {% else %}
+                <a href="javascript: void(0);" class="btn btn-soft-primary w-100">Select Plan</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Starter Plan -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card{% if subscription.plan_name == 'Starter' %} border border-primary{% endif %}">
+            <div class="card-body text-center p-4">
+                {% if subscription.plan_name == 'Starter' %}
+                <span class="badge bg-primary position-absolute top-0 end-0 m-3">Current Plan</span>
+                {% endif %}
+                <div class="avatar-md mx-auto mb-3">
+                    <div class="avatar-title bg-soft-info text-info rounded-circle fs-1">
+                        <i class="ri-rocket-line"></i>
+                    </div>
+                </div>
+                <h5 class="mb-1">Starter</h5>
+                <p class="text-muted">For small teams</p>
+                <h2 class="fw-bold mb-3">$29<small class="fs-13 text-muted fw-normal">/mo</small></h2>
+                <ul class="list-unstyled text-start mb-4">
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Up to 25 users</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>10 GB storage</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Standard reports</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Priority email support</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Basic analytics</li>
+                    <li class="py-1 text-muted"><i class="ri-close-line text-danger me-2"></i>Custom integrations</li>
+                </ul>
+                {% if subscription.plan_name == 'Starter' %}
+                <button class="btn btn-soft-primary w-100" disabled>Current Plan</button>
+                {% else %}
+                <a href="javascript: void(0);" class="btn btn-soft-info w-100">Select Plan</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Professional Plan -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card{% if subscription.plan_name == 'Professional' %} border border-primary{% endif %}">
+            <div class="card-body text-center p-4">
+                {% if subscription.plan_name == 'Professional' %}
+                <span class="badge bg-primary position-absolute top-0 end-0 m-3">Current Plan</span>
+                {% endif %}
+                <div class="avatar-md mx-auto mb-3">
+                    <div class="avatar-title bg-soft-warning text-warning rounded-circle fs-1">
+                        <i class="ri-vip-crown-line"></i>
+                    </div>
+                </div>
+                <h5 class="mb-1">Professional</h5>
+                <p class="text-muted">For growing businesses</p>
+                <h2 class="fw-bold mb-3">$79<small class="fs-13 text-muted fw-normal">/mo</small></h2>
+                <ul class="list-unstyled text-start mb-4">
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Up to 100 users</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>50 GB storage</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Advanced reports</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Phone & email support</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Advanced analytics</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Custom integrations</li>
+                </ul>
+                {% if subscription.plan_name == 'Professional' %}
+                <button class="btn btn-soft-primary w-100" disabled>Current Plan</button>
+                {% else %}
+                <a href="javascript: void(0);" class="btn btn-soft-warning w-100">Select Plan</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Enterprise Plan -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card{% if subscription.plan_name == 'Enterprise' %} border border-primary{% endif %}">
+            <div class="card-body text-center p-4">
+                {% if subscription.plan_name == 'Enterprise' %}
+                <span class="badge bg-primary position-absolute top-0 end-0 m-3">Current Plan</span>
+                {% endif %}
+                <div class="avatar-md mx-auto mb-3">
+                    <div class="avatar-title bg-soft-primary text-primary rounded-circle fs-1">
+                        <i class="ri-building-2-line"></i>
+                    </div>
+                </div>
+                <h5 class="mb-1">Enterprise</h5>
+                <p class="text-muted">For large organizations</p>
+                <h2 class="fw-bold mb-3">$199<small class="fs-13 text-muted fw-normal">/mo</small></h2>
+                <ul class="list-unstyled text-start mb-4">
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Unlimited users</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Unlimited storage</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Custom reports</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Dedicated support</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Advanced analytics</li>
+                    <li class="py-1"><i class="ri-check-line text-success me-2"></i>Custom integrations</li>
+                </ul>
+                {% if subscription.plan_name == 'Enterprise' %}
+                <button class="btn btn-soft-primary w-100" disabled>Current Plan</button>
+                {% else %}
+                <a href="javascript: void(0);" class="btn btn-primary w-100">Contact Sales</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
