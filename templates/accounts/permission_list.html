@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Permissions{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Permissions</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">User Management</a></li>
+                    <li class="breadcrumb-item active">Permissions</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Permissions Matrix -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-lock-line me-2 text-primary"></i>Role-Permission Matrix
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if roles %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" class="bg-light" style="min-width: 200px;">Permission</th>
+                                {% for role in roles %}
+                                <th scope="col" class="text-center">{{ role.name }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for perm in permissions %}
+                            <tr>
+                                <td>
+                                    <span class="fw-medium">{{ perm.name }}</span>
+                                    {% if perm.codename %}
+                                    <br><small class="text-muted">{{ perm.codename }}</small>
+                                    {% endif %}
+                                </td>
+                                {% for role in roles %}
+                                <td class="text-center">
+                                    {% if perm in role.permissions.all %}
+                                        <i class="ri-check-line text-success fs-5"></i>
+                                    {% else %}
+                                        <span class="text-muted">&mdash;</span>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="{{ roles|length|add:1 }}" class="text-center py-4 text-muted">
+                                    No permissions defined.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="avatar-md mx-auto mb-3">
+                        <div class="avatar-title bg-light text-secondary rounded-circle fs-1">
+                            <i class="ri-lock-line"></i>
+                        </div>
+                    </div>
+                    <h5 class="text-muted mb-1">No roles found</h5>
+                    <p class="text-muted mb-0">Create roles first to view the permission matrix.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
