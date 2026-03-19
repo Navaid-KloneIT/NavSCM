@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Users</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
+                    <li class="breadcrumb-item active">Users</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Bar -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="flex-shrink-0">
+                <form method="get" action="" class="d-inline-block">
+                    <div class="input-group" style="width: 300px;">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="ri-search-line text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" name="q" placeholder="Search users..." value="{{ request.GET.q|default:'' }}">
+                    </div>
+                </form>
+            </div>
+            <div class="flex-shrink-0">
+                <a href="{% url 'accounts:user_invite' %}" class="btn btn-primary">
+                    <i class="ri-user-add-line me-1"></i> Invite User
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Users Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-nowrap align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">User</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Role</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Joined</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm me-3 flex-shrink-0">
+                                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-5">
+                                                {{ user.first_name|first|default:user.email|first|upper }}{{ user.last_name|first|upper }}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h5 class="fs-14 mb-0">
+                                                {{ user.get_full_name|default:user.email }}
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    {% if user.role %}
+                                        <span class="badge bg-info-subtle text-info">{{ user.role.name }}</span>
+                                    {% else %}
+                                        <span class="text-muted">No Role</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.is_active %}
+                                        <span class="badge bg-success-subtle text-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'accounts:profile' user.pk %}" class="btn btn-sm btn-soft-primary">
+                                        <i class="ri-eye-line me-1"></i> View Profile
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="avatar-md mx-auto mb-3">
+                                        <div class="avatar-title bg-light text-secondary rounded-circle fs-1">
+                                            <i class="ri-user-line"></i>
+                                        </div>
+                                    </div>
+                                    <h5 class="text-muted mb-1">No users found</h5>
+                                    <p class="text-muted mb-0">
+                                        {% if request.GET.q %}
+                                            No users match your search "{{ request.GET.q }}". Try a different keyword.
+                                        {% else %}
+                                            Get started by inviting your first team member.
+                                        {% endif %}
+                                    </p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
