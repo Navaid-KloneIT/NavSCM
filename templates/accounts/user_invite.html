@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Invite User{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Invite User</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:user_list' %}">Users</a></li>
+                    <li class="breadcrumb-item active">Invite</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Invite Form -->
+<div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-10">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-mail-send-line me-2 text-primary"></i>Send Invitation
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">
+                            Email Address <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="ri-mail-line"></i>
+                            </span>
+                            <input type="email"
+                                   class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                                   id="{{ form.email.id_for_label }}"
+                                   name="{{ form.email.html_name }}"
+                                   value="{{ form.email.value|default:'' }}"
+                                   placeholder="Enter email address">
+                            {% if form.email.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.email.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Role -->
+                    <div class="mb-3">
+                        <label for="{{ form.role.id_for_label }}" class="form-label">Role</label>
+                        <select class="form-select {% if form.role.errors %}is-invalid{% endif %}"
+                                id="{{ form.role.id_for_label }}"
+                                name="{{ form.role.html_name }}">
+                            <option value="">Select a role...</option>
+                            {% for value, label in form.role.field.choices %}
+                                {% if value %}
+                                <option value="{{ value }}" {% if form.role.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        {% if form.role.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.role.errors %}{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Message -->
+                    <div class="mb-4">
+                        <label for="{{ form.message.id_for_label }}" class="form-label">Personal Message (Optional)</label>
+                        <textarea class="form-control {% if form.message.errors %}is-invalid{% endif %}"
+                                  id="{{ form.message.id_for_label }}"
+                                  name="{{ form.message.html_name }}"
+                                  rows="4"
+                                  placeholder="Add a personal note to the invitation...">{{ form.message.value|default:'' }}</textarea>
+                        {% if form.message.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.message.errors %}{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-send-plane-line me-1"></i> Send Invitation
+                        </button>
+                        <a href="{% url 'accounts:user_list' %}" class="btn btn-soft-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
