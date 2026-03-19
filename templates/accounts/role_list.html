@@ -1,84 +1,91 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block title %}Roles{% endblock %}
 
 {% block content %}
-<!-- Page Title -->
-<div class="row">
-    <div class="col-12">
-        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-            <h4 class="mb-sm-0">Roles</h4>
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">User Management</a></li>
-                    <li class="breadcrumb-item active">Roles</li>
-                </ol>
-            </div>
-        </div>
-    </div>
+<div class="page-title-box">
+    <h4>Roles</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHCM</a></li>
+            <li class="breadcrumb-item">User Management</li>
+            <li class="breadcrumb-item active">Roles</li>
+        </ol>
+    </nav>
 </div>
 
 <!-- Roles Table -->
 <div class="row">
     <div class="col-12">
-        <div class="card">
-            <div class="card-body">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>All Roles</h5>
+                <span class="text-muted">{{ roles|length }} total role{{ roles|length|pluralize }}</span>
+            </div>
+            <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover table-nowrap align-middle mb-0">
-                        <thead class="table-light">
+                    <table class="table mb-0">
+                        <thead>
                             <tr>
-                                <th scope="col">Role Name</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Users Count</th>
-                                <th scope="col">System Role</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Actions</th>
+                                <th>Role Name</th>
+                                <th>Description</th>
+                                <th>Users</th>
+                                <th>System Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for role in roles %}
                             <tr>
                                 <td>
-                                    <h5 class="fs-14 mb-0">
-                                        <i class="ri-shield-user-line me-1 text-primary"></i>{{ role.name }}
-                                    </h5>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar avatar-sm">
+                                            <i class="ri-shield-user-line"></i>
+                                        </div>
+                                        <span class="fw-medium">{{ role.name }}</span>
+                                    </div>
                                 </td>
-                                <td>{{ role.description|default:"-" }}</td>
+                                <td>{{ role.description|default:"-"|truncatewords:8 }}</td>
                                 <td>
-                                    <span class="badge bg-info-subtle text-info">{{ role.user_set.count }} users</span>
+                                    <span class="badge bg-soft-info text-info">{{ role.user_set.count }} users</span>
                                 </td>
                                 <td>
                                     {% if role.is_system_role %}
-                                        <span class="badge bg-warning-subtle text-warning">Yes</span>
+                                        <span class="badge bg-soft-warning text-warning">Yes</span>
                                     {% else %}
-                                        <span class="badge bg-secondary-subtle text-secondary">No</span>
+                                        <span class="badge bg-soft-secondary text-secondary">No</span>
                                     {% endif %}
                                 </td>
                                 <td>
                                     {% if role.is_active %}
-                                        <span class="badge bg-success-subtle text-success">Active</span>
+                                        <span class="status-badge badge-soft-success">
+                                            <span class="status-dot bg-success"></span>
+                                            Active
+                                        </span>
                                     {% else %}
-                                        <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                                        <span class="status-badge badge-soft-danger">
+                                            <span class="status-dot bg-danger"></span>
+                                            Inactive
+                                        </span>
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="javascript: void(0);" class="btn btn-sm btn-soft-primary">
-                                        <i class="ri-eye-line me-1"></i> View
-                                    </a>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'accounts:permission_list' %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="View Permissions">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
                                 <td colspan="6" class="text-center py-5">
-                                    <div class="avatar-md mx-auto mb-3">
-                                        <div class="avatar-title bg-light text-secondary rounded-circle fs-1">
-                                            <i class="ri-shield-user-line"></i>
-                                        </div>
+                                    <div class="text-muted">
+                                        <i class="ri-shield-user-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No roles found</p>
+                                        <p class="mb-0" style="font-size: 13px;">Roles will appear here once they are created.</p>
                                     </div>
-                                    <h5 class="text-muted mb-1">No roles found</h5>
-                                    <p class="text-muted mb-0">Roles will appear here once they are created.</p>
                                 </td>
                             </tr>
                             {% endfor %}
