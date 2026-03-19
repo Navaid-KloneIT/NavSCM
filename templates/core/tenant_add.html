@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Add Tenant{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Add Tenant</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'core:tenant_list' %}">Tenants</a></li>
+                    <li class="breadcrumb-item active">Add</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Tenant Form -->
+<div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-10">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-building-line me-2 text-primary"></i>Create Tenant
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+
+                    <!-- Name -->
+                    <div class="mb-3">
+                        <label for="id_name" class="form-label">
+                            Tenant Name <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="ri-building-line"></i>
+                            </span>
+                            <input type="text"
+                                   class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                                   id="id_name"
+                                   name="name"
+                                   value="{{ form.name.value|default:'' }}"
+                                   placeholder="Enter tenant name"
+                                   required>
+                            {% if form.name.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.name.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Domain -->
+                    <div class="mb-4">
+                        <label for="id_domain" class="form-label">Domain</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="ri-global-line"></i>
+                            </span>
+                            <input type="text"
+                                   class="form-control {% if form.domain.errors %}is-invalid{% endif %}"
+                                   id="id_domain"
+                                   name="domain"
+                                   value="{{ form.domain.value|default:'' }}"
+                                   placeholder="e.g., company.example.com">
+                            {% if form.domain.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.domain.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="form-text">Optional. The domain associated with this tenant.</div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-add-line me-1"></i> Create Tenant
+                        </button>
+                        <a href="{% url 'core:tenant_list' %}" class="btn btn-soft-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
