@@ -1,0 +1,169 @@
+{% load static %}
+
+<!-- Sidebar -->
+<div class="app-menu">
+    <!-- Brand -->
+    <div class="sidebar-brand">
+        <a href="{% url 'dashboard' %}" class="logo-lg">
+            <span class="brand-icon">N</span>
+            <span class="brand-text">Nav<span>HCM</span></span>
+        </a>
+        <a href="{% url 'dashboard' %}" class="logo-sm">
+            <span class="brand-icon">N</span>
+        </a>
+    </div>
+
+    <!-- Menu -->
+    <div class="sidebar-menu" id="sidebar-menu">
+        <ul class="nav-list">
+
+            <li class="menu-title">Menu</li>
+
+            <li class="nav-item">
+                <a href="{% url 'dashboard' %}" class="menu-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="ri-dashboard-2-line"></i>
+                    <span class="menu-text">Dashboard</span>
+                </a>
+            </li>
+
+            <li class="menu-title" data-toggle="menu-section">Administration <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Tenants -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'tenant_list' or request.resolver_match.url_name == 'tenant_add' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-building-4-line"></i>
+                    <span class="menu-text">Tenants</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'tenant_list' or request.resolver_match.url_name == 'tenant_add' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="#" class="menu-link {% if request.resolver_match.url_name == 'tenant_list' %}active{% endif %}">
+                            <span class="menu-text">All Tenants</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="menu-link {% if request.resolver_match.url_name == 'tenant_add' %}active{% endif %}">
+                            <span class="menu-text">Add Tenant</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Subscriptions -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'subscription_plans' or request.resolver_match.url_name == 'subscription_billing' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-vip-crown-line"></i>
+                    <span class="menu-text">Subscriptions</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'subscription_plans' or request.resolver_match.url_name == 'subscription_billing' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="#" class="menu-link {% if request.resolver_match.url_name == 'subscription_plans' %}active{% endif %}">
+                            <span class="menu-text">Plans</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="menu-link {% if request.resolver_match.url_name == 'subscription_billing' %}active{% endif %}">
+                            <span class="menu-text">Billing</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="menu-title" data-toggle="menu-section">User Management <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Users -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'user_list' or request.resolver_match.url_name == 'user_invite' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-team-line"></i>
+                    <span class="menu-text">Users</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'user_list' or request.resolver_match.url_name == 'user_invite' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'accounts:user_list' %}" class="menu-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}">
+                            <span class="menu-text">All Users</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'accounts:user_invite' %}" class="menu-link {% if request.resolver_match.url_name == 'user_invite' %}active{% endif %}">
+                            <span class="menu-text">Invite User</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Roles & Permissions -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'role_list' or request.resolver_match.url_name == 'permission_list' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-shield-user-line"></i>
+                    <span class="menu-text">Roles &amp; Permissions</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'role_list' or request.resolver_match.url_name == 'permission_list' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="#" class="menu-link {% if request.resolver_match.url_name == 'role_list' %}active{% endif %}">
+                            <span class="menu-text">Roles</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="menu-link {% if request.resolver_match.url_name == 'permission_list' %}active{% endif %}">
+                            <span class="menu-text">Permissions</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="menu-title" data-toggle="menu-section">Audit &amp; Security <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Audit Logs -->
+            <li class="nav-item">
+                <a href="#" class="menu-link {% if request.resolver_match.url_name == 'audit_logs' %}active{% endif %}">
+                    <i class="ri-file-list-3-line"></i>
+                    <span class="menu-text">Audit Logs</span>
+                </a>
+            </li>
+
+            <!-- Security -->
+            <li class="nav-item">
+                <a href="#" class="menu-link {% if request.resolver_match.url_name == 'security' %}active{% endif %}">
+                    <i class="ri-lock-line"></i>
+                    <span class="menu-text">Security</span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+
+    <!-- Sidebar Profile -->
+    <div class="sidebar-profile">
+        <div class="sidebar-profile-avatar">
+            {% if user.first_name %}
+                {{ user.first_name|first|upper }}
+            {% else %}
+                <i class="ri-user-3-line"></i>
+            {% endif %}
+        </div>
+        <div class="sidebar-profile-info">
+            <span class="sidebar-profile-name">
+                {% if user.get_full_name %}
+                    {{ user.get_full_name|truncatewords:3 }}
+                {% else %}
+                    {{ user.username|default:"User" }}
+                {% endif %}
+            </span>
+            <span class="sidebar-profile-role">
+                {% if user.is_superuser %}Administrator{% else %}User{% endif %}
+            </span>
+        </div>
+        <a href="{% url 'accounts:logout' %}" class="sidebar-profile-logout" title="Logout" onclick="event.preventDefault(); document.getElementById('sidebar-logout-form').submit();">
+            <i class="ri-logout-box-r-line"></i>
+        </a>
+        <form id="sidebar-logout-form" action="{% url 'accounts:logout' %}" method="POST" class="d-none">
+            {% csrf_token %}
+        </form>
+    </div>
+</div>
+
+<!-- Sidebar Backdrop (for mobile) -->
+<div class="vertical-overlay"></div>
