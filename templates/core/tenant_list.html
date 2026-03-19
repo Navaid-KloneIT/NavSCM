@@ -1,33 +1,52 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block title %}Tenants{% endblock %}
 
 {% block content %}
-<!-- Page Title -->
-<div class="row">
-    <div class="col-12">
-        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-            <h4 class="mb-sm-0">Tenants</h4>
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">Administration</a></li>
-                    <li class="breadcrumb-item active">Tenants</li>
-                </ol>
-            </div>
-        </div>
-    </div>
+<div class="page-title-box">
+    <h4>Tenants</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHCM</a></li>
+            <li class="breadcrumb-item active">Tenants</li>
+        </ol>
+    </nav>
 </div>
 
-<!-- Action Bar -->
-<div class="row mb-3">
+<!-- Search & Filters -->
+<div class="row mb-4">
     <div class="col-12">
-        <div class="d-flex flex-wrap align-items-center justify-content-end gap-2">
-            <div class="flex-shrink-0">
-                <a href="{% url 'core:tenant_add' %}" class="btn btn-primary">
-                    <i class="ri-add-line me-1"></i> Add Tenant
-                </a>
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'core:tenant_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by name, slug, or domain...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                                <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'core:tenant_add' %}" class="btn btn-success w-100">
+                                <i class="ri-add-line me-1"></i> Add Tenant
+                            </a>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -36,52 +55,75 @@
 <!-- Tenants Table -->
 <div class="row">
     <div class="col-12">
-        <div class="card">
-            <div class="card-body">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>All Tenants</h5>
+                <span class="text-muted">{{ tenants|length }} total tenant{{ tenants|length|pluralize }}</span>
+            </div>
+            <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover table-nowrap align-middle mb-0">
-                        <thead class="table-light">
+                    <table class="table mb-0">
+                        <thead>
                             <tr>
-                                <th scope="col">Name</th>
-                                <th scope="col">Slug</th>
-                                <th scope="col">Domain</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Created</th>
-                                <th scope="col">Actions</th>
+                                <th>Name</th>
+                                <th>Slug</th>
+                                <th>Domain</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for tenant in tenants %}
                             <tr>
                                 <td>
-                                    <h5 class="fs-14 mb-0">{{ tenant.name }}</h5>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar avatar-sm">
+                                            {{ tenant.name|first|upper }}
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium">{{ tenant.name }}</span>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td><code>{{ tenant.slug }}</code></td>
+                                <td><span class="badge bg-light text-dark">{{ tenant.slug }}</span></td>
                                 <td>{{ tenant.domain|default:"-" }}</td>
                                 <td>
                                     {% if tenant.is_active %}
-                                        <span class="badge bg-success-subtle text-success">Active</span>
+                                        <span class="status-badge badge-soft-success">
+                                            <span class="status-dot bg-success"></span>
+                                            Active
+                                        </span>
                                     {% else %}
-                                        <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                                        <span class="status-badge badge-soft-danger">
+                                            <span class="status-dot bg-danger"></span>
+                                            Inactive
+                                        </span>
                                     {% endif %}
                                 </td>
                                 <td>{{ tenant.created_at|date:"M d, Y" }}</td>
                                 <td>
-                                    <a href="{% url 'core:tenant_list' %}" class="btn btn-sm btn-soft-primary">
-                                        <i class="ri-eye-line me-1"></i> View
-                                    </a>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'core:tenant_list' %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="View">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
                                 <td colspan="6" class="text-center py-5">
-                                    <div class="avatar-md mx-auto mb-3">
-                                        <div class="avatar-title bg-light text-secondary rounded-circle fs-1">
-                                            <i class="ri-building-line"></i>
-                                        </div>
+                                    <div class="text-muted">
+                                        <i class="ri-building-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No tenants found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by adding your first tenant.
+                                            {% endif %}
+                                        </p>
                                     </div>
-                                    <h5 class="text-muted mb-1">No tenants found</h5>
-                                    <p class="text-muted mb-0">Get started by adding your first tenant.</p>
                                 </td>
                             </tr>
                             {% endfor %}
