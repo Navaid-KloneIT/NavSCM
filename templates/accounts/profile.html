@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">My Profile</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
+                    <li class="breadcrumb-item active">Profile</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column: Profile Card -->
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <!-- Avatar -->
+                <div class="mx-auto mb-3" style="width: 100px; height: 100px;">
+                    {% if profile_user.avatar %}
+                        <img src="{{ profile_user.avatar.url }}" alt="{{ profile_user.get_full_name }}"
+                             class="rounded-circle img-fluid" style="width: 100px; height: 100px; object-fit: cover;">
+                    {% else %}
+                        <div class="avatar-title bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 100px; height: 100px; font-size: 2.5rem; font-weight: 600;">
+                            {{ profile_user.first_name|first|default:profile_user.email|first|upper }}{{ profile_user.last_name|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Name & Title -->
+                <h5 class="mb-1">{{ profile_user.get_full_name|default:profile_user.email }}</h5>
+                {% if profile_user.job_title %}
+                    <p class="text-muted mb-0">{{ profile_user.job_title }}</p>
+                {% endif %}
+                {% if profile_user.department %}
+                    <p class="text-muted mb-3">{{ profile_user.department }}</p>
+                {% else %}
+                    <div class="mb-3"></div>
+                {% endif %}
+
+                <hr>
+
+                <!-- Contact Details -->
+                <div class="text-start">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="ri-mail-line text-primary fs-18 me-3"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="text-muted mb-0 fs-12">Email</p>
+                            <h6 class="fs-14 mb-0">{{ profile_user.email }}</h6>
+                        </div>
+                    </div>
+
+                    {% if profile_user.phone %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="ri-phone-line text-primary fs-18 me-3"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="text-muted mb-0 fs-12">Phone</p>
+                            <h6 class="fs-14 mb-0">{{ profile_user.phone }}</h6>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if profile_user.tenant %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="ri-building-line text-primary fs-18 me-3"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="text-muted mb-0 fs-12">Organization</p>
+                            <h6 class="fs-14 mb-0">{{ profile_user.tenant.name }}</h6>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if profile_user.role %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="ri-shield-user-line text-primary fs-18 me-3"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="text-muted mb-0 fs-12">Role</p>
+                            <h6 class="fs-14 mb-0">
+                                <span class="badge bg-info-subtle text-info">{{ profile_user.role.name }}</span>
+                            </h6>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Edit Profile Form -->
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-edit-line me-2 text-primary"></i>Edit Profile
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+
+                    <!-- First Name & Last Name -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                            <input type="text"
+                                   class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+                                   id="{{ form.first_name.id_for_label }}"
+                                   name="{{ form.first_name.html_name }}"
+                                   value="{{ form.first_name.value|default:'' }}"
+                                   placeholder="Enter first name">
+                            {% if form.first_name.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.first_name.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                            <input type="text"
+                                   class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
+                                   id="{{ form.last_name.id_for_label }}"
+                                   name="{{ form.last_name.html_name }}"
+                                   value="{{ form.last_name.value|default:'' }}"
+                                   placeholder="Enter last name">
+                            {% if form.last_name.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.last_name.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Email & Phone -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                            <input type="email"
+                                   class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                                   id="{{ form.email.id_for_label }}"
+                                   name="{{ form.email.html_name }}"
+                                   value="{{ form.email.value|default:'' }}"
+                                   placeholder="Enter email address">
+                            {% if form.email.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.email.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
+                            <input type="text"
+                                   class="form-control {% if form.phone.errors %}is-invalid{% endif %}"
+                                   id="{{ form.phone.id_for_label }}"
+                                   name="{{ form.phone.html_name }}"
+                                   value="{{ form.phone.value|default:'' }}"
+                                   placeholder="Enter phone number">
+                            {% if form.phone.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.phone.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Job Title & Department -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.job_title.id_for_label }}" class="form-label">Job Title</label>
+                            <input type="text"
+                                   class="form-control {% if form.job_title.errors %}is-invalid{% endif %}"
+                                   id="{{ form.job_title.id_for_label }}"
+                                   name="{{ form.job_title.html_name }}"
+                                   value="{{ form.job_title.value|default:'' }}"
+                                   placeholder="Enter job title">
+                            {% if form.job_title.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.job_title.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.department.id_for_label }}" class="form-label">Department</label>
+                            <input type="text"
+                                   class="form-control {% if form.department.errors %}is-invalid{% endif %}"
+                                   id="{{ form.department.id_for_label }}"
+                                   name="{{ form.department.html_name }}"
+                                   value="{{ form.department.value|default:'' }}"
+                                   placeholder="Enter department">
+                            {% if form.department.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.department.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="mb-3">
+                        <label for="{{ form.bio.id_for_label }}" class="form-label">Bio</label>
+                        <textarea class="form-control {% if form.bio.errors %}is-invalid{% endif %}"
+                                  id="{{ form.bio.id_for_label }}"
+                                  name="{{ form.bio.html_name }}"
+                                  rows="4"
+                                  placeholder="Write a short bio...">{{ form.bio.value|default:'' }}</textarea>
+                        {% if form.bio.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.bio.errors %}{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Avatar Upload -->
+                    <div class="mb-4">
+                        <label for="{{ form.avatar.id_for_label }}" class="form-label">Profile Photo</label>
+                        <input type="file"
+                               class="form-control {% if form.avatar.errors %}is-invalid{% endif %}"
+                               id="{{ form.avatar.id_for_label }}"
+                               name="{{ form.avatar.html_name }}"
+                               accept="image/*">
+                        {% if form.avatar.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.avatar.errors %}{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+                        <div class="form-text">Accepted formats: JPG, PNG, GIF. Max size: 2MB.</div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="d-flex align-items-center">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Update Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
