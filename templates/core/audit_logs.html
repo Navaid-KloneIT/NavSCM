@@ -1,36 +1,54 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block title %}Audit Logs{% endblock %}
 
 {% block content %}
-<!-- Page Title -->
-<div class="row">
-    <div class="col-12">
-        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-            <h4 class="mb-sm-0">Audit Logs</h4>
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">Audit & Security</a></li>
-                    <li class="breadcrumb-item active">Audit Logs</li>
-                </ol>
-            </div>
-        </div>
-    </div>
+<div class="page-title-box">
+    <h4>Audit Logs</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHCM</a></li>
+            <li class="breadcrumb-item">Audit & Security</li>
+            <li class="breadcrumb-item active">Audit Logs</li>
+        </ol>
+    </nav>
 </div>
 
-<!-- Search Bar -->
-<div class="row mb-3">
+<!-- Search & Filters -->
+<div class="row mb-4">
     <div class="col-12">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <div class="flex-shrink-0">
-                <form method="get" action="" class="d-inline-block">
-                    <div class="input-group" style="width: 300px;">
-                        <span class="input-group-text bg-transparent border-end-0">
-                            <i class="ri-search-line text-muted"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0" name="q" placeholder="Search audit logs..." value="{{ request.GET.q|default:'' }}">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'core:audit_logs' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by action, model, or user...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Filter by Action</label>
+                            <select class="form-select" name="action">
+                                <option value="">All Actions</option>
+                                <option value="user.login" {% if request.GET.action == 'user.login' %}selected{% endif %}>User Login</option>
+                                <option value="user.logout" {% if request.GET.action == 'user.logout' %}selected{% endif %}>User Logout</option>
+                                <option value="user.create" {% if request.GET.action == 'user.create' %}selected{% endif %}>User Create</option>
+                                <option value="user.update" {% if request.GET.action == 'user.update' %}selected{% endif %}>User Update</option>
+                                <option value="settings.update" {% if request.GET.action == 'settings.update' %}selected{% endif %}>Settings Update</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'core:audit_logs' %}" class="btn btn-soft-secondary w-100">
+                                <i class="ri-refresh-line me-1"></i> Reset
+                            </a>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -41,54 +59,69 @@
 <!-- Audit Logs Table -->
 <div class="row">
     <div class="col-12">
-        <div class="card">
-            <div class="card-body">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Activity Log</h5>
+                <span class="text-muted">{{ logs|length }} entr{{ logs|length|pluralize:"y,ies" }}</span>
+            </div>
+            <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover table-nowrap align-middle mb-0">
-                        <thead class="table-light">
+                    <table class="table mb-0">
+                        <thead>
                             <tr>
-                                <th scope="col">Action</th>
-                                <th scope="col">Model</th>
-                                <th scope="col">User</th>
-                                <th scope="col">IP Address</th>
-                                <th scope="col">Timestamp</th>
+                                <th>Action</th>
+                                <th>Model</th>
+                                <th>User</th>
+                                <th>IP Address</th>
+                                <th>Timestamp</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for log in logs %}
                             <tr>
                                 <td>
-                                    {% if log.action == 'user.login' %}
-                                        <span class="badge bg-success-subtle text-success">{{ log.action }}</span>
-                                    {% elif log.action == 'user.create' %}
-                                        <span class="badge bg-primary-subtle text-primary">{{ log.action }}</span>
+                                    {% if 'login' in log.action %}
+                                        <span class="badge bg-soft-success text-success">{{ log.action }}</span>
+                                    {% elif 'create' in log.action %}
+                                        <span class="badge bg-soft-primary text-primary">{{ log.action }}</span>
                                     {% elif 'delete' in log.action %}
-                                        <span class="badge bg-danger-subtle text-danger">{{ log.action }}</span>
+                                        <span class="badge bg-soft-danger text-danger">{{ log.action }}</span>
+                                    {% elif 'update' in log.action %}
+                                        <span class="badge bg-soft-warning text-warning">{{ log.action }}</span>
                                     {% else %}
-                                        <span class="badge bg-info-subtle text-info">{{ log.action }}</span>
+                                        <span class="badge bg-soft-info text-info">{{ log.action }}</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ log.model|default:"-" }}</td>
-                                <td>{{ log.user|default:"-" }}</td>
+                                <td><span class="badge bg-light text-dark">{{ log.model_name|default:"-" }}</span></td>
+                                <td>
+                                    {% if log.user %}
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="avatar avatar-xs">
+                                                {{ log.user.first_name|first|upper }}
+                                            </div>
+                                            <span>{{ log.user.get_full_name|default:log.user.username }}</span>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">System</span>
+                                    {% endif %}
+                                </td>
                                 <td><code>{{ log.ip_address|default:"-" }}</code></td>
                                 <td>{{ log.timestamp|date:"M d, Y H:i:s" }}</td>
                             </tr>
                             {% empty %}
                             <tr>
                                 <td colspan="5" class="text-center py-5">
-                                    <div class="avatar-md mx-auto mb-3">
-                                        <div class="avatar-title bg-light text-secondary rounded-circle fs-1">
-                                            <i class="ri-file-list-3-line"></i>
-                                        </div>
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No audit logs found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.action %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Audit logs will appear here as actions are performed.
+                                            {% endif %}
+                                        </p>
                                     </div>
-                                    <h5 class="text-muted mb-1">No audit logs found</h5>
-                                    <p class="text-muted mb-0">
-                                        {% if request.GET.q %}
-                                            No logs match your search "{{ request.GET.q }}". Try a different keyword.
-                                        {% else %}
-                                            Audit logs will appear here as actions are performed.
-                                        {% endif %}
-                                    </p>
                                 </td>
                             </tr>
                             {% endfor %}
