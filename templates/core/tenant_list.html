@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Tenants{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Tenants</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">Administration</a></li>
+                    <li class="breadcrumb-item active">Tenants</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Bar -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="d-flex flex-wrap align-items-center justify-content-end gap-2">
+            <div class="flex-shrink-0">
+                <a href="{% url 'core:tenant_add' %}" class="btn btn-primary">
+                    <i class="ri-add-line me-1"></i> Add Tenant
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tenants Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-nowrap align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Slug</th>
+                                <th scope="col">Domain</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Created</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tenant in tenants %}
+                            <tr>
+                                <td>
+                                    <h5 class="fs-14 mb-0">{{ tenant.name }}</h5>
+                                </td>
+                                <td><code>{{ tenant.slug }}</code></td>
+                                <td>{{ tenant.domain|default:"-" }}</td>
+                                <td>
+                                    {% if tenant.is_active %}
+                                        <span class="badge bg-success-subtle text-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ tenant.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'core:tenant_detail' tenant.pk %}" class="btn btn-sm btn-soft-primary">
+                                        <i class="ri-eye-line me-1"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="avatar-md mx-auto mb-3">
+                                        <div class="avatar-title bg-light text-secondary rounded-circle fs-1">
+                                            <i class="ri-building-line"></i>
+                                        </div>
+                                    </div>
+                                    <h5 class="text-muted mb-1">No tenants found</h5>
+                                    <p class="text-muted mb-0">Get started by adding your first tenant.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
