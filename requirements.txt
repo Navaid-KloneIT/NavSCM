@@ -1,0 +1,6 @@
+Django==4.2.28
+django-crispy-forms==2.5
+crispy-bootstrap5==2025.6
+mysqlclient==2.2.8
+Faker==40.4.0
+python-decouple==3.8
