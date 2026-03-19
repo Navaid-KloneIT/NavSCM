@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Audit Logs{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Audit Logs</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">Audit & Security</a></li>
+                    <li class="breadcrumb-item active">Audit Logs</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Bar -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="flex-shrink-0">
+                <form method="get" action="" class="d-inline-block">
+                    <div class="input-group" style="width: 300px;">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="ri-search-line text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" name="q" placeholder="Search audit logs..." value="{{ request.GET.q|default:'' }}">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Audit Logs Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-nowrap align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Action</th>
+                                <th scope="col">Model</th>
+                                <th scope="col">User</th>
+                                <th scope="col">IP Address</th>
+                                <th scope="col">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td>
+                                    {% if log.action == 'user.login' %}
+                                        <span class="badge bg-success-subtle text-success">{{ log.action }}</span>
+                                    {% elif log.action == 'user.create' %}
+                                        <span class="badge bg-primary-subtle text-primary">{{ log.action }}</span>
+                                    {% elif 'delete' in log.action %}
+                                        <span class="badge bg-danger-subtle text-danger">{{ log.action }}</span>
+                                    {% else %}
+                                        <span class="badge bg-info-subtle text-info">{{ log.action }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ log.model|default:"-" }}</td>
+                                <td>{{ log.user|default:"-" }}</td>
+                                <td><code>{{ log.ip_address|default:"-" }}</code></td>
+                                <td>{{ log.timestamp|date:"M d, Y H:i:s" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="avatar-md mx-auto mb-3">
+                                        <div class="avatar-title bg-light text-secondary rounded-circle fs-1">
+                                            <i class="ri-file-list-3-line"></i>
+                                        </div>
+                                    </div>
+                                    <h5 class="text-muted mb-1">No audit logs found</h5>
+                                    <p class="text-muted mb-0">
+                                        {% if request.GET.q %}
+                                            No logs match your search "{{ request.GET.q }}". Try a different keyword.
+                                        {% else %}
+                                            Audit logs will appear here as actions are performed.
+                                        {% endif %}
+                                    </p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
