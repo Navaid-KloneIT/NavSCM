@@ -194,4 +194,7 @@ def profile_view(request):
         messages.success(request, 'Your profile has been updated.')
         return redirect('accounts:profile')
 
-    return render(request, 'accounts/profile.html', {'form': form})
+    return render(request, 'accounts/profile.html', {
+        'form': form,
+        'profile_user': request.user,
+    })
