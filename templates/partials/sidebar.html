@@ -37,12 +37,12 @@
                 </a>
                 <ul class="sub-menu" {% if request.resolver_match.url_name == 'tenant_list' or request.resolver_match.url_name == 'tenant_add' %}style="display:block"{% endif %}>
                     <li class="nav-item">
-                        <a href="#" class="menu-link {% if request.resolver_match.url_name == 'tenant_list' %}active{% endif %}">
+                        <a href="{% url 'core:tenant_list' %}" class="menu-link {% if request.resolver_match.url_name == 'tenant_list' %}active{% endif %}">
                             <span class="menu-text">All Tenants</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="menu-link {% if request.resolver_match.url_name == 'tenant_add' %}active{% endif %}">
+                        <a href="{% url 'core:tenant_add' %}" class="menu-link {% if request.resolver_match.url_name == 'tenant_add' %}active{% endif %}">
                             <span class="menu-text">Add Tenant</span>
                         </a>
                     </li>
@@ -58,12 +58,12 @@
                 </a>
                 <ul class="sub-menu" {% if request.resolver_match.url_name == 'subscription_plans' or request.resolver_match.url_name == 'subscription_billing' %}style="display:block"{% endif %}>
                     <li class="nav-item">
-                        <a href="#" class="menu-link {% if request.resolver_match.url_name == 'subscription_plans' %}active{% endif %}">
+                        <a href="{% url 'core:subscription_plans' %}" class="menu-link {% if request.resolver_match.url_name == 'subscription_plans' %}active{% endif %}">
                             <span class="menu-text">Plans</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="menu-link {% if request.resolver_match.url_name == 'subscription_billing' %}active{% endif %}">
+                        <a href="{% url 'core:subscription_billing' %}" class="menu-link {% if request.resolver_match.url_name == 'subscription_billing' %}active{% endif %}">
                             <span class="menu-text">Billing</span>
                         </a>
                     </li>
@@ -102,12 +102,12 @@
                 </a>
                 <ul class="sub-menu" {% if request.resolver_match.url_name == 'role_list' or request.resolver_match.url_name == 'permission_list' %}style="display:block"{% endif %}>
                     <li class="nav-item">
-                        <a href="#" class="menu-link {% if request.resolver_match.url_name == 'role_list' %}active{% endif %}">
+                        <a href="{% url 'accounts:role_list' %}" class="menu-link {% if request.resolver_match.url_name == 'role_list' %}active{% endif %}">
                             <span class="menu-text">Roles</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="menu-link {% if request.resolver_match.url_name == 'permission_list' %}active{% endif %}">
+                        <a href="{% url 'accounts:permission_list' %}" class="menu-link {% if request.resolver_match.url_name == 'permission_list' %}active{% endif %}">
                             <span class="menu-text">Permissions</span>
                         </a>
                     </li>
@@ -118,7 +118,7 @@
 
             <!-- Audit Logs -->
             <li class="nav-item">
-                <a href="#" class="menu-link {% if request.resolver_match.url_name == 'audit_logs' %}active{% endif %}">
+                <a href="{% url 'core:audit_logs' %}" class="menu-link {% if request.resolver_match.url_name == 'audit_logs' %}active{% endif %}">
                     <i class="ri-file-list-3-line"></i>
                     <span class="menu-text">Audit Logs</span>
                 </a>
@@ -126,7 +126,7 @@
 
             <!-- Security -->
             <li class="nav-item">
-                <a href="#" class="menu-link {% if request.resolver_match.url_name == 'security' %}active{% endif %}">
+                <a href="{% url 'core:security' %}" class="menu-link {% if request.resolver_match.url_name == 'security' %}active{% endif %}">
                     <i class="ri-lock-line"></i>
                     <span class="menu-text">Security</span>
                 </a>
