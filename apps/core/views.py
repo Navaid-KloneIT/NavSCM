@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import AuditLog, Subscription, Tenant
 
@@ -28,6 +28,32 @@ def tenant_list_view(request):
 
     return render(request, 'core/tenant_list.html', {
         'tenants': tenants,
+    })
+
+
+@login_required
+def tenant_detail_view(request, pk):
+    tenant = get_object_or_404(Tenant, pk=pk)
+
+    if not request.user.is_superuser and request.user.tenant_id != tenant.pk:
+        return redirect('core:tenant_list')
+
+    subscription = None
+    try:
+        subscription = tenant.subscription
+    except Subscription.DoesNotExist:
+        pass
+
+    user_count = tenant.users.count()
+    role_count = tenant.roles.count()
+    recent_logs = tenant.audit_logs.select_related('user')[:10]
+
+    return render(request, 'core/tenant_detail.html', {
+        'tenant': tenant,
+        'subscription': subscription,
+        'user_count': user_count,
+        'role_count': role_count,
+        'recent_logs': recent_logs,
     })
 
 
