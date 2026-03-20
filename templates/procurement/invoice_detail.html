@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice: {{ invoice.invoice_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ invoice.invoice_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'procurement:invoice_list' %}">Invoices</a></li>
+            <li class="breadcrumb-item active">{{ invoice.invoice_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Invoice Details</h5>
+                {% if invoice.status == 'matched' or invoice.status == 'paid' %}
+                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> {{ invoice.get_status_display }}</span>
+                {% elif invoice.status == 'partially_matched' %}
+                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> {{ invoice.get_status_display }}</span>
+                {% elif invoice.status == 'disputed' %}
+                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Disputed</span>
+                {% else %}
+                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Pending</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Vendor:</strong></div>
+                    <div class="col-md-3"><a href="{% url 'procurement:vendor_detail' invoice.vendor.pk %}">{{ invoice.vendor.name }}</a></div>
+                    <div class="col-md-3"><strong>Invoice Date:</strong></div>
+                    <div class="col-md-3">{{ invoice.invoice_date|date:"M d, Y" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Purchase Order:</strong></div>
+                    <div class="col-md-3">
+                        {% if invoice.purchase_order %}
+                            <a href="{% url 'procurement:po_detail' invoice.purchase_order.pk %}">{{ invoice.purchase_order.po_number }}</a>
+                        {% else %}-{% endif %}
+                    </div>
+                    <div class="col-md-3"><strong>Due Date:</strong></div>
+                    <div class="col-md-3">{{ invoice.due_date|date:"M d, Y"|default:"-" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>GRN:</strong></div>
+                    <div class="col-md-3">
+                        {% if invoice.grn %}
+                            <a href="{% url 'procurement:grn_detail' invoice.grn.pk %}">{{ invoice.grn.grn_number }}</a>
+                        {% else %}-{% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <small class="text-muted">Subtotal</small>
+                        <h5>{{ invoice.subtotal }}</h5>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <small class="text-muted">Tax</small>
+                        <h5>{{ invoice.tax_amount }}</h5>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <small class="text-muted">Total</small>
+                        <h5 class="text-primary">{{ invoice.total_amount }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card table-card">
+            <div class="card-header"><h5>Invoice Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr><th>#</th><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for line in items %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ line.description|default:"-" }}</td>
+                                <td>{{ line.quantity }}</td>
+                                <td>{{ line.unit_price }}</td>
+                                <td>{{ line.total_price }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center py-3 text-muted">No items.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {% if matches %}
+        <div class="card table-card">
+            <div class="card-header"><h5>Three-Way Match Results</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr><th>PO</th><th>GRN</th><th>Qty Match</th><th>Price Match</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for m in matches %}
+                            <tr>
+                                <td>{{ m.purchase_order.po_number }}</td>
+                                <td>{{ m.grn.grn_number }}</td>
+                                <td>{% if m.quantity_match %}<i class="ri-check-line text-success"></i>{% else %}<i class="ri-close-line text-danger"></i>{% endif %}</td>
+                                <td>{% if m.price_match %}<i class="ri-check-line text-success"></i>{% else %}<i class="ri-close-line text-danger"></i>{% endif %}</td>
+                                <td>
+                                    {% if m.match_status == 'full_match' %}
+                                        <span class="badge bg-success">Full Match</span>
+                                    {% elif m.match_status == 'partial_match' %}
+                                        <span class="badge bg-warning text-dark">Partial</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Mismatch</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if invoice.status == 'pending' %}
+                    <a href="{% url 'procurement:reconciliation_create' %}" class="btn btn-soft-primary w-100 mb-2">
+                        <i class="ri-scales-3-line me-1"></i> Run 3-Way Match
+                    </a>
+                {% endif %}
+                <a href="{% url 'procurement:invoice_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
