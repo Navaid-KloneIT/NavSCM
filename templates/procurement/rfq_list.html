@@ -105,6 +105,12 @@
                                         {% if rfq.status == 'draft' %}
                                         <a href="{% url 'procurement:rfq_edit' rfq.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
                                         {% endif %}
+                                        {% if rfq.status == 'draft' or rfq.status == 'cancelled' %}
+                                        <form method="POST" action="{% url 'procurement:rfq_delete' rfq.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this RFQ?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
