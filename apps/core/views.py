@@ -1,5 +1,9 @@
+from datetime import timedelta
+
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import AuditLog, Subscription, Tenant
@@ -82,37 +86,150 @@ def subscription_plans_view(request):
     })
 
 
+def _get_billing_subscription(user):
+    """Get subscription for billing views - handles both tenant users and superusers."""
+    if user.tenant:
+        try:
+            return user.tenant.subscription
+        except Subscription.DoesNotExist:
+            return None
+    elif user.is_superuser:
+        return Subscription.objects.select_related('tenant').first()
+    return None
+
+
+def _build_invoices(subscription):
+    """Build sample invoice list from subscription data."""
+    if not subscription:
+        return []
+    price_map = {'free': 0, 'starter': 29, 'professional': 79, 'enterprise': 199}
+    amount = price_map.get(subscription.plan, 0)
+    start = subscription.start_date
+    invoices = []
+    for i in range(6):
+        invoices.append({
+            'number': f'INV-{start.year}{start.month:02d}-{1000 + i}',
+            'date': start - timedelta(days=30 * i),
+            'amount': amount,
+            'status': 'paid' if i > 0 else 'current',
+            'plan': subscription.get_plan_display(),
+        })
+    return invoices
+
+
+# Sample payment method stored in session for demo purposes
+DEFAULT_PAYMENT_METHOD = {
+    'card_brand': 'Visa',
+    'card_last4': '4242',
+    'card_expiry': '12/2027',
+    'card_holder': '',
+}
+
+
+def _get_payment_method(request):
+    """Get payment method from session or return default sample data."""
+    return request.session.get('payment_method', DEFAULT_PAYMENT_METHOD)
+
+
 @login_required
 def subscription_billing_view(request):
-    subscription = None
-    if request.user.tenant:
-        try:
-            subscription = request.user.tenant.subscription
-        except Subscription.DoesNotExist:
-            pass
-    elif request.user.is_superuser:
-        subscription = Subscription.objects.select_related('tenant').first()
+    subscription = _get_billing_subscription(request.user)
 
-    # Build sample billing history from subscription data
-    invoices = []
-    if subscription:
-        from datetime import timedelta
-        price_map = {'free': 0, 'starter': 29, 'professional': 79, 'enterprise': 199}
-        amount = price_map.get(subscription.plan, 0)
-        start = subscription.start_date
-        for i in range(6):
-            invoices.append({
-                'number': f'INV-{start.year}{start.month:02d}-{1000 + i}',
-                'date': start - timedelta(days=30 * i),
-                'amount': f'${amount}.00',
-                'status': 'paid' if i > 0 else 'current',
-                'plan': subscription.get_plan_display(),
-            })
+    if request.method == 'POST':
+        card_number = request.POST.get('card_number', '').replace(' ', '')
+        card_expiry = request.POST.get('card_expiry', '').strip()
+        card_holder = request.POST.get('card_holder', '').strip()
+
+        errors = []
+        if not card_number or len(card_number) < 13 or not card_number.isdigit():
+            errors.append('Please enter a valid card number.')
+        if not card_expiry or '/' not in card_expiry:
+            errors.append('Please enter a valid expiry date (MM/YY).')
+        if not card_holder:
+            errors.append('Please enter the cardholder name.')
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+        else:
+            # Determine card brand from first digit
+            brand_map = {'4': 'Visa', '5': 'Mastercard', '3': 'Amex', '6': 'Discover'}
+            card_brand = brand_map.get(card_number[0], 'Card')
+
+            request.session['payment_method'] = {
+                'card_brand': card_brand,
+                'card_last4': card_number[-4:],
+                'card_expiry': card_expiry,
+                'card_holder': card_holder,
+            }
+            messages.success(request, 'Payment method updated successfully.')
+
+        return redirect('core:subscription_billing')
+
+    invoices = _build_invoices(subscription)
+    payment_method = _get_payment_method(request)
 
     return render(request, 'core/subscription_billing.html', {
         'subscription': subscription,
         'invoices': invoices,
+        'payment_method': payment_method,
     })
+
+
+@login_required
+def invoice_download_view(request, invoice_number):
+    subscription = _get_billing_subscription(request.user)
+    if not subscription:
+        messages.error(request, 'No subscription found.')
+        return redirect('core:subscription_billing')
+
+    invoices = _build_invoices(subscription)
+    invoice = None
+    for inv in invoices:
+        if inv['number'] == invoice_number:
+            invoice = inv
+            break
+
+    if not invoice:
+        messages.error(request, 'Invoice not found.')
+        return redirect('core:subscription_billing')
+
+    tenant_name = subscription.tenant.name
+    tenant_domain = subscription.tenant.domain or 'company.com'
+
+    # Generate a plain-text invoice file for download
+    lines = [
+        '=' * 60,
+        f'                    INVOICE',
+        '=' * 60,
+        '',
+        f'  Invoice Number:   {invoice["number"]}',
+        f'  Date:             {invoice["date"].strftime("%B %d, %Y")}',
+        f'  Status:           {invoice["status"].upper()}',
+        '',
+        '-' * 60,
+        f'  Bill To:',
+        f'    {tenant_name}',
+        f'    billing@{tenant_domain}',
+        '',
+        '-' * 60,
+        f'  Description                          Amount',
+        '-' * 60,
+        f'  {invoice["plan"]} Plan (Monthly)               ${invoice["amount"]}.00',
+        '',
+        '-' * 60,
+        f'  Total:                                ${invoice["amount"]}.00',
+        '=' * 60,
+        '',
+        '  Thank you for your business!',
+        '',
+    ]
+
+    content = '\n'.join(lines)
+
+    response = HttpResponse(content, content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename="{invoice["number"]}.txt"'
+    return response
 
 
 @login_required
