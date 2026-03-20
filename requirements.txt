@@ -5,3 +5,4 @@ mysqlclient==2.2.8
 Faker==40.4.0
 python-decouple==3.8
 Pillow==11.2.1
+xhtml2pdf==0.2.17
