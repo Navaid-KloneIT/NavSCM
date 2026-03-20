@@ -189,6 +189,14 @@
                         <i class="ri-shopping-cart-line me-1"></i> Create PO
                     </a>
                 {% endif %}
+                {% if rfq.status == 'draft' or rfq.status == 'cancelled' %}
+                    <form method="POST" action="{% url 'procurement:rfq_delete' rfq.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-soft-danger w-100 mb-2" onclick="return confirm('Are you sure you want to delete this RFQ?')">
+                            <i class="ri-delete-bin-line me-1"></i> Delete
+                        </button>
+                    </form>
+                {% endif %}
                 <a href="{% url 'procurement:rfq_list' %}" class="btn btn-light w-100">
                     <i class="ri-arrow-left-line me-1"></i> Back to List
                 </a>
