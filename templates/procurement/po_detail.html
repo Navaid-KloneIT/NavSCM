@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}{{ po.po_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ po.po_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'procurement:po_list' %}">Purchase Orders</a></li>
+            <li class="breadcrumb-item active">{{ po.po_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- PO Info -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Purchase Order Details</h5>
+                {% if po.status == 'approved' or po.status == 'received' %}
+                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> {{ po.get_status_display }}</span>
+                {% elif po.status == 'pending_approval' or po.status == 'sent' or po.status == 'acknowledged' or po.status == 'partially_received' %}
+                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> {{ po.get_status_display }}</span>
+                {% elif po.status == 'cancelled' %}
+                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                {% else %}
+                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Vendor:</strong></div>
+                    <div class="col-md-3"><a href="{% url 'procurement:vendor_detail' po.vendor.pk %}">{{ po.vendor.name }}</a></div>
+                    <div class="col-md-3"><strong>Payment Terms:</strong></div>
+                    <div class="col-md-3">{{ po.get_payment_terms_display }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Order Date:</strong></div>
+                    <div class="col-md-3">{{ po.order_date|date:"M d, Y"|default:"-" }}</div>
+                    <div class="col-md-3"><strong>Expected Delivery:</strong></div>
+                    <div class="col-md-3">{{ po.expected_delivery_date|date:"M d, Y"|default:"-" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Created By:</strong></div>
+                    <div class="col-md-3">{{ po.created_by.get_full_name|default:"-" }}</div>
+                    {% if po.approved_by %}
+                    <div class="col-md-3"><strong>Approved By:</strong></div>
+                    <div class="col-md-3">{{ po.approved_by.get_full_name }} on {{ po.approved_at|date:"M d, Y" }}</div>
+                    {% endif %}
+                </div>
+                {% if po.rfq %}
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Linked RFQ:</strong></div>
+                    <div class="col-md-3"><a href="{% url 'procurement:rfq_detail' po.rfq.pk %}">{{ po.rfq.rfq_number }}</a></div>
+                </div>
+                {% endif %}
+                {% if po.requisition %}
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Linked PR:</strong></div>
+                    <div class="col-md-3"><a href="{% url 'procurement:requisition_detail' po.requisition.pk %}">{{ po.requisition.requisition_number }}</a></div>
+                </div>
+                {% endif %}
+                {% if po.shipping_address %}
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Ship To:</strong></div>
+                    <div class="col-md-9">{{ po.shipping_address|linebreaksbr }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Line Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Order Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Item</th>
+                                <th>Description</th>
+                                <th>Qty</th>
+                                <th>Unit Price</th>
+                                <th>Tax %</th>
+                                <th>Discount</th>
+                                <th>Total</th>
+                                <th>Received</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in items %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ line.item.name|default:"-" }}</td>
+                                <td>{{ line.description|default:"-" }}</td>
+                                <td>{{ line.quantity }}</td>
+                                <td>{{ line.unit_price }}</td>
+                                <td>{{ line.tax_rate }}%</td>
+                                <td>{{ line.discount }}</td>
+                                <td><strong>{{ line.total_price }}</strong></td>
+                                <td>{{ line.received_quantity }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="9" class="text-center py-3 text-muted">No items.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="7" class="text-end"><strong>Subtotal:</strong></td>
+                                <td colspan="2"><strong>{{ po.subtotal }}</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="text-end">Tax:</td>
+                                <td colspan="2">{{ po.tax_amount }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="text-end">Discount:</td>
+                                <td colspan="2">-{{ po.discount_amount }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="text-end"><strong>Total:</strong></td>
+                                <td colspan="2"><strong>{{ po.total_amount }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRNs -->
+        {% if grns %}
+        <div class="card table-card">
+            <div class="card-header"><h5>Goods Receipts</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr><th>GRN Number</th><th>Date</th><th>Status</th><th>Received By</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for grn in grns %}
+                            <tr>
+                                <td><a href="{% url 'procurement:grn_detail' grn.pk %}">{{ grn.grn_number }}</a></td>
+                                <td>{{ grn.received_date|date:"M d, Y" }}</td>
+                                <td><span class="badge bg-soft-primary text-primary">{{ grn.get_status_display }}</span></td>
+                                <td>{{ grn.received_by.get_full_name|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Shipment Updates -->
+        {% if shipment_updates %}
+        <div class="card table-card">
+            <div class="card-header"><h5>Shipment Updates</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr><th>Status</th><th>Tracking</th><th>Carrier</th><th>ETA</th><th>Date</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for su in shipment_updates %}
+                            <tr>
+                                <td><span class="badge bg-soft-info text-info">{{ su.get_status_display }}</span></td>
+                                <td>{{ su.tracking_number|default:"-" }}</td>
+                                <td>{{ su.carrier|default:"-" }}</td>
+                                <td>{{ su.estimated_arrival|date:"M d, Y"|default:"-" }}</td>
+                                <td>{{ su.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if po.status == 'draft' %}
+                    <a href="{% url 'procurement:po_edit' po.pk %}" class="btn btn-soft-warning w-100 mb-2">
+                        <i class="ri-pencil-line me-1"></i> Edit
+                    </a>
+                    <form method="POST" action="{% url 'procurement:po_submit' po.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2">
+                            <i class="ri-send-plane-line me-1"></i> Submit for Approval
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if po.status == 'pending_approval' %}
+                    <form method="POST" action="{% url 'procurement:po_approve' po.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" name="action" value="approve" class="btn btn-success w-100 mb-2">
+                            <i class="ri-check-line me-1"></i> Approve
+                        </button>
+                        <button type="submit" name="action" value="reject" class="btn btn-danger w-100 mb-2">
+                            <i class="ri-close-line me-1"></i> Reject
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if po.status == 'approved' or po.status == 'sent' or po.status == 'acknowledged' or po.status == 'partially_received' %}
+                    <a href="{% url 'procurement:grn_create' %}" class="btn btn-soft-success w-100 mb-2">
+                        <i class="ri-inbox-archive-line me-1"></i> Create GRN
+                    </a>
+                {% endif %}
+
+                {% if po.status != 'received' and po.status != 'cancelled' %}
+                    <form method="POST" action="{% url 'procurement:po_cancel' po.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-soft-danger w-100 mb-2" onclick="return confirm('Are you sure you want to cancel this PO?')">
+                            <i class="ri-close-circle-line me-1"></i> Cancel PO
+                        </button>
+                    </form>
+                {% endif %}
+
+                <a href="{% url 'procurement:po_list' %}" class="btn btn-light w-100">
+                    <i class="ri-arrow-left-line me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+
+        {% if po.notes %}
+        <div class="card">
+            <div class="card-header"><h5>Notes</h5></div>
+            <div class="card-body">{{ po.notes|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
