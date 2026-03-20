@@ -85,6 +85,8 @@ class Command(BaseCommand):
             Vendor.objects.all().delete()
             self.stdout.write(self.style.SUCCESS('All procurement data flushed.'))
 
+        tenant_admins = []
+
         for tenant in tenants:
             self.stdout.write(f'\nSeeding procurement data for: {tenant.name}')
             users = list(User.objects.filter(tenant=tenant, is_active=True))
@@ -92,6 +94,20 @@ class Command(BaseCommand):
             if not users:
                 self.stdout.write(self.style.WARNING(f'  No users found, skipping.'))
                 continue
+
+            # Check if procurement data already exists for this tenant
+            if PurchaseRequisition.objects.filter(tenant=tenant).exists():
+                self.stdout.write(self.style.WARNING(
+                    f'  Procurement data already exists. Use --flush to re-seed.'
+                ))
+                continue
+
+            # Find tenant admin for login info
+            admin_user = User.objects.filter(
+                tenant=tenant, is_tenant_admin=True
+            ).first()
+            if admin_user:
+                tenant_admins.append(admin_user.username)
 
             categories = self._create_categories(tenant)
             items = self._create_items(tenant, categories)
@@ -109,6 +125,15 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('=' * 50))
         self.stdout.write(self.style.SUCCESS('Procurement seeding complete!'))
         self.stdout.write(self.style.SUCCESS('=' * 50))
+        self.stdout.write('')
+        self.stdout.write('To see procurement data, log in as a tenant admin:')
+        for username in tenant_admins:
+            self.stdout.write(f'  Username: {username} / Password: password123')
+        self.stdout.write('')
+        self.stdout.write(self.style.WARNING(
+            'NOTE: The superuser "admin" has no tenant, so procurement data '
+            'will NOT appear when logged in as admin.'
+        ))
 
     def _create_categories(self, tenant):
         category_data = [
@@ -126,7 +151,7 @@ class Command(BaseCommand):
 
         categories = []
         for name, slug, desc in category_data:
-            cat, created = ItemCategory.objects.get_or_create(
+            cat, _ = ItemCategory.objects.get_or_create(
                 tenant=tenant,
                 slug=slug,
                 defaults={'name': name, 'description': desc, 'is_active': True},
@@ -191,7 +216,7 @@ class Command(BaseCommand):
 
         items = []
         for name, code, cat_idx, uom, price in items_data:
-            item, created = Item.objects.get_or_create(
+            item, _ = Item.objects.get_or_create(
                 tenant=tenant,
                 code=code,
                 defaults={
@@ -226,7 +251,7 @@ class Command(BaseCommand):
 
         vendors = []
         for name, code, terms in vendor_data:
-            vendor, created = Vendor.objects.get_or_create(
+            vendor, _ = Vendor.objects.get_or_create(
                 tenant=tenant,
                 code=code,
                 defaults={
@@ -251,17 +276,19 @@ class Command(BaseCommand):
     def _create_vendor_contacts(self, tenant, vendors):
         count = 0
         for vendor in vendors:
+            # Skip if contacts already exist
+            if VendorContact.objects.filter(tenant=tenant, vendor=vendor).exists():
+                count += VendorContact.objects.filter(tenant=tenant, vendor=vendor).count()
+                continue
             for i in range(random.randint(1, 3)):
-                VendorContact.objects.get_or_create(
+                VendorContact.objects.create(
                     tenant=tenant,
                     vendor=vendor,
+                    name=fake.name(),
                     email=fake.email(),
-                    defaults={
-                        'name': fake.name(),
-                        'phone': fake.phone_number()[:20],
-                        'is_primary': i == 0,
-                        'is_active': True,
-                    },
+                    phone=fake.phone_number()[:20],
+                    is_primary=i == 0,
+                    is_active=True,
                 )
                 count += 1
         self.stdout.write(f'  Created {count} vendor contacts')
@@ -273,11 +300,21 @@ class Command(BaseCommand):
 
         requisitions = []
         for i in range(15):
+            pr_number = f'PR-{i + 1:05d}'
+
+            # Skip if already exists
+            existing = PurchaseRequisition.objects.filter(
+                tenant=tenant, requisition_number=pr_number
+            ).first()
+            if existing:
+                requisitions.append(existing)
+                continue
+
             status = random.choice(statuses)
             requester = random.choice(users)
             pr = PurchaseRequisition(
                 tenant=tenant,
-                requisition_number=f'PR-{i + 1:05d}',
+                requisition_number=pr_number,
                 title=fake.sentence(nb_words=5),
                 description=fake.paragraph(nb_sentences=2),
                 requested_by=requester,
@@ -287,7 +324,7 @@ class Command(BaseCommand):
                 required_date=timezone.now().date() + timedelta(days=random.randint(7, 60)),
                 notes=fake.sentence() if random.random() > 0.5 else '',
             )
-            if status in ('approved',):
+            if status == 'approved':
                 pr.approved_by = random.choice(users)
                 pr.approved_at = timezone.now() - timedelta(days=random.randint(1, 10))
             pr.save()
@@ -315,12 +352,19 @@ class Command(BaseCommand):
 
         rfqs = []
         for i in range(8):
+            rfq_number = f'RFQ-{i + 1:05d}'
+
+            existing = RFQ.objects.filter(tenant=tenant, rfq_number=rfq_number).first()
+            if existing:
+                rfqs.append(existing)
+                continue
+
             status = random.choice(statuses)
             linked_pr = random.choice(approved_prs) if approved_prs and random.random() > 0.3 else None
 
             rfq = RFQ(
                 tenant=tenant,
-                rfq_number=f'RFQ-{i + 1:05d}',
+                rfq_number=rfq_number,
                 title=fake.sentence(nb_words=5),
                 description=fake.paragraph(nb_sentences=2),
                 requisition=linked_pr,
@@ -388,6 +432,13 @@ class Command(BaseCommand):
 
         purchase_orders = []
         for i in range(12):
+            po_number = f'PO-{i + 1:05d}'
+
+            existing = PurchaseOrder.objects.filter(tenant=tenant, po_number=po_number).first()
+            if existing:
+                purchase_orders.append(existing)
+                continue
+
             vendor = random.choice(vendors)
             status = random.choice(statuses)
             linked_rfq = random.choice(rfqs) if rfqs and random.random() > 0.5 else None
@@ -395,7 +446,7 @@ class Command(BaseCommand):
 
             po = PurchaseOrder(
                 tenant=tenant,
-                po_number=f'PO-{i + 1:05d}',
+                po_number=po_number,
                 vendor=vendor,
                 rfq=linked_rfq,
                 requisition=linked_pr,
@@ -422,9 +473,9 @@ class Command(BaseCommand):
                 discount = Decimal(str(random.choice([0, 0, 0, 5, 10])))
                 received_qty = Decimal('0')
 
-                if status in ('partially_received',):
-                    received_qty = qty * Decimal(str(random.uniform(0.3, 0.8))).quantize(Decimal('0.01'))
-                elif status in ('received',):
+                if status == 'partially_received':
+                    received_qty = (qty * Decimal(str(random.uniform(0.3, 0.8)))).quantize(Decimal('0.01'))
+                elif status == 'received':
                     received_qty = qty
 
                 po_item = PurchaseOrderItem.objects.create(
@@ -460,9 +511,16 @@ class Command(BaseCommand):
 
         grns = []
         for i, po in enumerate(eligible_pos[:8]):
+            grn_number = f'GRN-{i + 1:05d}'
+
+            existing = GoodsReceiptNote.objects.filter(tenant=tenant, grn_number=grn_number).first()
+            if existing:
+                grns.append(existing)
+                continue
+
             grn = GoodsReceiptNote(
                 tenant=tenant,
-                grn_number=f'GRN-{i + 1:05d}',
+                grn_number=grn_number,
                 purchase_order=po,
                 received_by=random.choice(users),
                 received_date=timezone.now().date() - timedelta(days=random.randint(0, 20)),
@@ -507,9 +565,16 @@ class Command(BaseCommand):
                     matching_grn = grn
                     break
 
+            inv_number = f'INV-{i + 1:04d}'
+
+            existing = VendorInvoice.objects.filter(tenant=tenant, invoice_number=inv_number).first()
+            if existing:
+                invoices.append(existing)
+                continue
+
             invoice = VendorInvoice(
                 tenant=tenant,
-                invoice_number=f'INV-{fake.bothify("####")}-{i + 1}',
+                invoice_number=inv_number,
                 vendor=po.vendor,
                 purchase_order=po,
                 grn=matching_grn,
@@ -543,6 +608,11 @@ class Command(BaseCommand):
         count = 0
         for invoice in invoices:
             if invoice.purchase_order and invoice.grn:
+                # Skip if match already exists
+                if ThreeWayMatch.objects.filter(tenant=tenant, invoice=invoice).exists():
+                    count += 1
+                    continue
+
                 po = invoice.purchase_order
                 grn = invoice.grn
 
@@ -582,7 +652,11 @@ class Command(BaseCommand):
 
         count = 0
         for po in eligible_pos:
-            # Get a vendor contact for this vendor
+            # Skip if updates already exist
+            if ShipmentUpdate.objects.filter(purchase_order=po).exists():
+                count += ShipmentUpdate.objects.filter(purchase_order=po).count()
+                continue
+
             contact = VendorContact.objects.filter(tenant=tenant, vendor=po.vendor).first()
 
             statuses_sequence = ['preparing', 'shipped', 'in_transit', 'delivered']
