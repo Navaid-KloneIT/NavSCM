@@ -74,6 +74,8 @@ def subscription_plans_view(request):
             subscription = request.user.tenant.subscription
         except Subscription.DoesNotExist:
             pass
+    elif request.user.is_superuser:
+        subscription = Subscription.objects.select_related('tenant').first()
 
     return render(request, 'core/subscription_plans.html', {
         'subscription': subscription,
@@ -82,7 +84,35 @@ def subscription_plans_view(request):
 
 @login_required
 def subscription_billing_view(request):
-    return render(request, 'core/subscription_billing.html')
+    subscription = None
+    if request.user.tenant:
+        try:
+            subscription = request.user.tenant.subscription
+        except Subscription.DoesNotExist:
+            pass
+    elif request.user.is_superuser:
+        subscription = Subscription.objects.select_related('tenant').first()
+
+    # Build sample billing history from subscription data
+    invoices = []
+    if subscription:
+        from datetime import timedelta
+        price_map = {'free': 0, 'starter': 29, 'professional': 79, 'enterprise': 199}
+        amount = price_map.get(subscription.plan, 0)
+        start = subscription.start_date
+        for i in range(6):
+            invoices.append({
+                'number': f'INV-{start.year}{start.month:02d}-{1000 + i}',
+                'date': start - timedelta(days=30 * i),
+                'amount': f'${amount}.00',
+                'status': 'paid' if i > 0 else 'current',
+                'plan': subscription.get_plan_display(),
+            })
+
+    return render(request, 'core/subscription_billing.html', {
+        'subscription': subscription,
+        'invoices': invoices,
+    })
 
 
 @login_required
