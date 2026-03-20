@@ -12,6 +12,20 @@ def tenant_list_view(request):
     else:
         tenants = Tenant.objects.filter(id=request.user.tenant_id)
 
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        tenants = tenants.filter(
+            Q(name__icontains=search_query)
+            | Q(slug__icontains=search_query)
+            | Q(domain__icontains=search_query)
+        )
+
+    status_filter = request.GET.get('status', '').strip()
+    if status_filter == 'active':
+        tenants = tenants.filter(is_active=True)
+    elif status_filter == 'inactive':
+        tenants = tenants.filter(is_active=False)
+
     return render(request, 'core/tenant_list.html', {
         'tenants': tenants,
     })
@@ -60,6 +74,10 @@ def audit_log_view(request):
             | Q(user__first_name__icontains=search_query)
             | Q(user__last_name__icontains=search_query)
         )
+
+    action_filter = request.GET.get('action', '').strip()
+    if action_filter:
+        logs = logs.filter(action=action_filter)
 
     return render(request, 'core/audit_logs.html', {
         'logs': logs,
