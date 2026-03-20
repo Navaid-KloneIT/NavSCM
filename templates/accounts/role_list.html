@@ -14,6 +14,53 @@
     </nav>
 </div>
 
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'accounts:role_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by role name or description...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" name="type">
+                                <option value="">All Types</option>
+                                <option value="system" {% if request.GET.type == 'system' %}selected{% endif %}>System</option>
+                                <option value="custom" {% if request.GET.type == 'custom' %}selected{% endif %}>Custom</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                                <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'accounts:role_list' %}" class="btn btn-soft-secondary w-100">
+                                <i class="ri-refresh-line me-1"></i> Reset
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Roles Table -->
 <div class="row">
     <div class="col-12">
@@ -52,9 +99,9 @@
                                 </td>
                                 <td>
                                     {% if role.is_system_role %}
-                                        <span class="badge bg-soft-warning text-warning">Yes</span>
+                                        <span class="badge bg-soft-warning text-warning">System</span>
                                     {% else %}
-                                        <span class="badge bg-soft-secondary text-secondary">No</span>
+                                        <span class="badge bg-soft-secondary text-secondary">Custom</span>
                                     {% endif %}
                                 </td>
                                 <td>
@@ -84,7 +131,13 @@
                                     <div class="text-muted">
                                         <i class="ri-shield-user-line" style="font-size: 48px; opacity: 0.3;"></i>
                                         <p class="mt-2 mb-1">No roles found</p>
-                                        <p class="mb-0" style="font-size: 13px;">Roles will appear here once they are created.</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.type or request.GET.status %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Roles will appear here once they are created.
+                                            {% endif %}
+                                        </p>
                                     </div>
                                 </td>
                             </tr>
