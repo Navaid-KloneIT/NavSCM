@@ -217,6 +217,25 @@ def role_list_view(request):
     tenant = request.tenant
     roles = Role.objects.filter(tenant=tenant)
 
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        roles = roles.filter(
+            Q(name__icontains=search_query)
+            | Q(description__icontains=search_query)
+        )
+
+    status_filter = request.GET.get('status', '').strip()
+    if status_filter == 'active':
+        roles = roles.filter(is_active=True)
+    elif status_filter == 'inactive':
+        roles = roles.filter(is_active=False)
+
+    type_filter = request.GET.get('type', '').strip()
+    if type_filter == 'system':
+        roles = roles.filter(is_system_role=True)
+    elif type_filter == 'custom':
+        roles = roles.filter(is_system_role=False)
+
     return render(request, 'accounts/role_list.html', {
         'roles': roles,
     })
@@ -225,8 +244,35 @@ def role_list_view(request):
 @login_required
 def permission_list_view(request):
     tenant = request.tenant
-    roles = Role.objects.filter(tenant=tenant).prefetch_related('users')
+    roles = list(Role.objects.filter(tenant=tenant, is_active=True))
+
+    # Collect all unique permissions across all roles
+    all_permissions = set()
+    for role in roles:
+        if role.permissions:
+            all_permissions.update(role.permissions)
+    all_permissions = sorted(all_permissions)
+
+    # Build matrix: each row has name, codename, and a list of booleans
+    # matching the order of `roles`
+    permission_matrix = []
+    for perm in all_permissions:
+        row = {
+            'name': perm.replace('_', ' ').title(),
+            'codename': perm,
+            'checks': [perm in (role.permissions or []) for role in roles],
+        }
+        permission_matrix.append(row)
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        permission_matrix = [
+            p for p in permission_matrix
+            if search_query.lower() in p['name'].lower()
+            or search_query.lower() in p['codename'].lower()
+        ]
 
     return render(request, 'accounts/permission_list.html', {
         'roles': roles,
+        'permission_matrix': permission_matrix,
     })
