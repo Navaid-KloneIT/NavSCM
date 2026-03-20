@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}{{ rfq.rfq_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ rfq.rfq_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'procurement:rfq_list' %}">RFQs</a></li>
+            <li class="breadcrumb-item active">{{ rfq.rfq_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- RFQ Info -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>{{ rfq.title }}</h5>
+                {% if rfq.status == 'closed' or rfq.status == 'evaluated' %}
+                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> {{ rfq.get_status_display }}</span>
+                {% elif rfq.status == 'sent' or rfq.status == 'received' %}
+                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> {{ rfq.get_status_display }}</span>
+                {% elif rfq.status == 'cancelled' %}
+                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                {% else %}
+                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Created By:</strong></div>
+                    <div class="col-md-3">{{ rfq.created_by.get_full_name|default:"-" }}</div>
+                    <div class="col-md-3"><strong>Deadline:</strong></div>
+                    <div class="col-md-3">{{ rfq.submission_deadline|date:"M d, Y"|default:"-" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Linked PR:</strong></div>
+                    <div class="col-md-3">
+                        {% if rfq.requisition %}
+                            <a href="{% url 'procurement:requisition_detail' rfq.requisition.pk %}">{{ rfq.requisition.requisition_number }}</a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3"><strong>Created:</strong></div>
+                    <div class="col-md-3">{{ rfq.created_at|date:"M d, Y H:i" }}</div>
+                </div>
+                {% if rfq.description %}
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Description:</strong></div>
+                    <div class="col-md-9">{{ rfq.description }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- RFQ Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>RFQ Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Item</th>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th>UoM</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in items %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ line.item.name|default:"-" }}</td>
+                                <td>{{ line.description|default:"-" }}</td>
+                                <td>{{ line.quantity }}</td>
+                                <td>{{ line.get_unit_of_measure_display }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center py-3 text-muted">No items.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invited Vendors -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Invited Vendors</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Vendor</th>
+                                <th>Status</th>
+                                <th>Invited</th>
+                                <th>Responded</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rv in rfq_vendors %}
+                            <tr>
+                                <td><a href="{% url 'procurement:vendor_detail' rv.vendor.pk %}">{{ rv.vendor.name }}</a></td>
+                                <td>
+                                    {% if rv.status == 'quoted' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Quoted</span>
+                                    {% elif rv.status == 'declined' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Declined</span>
+                                    {% elif rv.status == 'no_response' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> No Response</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Invited</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ rv.invited_at|date:"M d, Y" }}</td>
+                                <td>{{ rv.responded_at|date:"M d, Y"|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-3 text-muted">No vendors invited.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quote Comparison -->
+        {% if quote_matrix %}
+        <div class="card table-card">
+            <div class="card-header"><h5>Quote Comparison</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                {% for rv in rfq_vendors %}
+                                <th>{{ rv.vendor.name }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in quote_matrix %}
+                            <tr>
+                                <td>{{ row.item.item.name|default:row.item.description }}</td>
+                                <td>{{ row.item.quantity }}</td>
+                                {% for quote in row.quotes %}
+                                <td>
+                                    {% if quote %}
+                                        <strong>{{ quote.unit_price }}</strong>
+                                        <br><small class="text-muted">{{ quote.lead_time_days }} days</small>
+                                        {% if quote.is_selected %}<br><span class="badge bg-success">Selected</span>{% endif %}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if rfq.status == 'draft' %}
+                    <a href="{% url 'procurement:rfq_edit' rfq.pk %}" class="btn btn-soft-warning w-100 mb-2">
+                        <i class="ri-pencil-line me-1"></i> Edit
+                    </a>
+                {% endif %}
+                {% if rfq.status == 'evaluated' or rfq.status == 'closed' %}
+                    <a href="{% url 'procurement:po_create' %}" class="btn btn-soft-success w-100 mb-2">
+                        <i class="ri-shopping-cart-line me-1"></i> Create PO
+                    </a>
+                {% endif %}
+                <a href="{% url 'procurement:rfq_list' %}" class="btn btn-light w-100">
+                    <i class="ri-arrow-left-line me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
