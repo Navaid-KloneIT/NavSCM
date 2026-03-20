@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice Reconciliation{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Invoice Reconciliation</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'procurement:reconciliation' %}">Procurement</a></li>
+            <li class="breadcrumb-item active">Reconciliation</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ stats.total }}</h3>
+                <p class="text-muted mb-0">Total Matches</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="text-success">{{ stats.full_match }}</h3>
+                <p class="text-muted mb-0">Full Matches</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="text-warning">{{ stats.partial_match }}</h3>
+                <p class="text-muted mb-0">Partial Matches</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="text-danger">{{ stats.mismatch }}</h3>
+                <p class="text-muted mb-0">Mismatches</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'procurement:reconciliation' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by invoice, PO, or GRN number...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'procurement:reconciliation_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Match</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Matches Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header"><h5>Three-Way Matches</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Invoice</th>
+                                <th>Purchase Order</th>
+                                <th>GRN</th>
+                                <th>Qty Match</th>
+                                <th>Price Match</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in matches %}
+                            <tr>
+                                <td><a href="{% url 'procurement:invoice_detail' m.invoice.pk %}">{{ m.invoice.invoice_number }}</a></td>
+                                <td><a href="{% url 'procurement:po_detail' m.purchase_order.pk %}">{{ m.purchase_order.po_number }}</a></td>
+                                <td><a href="{% url 'procurement:grn_detail' m.grn.pk %}">{{ m.grn.grn_number }}</a></td>
+                                <td>{% if m.quantity_match %}<i class="ri-check-line text-success fs-5"></i>{% else %}<i class="ri-close-line text-danger fs-5"></i>{% endif %}</td>
+                                <td>{% if m.price_match %}<i class="ri-check-line text-success fs-5"></i>{% else %}<i class="ri-close-line text-danger fs-5"></i>{% endif %}</td>
+                                <td>
+                                    {% if m.match_status == 'full_match' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Full Match</span>
+                                    {% elif m.match_status == 'partial_match' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Partial</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Mismatch</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ m.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-scales-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No reconciliation records found</p>
+                                        <p class="mb-0" style="font-size: 13px;">Run a three-way match to compare PO, GRN, and Invoice data.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
