@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'procurement:reconciliation' %}">Reconciliation</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><h5>Select Documents for Three-Way Match</h5></div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Vendor Invoice *</label>
+                            <select name="invoice" class="form-select" required>
+                                <option value="">Select Invoice...</option>
+                                {% for inv in invoices %}
+                                <option value="{{ inv.pk }}">{{ inv.invoice_number }} - {{ inv.vendor.name }} ({{ inv.total_amount }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Purchase Order *</label>
+                            <select name="purchase_order" class="form-select" required>
+                                <option value="">Select PO...</option>
+                                {% for po in purchase_orders %}
+                                <option value="{{ po.pk }}">{{ po.po_number }} - {{ po.vendor.name }} ({{ po.total_amount }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Goods Receipt Note *</label>
+                            <select name="grn" class="form-select" required>
+                                <option value="">Select GRN...</option>
+                                {% for grn in grns %}
+                                <option value="{{ grn.pk }}">{{ grn.grn_number }} - PO: {{ grn.purchase_order.po_number }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary w-100 mb-2">
+                            <i class="ri-scales-3-line me-1"></i> Run Three-Way Match
+                        </button>
+                        <a href="{% url 'procurement:reconciliation' %}" class="btn btn-light w-100">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><h5>How Three-Way Matching Works</h5></div>
+            <div class="card-body">
+                <p>Three-way matching compares three documents to ensure accuracy:</p>
+                <ol>
+                    <li><strong>Purchase Order (PO)</strong> - What was ordered and at what price</li>
+                    <li><strong>Goods Receipt Note (GRN)</strong> - What was actually received</li>
+                    <li><strong>Vendor Invoice</strong> - What the vendor is charging</li>
+                </ol>
+                <p class="mb-0">The system checks:</p>
+                <ul class="mb-0">
+                    <li><strong>Quantity Match:</strong> GRN received qty vs PO ordered qty</li>
+                    <li><strong>Price Match:</strong> Invoice total vs PO total</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
