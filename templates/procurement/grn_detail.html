@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{{ grn.grn_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ grn.grn_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'procurement:grn_list' %}">GRNs</a></li>
+            <li class="breadcrumb-item active">{{ grn.grn_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>GRN Details</h5>
+                {% if grn.status == 'confirmed' %}
+                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Confirmed</span>
+                {% elif grn.status == 'partial' %}
+                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Partial</span>
+                {% else %}
+                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Purchase Order:</strong></div>
+                    <div class="col-md-3"><a href="{% url 'procurement:po_detail' grn.purchase_order.pk %}">{{ grn.purchase_order.po_number }}</a></div>
+                    <div class="col-md-3"><strong>Received Date:</strong></div>
+                    <div class="col-md-3">{{ grn.received_date|date:"M d, Y" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Received By:</strong></div>
+                    <div class="col-md-3">{{ grn.received_by.get_full_name|default:"-" }}</div>
+                    <div class="col-md-3"><strong>Created:</strong></div>
+                    <div class="col-md-3">{{ grn.created_at|date:"M d, Y H:i" }}</div>
+                </div>
+                {% if grn.notes %}
+                <div class="row">
+                    <div class="col-md-3"><strong>Notes:</strong></div>
+                    <div class="col-md-9">{{ grn.notes }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card table-card">
+            <div class="card-header"><h5>Received Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Item</th>
+                                <th>Ordered Qty</th>
+                                <th>Received</th>
+                                <th>Accepted</th>
+                                <th>Rejected</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in items %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ line.po_item.item.name|default:line.po_item.description }}</td>
+                                <td>{{ line.po_item.quantity }}</td>
+                                <td>{{ line.received_quantity }}</td>
+                                <td><span class="text-success">{{ line.accepted_quantity }}</span></td>
+                                <td><span class="text-danger">{{ line.rejected_quantity }}</span></td>
+                                <td>{{ line.rejection_reason|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="7" class="text-center py-3 text-muted">No items.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                <a href="{% url 'procurement:grn_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
