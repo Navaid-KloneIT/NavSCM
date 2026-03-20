@@ -20,7 +20,209 @@
     </div>
 </div>
 
-<!-- Billing Info -->
+{% if subscription %}
+<!-- Billing Summary Cards -->
+<div class="row mb-3">
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-sm flex-shrink-0 me-3">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-4">
+                            <i class="ri-vip-crown-line"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-muted mb-1">Current Plan</p>
+                        <h5 class="mb-0">{{ subscription.get_plan_display }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-sm flex-shrink-0 me-3">
+                        <div class="avatar-title bg-success-subtle text-success rounded-circle fs-4">
+                            <i class="ri-checkbox-circle-line"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-muted mb-1">Status</p>
+                        <h5 class="mb-0">{{ subscription.get_status_display }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-sm flex-shrink-0 me-3">
+                        <div class="avatar-title bg-info-subtle text-info rounded-circle fs-4">
+                            <i class="ri-calendar-line"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-muted mb-1">Start Date</p>
+                        <h5 class="mb-0">{{ subscription.start_date|date:"M d, Y" }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-sm flex-shrink-0 me-3">
+                        <div class="avatar-title bg-warning-subtle text-warning rounded-circle fs-4">
+                            <i class="ri-calendar-check-line"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-muted mb-1">End Date</p>
+                        <h5 class="mb-0">{{ subscription.end_date|date:"M d, Y"|default:"N/A" }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Payment Method -->
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-bank-card-line me-2 text-primary"></i>Payment Method
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="avatar-sm flex-shrink-0 me-3">
+                        <div class="avatar-title bg-dark text-white rounded fs-4">
+                            <i class="ri-visa-line"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Visa ending in 4242</h6>
+                        <small class="text-muted">Expires 12/2027</small>
+                    </div>
+                </div>
+                <a href="javascript: void(0);" class="btn btn-sm btn-soft-primary w-100">
+                    <i class="ri-edit-line me-1"></i> Update Payment Method
+                </a>
+            </div>
+        </div>
+
+        <!-- Billing Details -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-file-list-3-line me-2 text-primary"></i>Billing Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <small class="text-muted">Company</small>
+                    <p class="mb-0 fw-medium">{{ subscription.tenant.name }}</p>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Email</small>
+                    <p class="mb-0 fw-medium">billing@{{ subscription.tenant.domain|default:"company.com" }}</p>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Max Users</small>
+                    <p class="mb-0 fw-medium">{{ subscription.max_users }}</p>
+                </div>
+                <div>
+                    <small class="text-muted">Max Storage</small>
+                    <p class="mb-0 fw-medium">{{ subscription.max_storage_gb }} GB</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice History -->
+    <div class="col-xl-8">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-bill-line me-2 text-primary"></i>Invoice History
+                </h5>
+                <span class="text-muted">{{ invoices|length }} invoice{{ invoices|length|pluralize }}</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Invoice</th>
+                                <th>Date</th>
+                                <th>Plan</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invoice in invoices %}
+                            <tr>
+                                <td>
+                                    <span class="fw-medium">{{ invoice.number }}</span>
+                                </td>
+                                <td>{{ invoice.date|date:"M d, Y" }}</td>
+                                <td><span class="badge bg-light text-dark">{{ invoice.plan }}</span></td>
+                                <td class="fw-medium">{{ invoice.amount }}</td>
+                                <td>
+                                    {% if invoice.status == 'paid' %}
+                                        <span class="status-badge badge-soft-success">
+                                            <span class="status-dot bg-success"></span>
+                                            Paid
+                                        </span>
+                                    {% elif invoice.status == 'current' %}
+                                        <span class="status-badge badge-soft-info">
+                                            <span class="status-dot bg-info"></span>
+                                            Current
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-warning">
+                                            <span class="status-dot bg-warning"></span>
+                                            Pending
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="javascript: void(0);" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="Download">
+                                        <i class="ri-download-2-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-bill-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No invoices found</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- No Subscription -->
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -38,4 +240,5 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock %}
