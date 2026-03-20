@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}{{ requisition.requisition_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ requisition.requisition_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'procurement:requisition_list' %}">Requisitions</a></li>
+            <li class="breadcrumb-item active">{{ requisition.requisition_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Requisition Info -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>{{ requisition.title }}</h5>
+                <div>
+                    {% if requisition.status == 'approved' %}
+                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Approved</span>
+                    {% elif requisition.status == 'pending_approval' %}
+                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending Approval</span>
+                    {% elif requisition.status == 'rejected' %}
+                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Rejected</span>
+                    {% elif requisition.status == 'cancelled' %}
+                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                    {% else %}
+                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Requested By:</strong></div>
+                    <div class="col-md-3">{{ requisition.requested_by.get_full_name|default:"-" }}</div>
+                    <div class="col-md-3"><strong>Department:</strong></div>
+                    <div class="col-md-3">{{ requisition.department|default:"-" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Priority:</strong></div>
+                    <div class="col-md-3">
+                        {% if requisition.priority == 'urgent' %}
+                            <span class="badge bg-danger">Urgent</span>
+                        {% elif requisition.priority == 'high' %}
+                            <span class="badge bg-warning text-dark">High</span>
+                        {% elif requisition.priority == 'medium' %}
+                            <span class="badge bg-info">Medium</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Low</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3"><strong>Required Date:</strong></div>
+                    <div class="col-md-3">{{ requisition.required_date|date:"M d, Y"|default:"-" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Created:</strong></div>
+                    <div class="col-md-3">{{ requisition.created_at|date:"M d, Y H:i" }}</div>
+                    {% if requisition.approved_by %}
+                    <div class="col-md-3"><strong>Approved By:</strong></div>
+                    <div class="col-md-3">{{ requisition.approved_by.get_full_name }} on {{ requisition.approved_at|date:"M d, Y H:i" }}</div>
+                    {% endif %}
+                </div>
+                {% if requisition.description %}
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Description:</strong></div>
+                    <div class="col-md-9">{{ requisition.description }}</div>
+                </div>
+                {% endif %}
+                {% if requisition.notes %}
+                <div class="row">
+                    <div class="col-md-3"><strong>Notes:</strong></div>
+                    <div class="col-md-9">{{ requisition.notes }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Line Items -->
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Line Items</h5>
+                <span class="text-muted">Total: {{ requisition.total_amount }}</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Item</th>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th>Est. Unit Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in items %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ line.item.name|default:"-" }}</td>
+                                <td>{{ line.description|default:"-" }}</td>
+                                <td>{{ line.quantity }}</td>
+                                <td>{{ line.estimated_unit_price }}</td>
+                                <td>{{ line.total_price }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-3 text-muted">No line items.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Sidebar -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if requisition.status == 'draft' or requisition.status == 'rejected' %}
+                    <a href="{% url 'procurement:requisition_edit' requisition.pk %}" class="btn btn-soft-warning w-100 mb-2">
+                        <i class="ri-pencil-line me-1"></i> Edit
+                    </a>
+                    <form method="POST" action="{% url 'procurement:requisition_submit' requisition.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2">
+                            <i class="ri-send-plane-line me-1"></i> Submit for Approval
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if requisition.status == 'pending_approval' %}
+                    <form method="POST" action="{% url 'procurement:requisition_approve' requisition.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" name="action" value="approve" class="btn btn-success w-100 mb-2">
+                            <i class="ri-check-line me-1"></i> Approve
+                        </button>
+                        <button type="submit" name="action" value="reject" class="btn btn-danger w-100 mb-2">
+                            <i class="ri-close-line me-1"></i> Reject
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if requisition.status == 'approved' %}
+                    <a href="{% url 'procurement:rfq_create' %}" class="btn btn-soft-primary w-100 mb-2">
+                        <i class="ri-file-copy-line me-1"></i> Create RFQ
+                    </a>
+                    <a href="{% url 'procurement:po_create' %}" class="btn btn-soft-success w-100 mb-2">
+                        <i class="ri-shopping-cart-line me-1"></i> Create PO
+                    </a>
+                {% endif %}
+
+                <a href="{% url 'procurement:requisition_list' %}" class="btn btn-light w-100">
+                    <i class="ri-arrow-left-line me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
