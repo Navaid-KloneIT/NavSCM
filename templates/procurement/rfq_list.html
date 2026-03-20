@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Request for Quotations{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Request for Quotations</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'procurement:rfq_list' %}">Procurement</a></li>
+            <li class="breadcrumb-item active">RFQs</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'procurement:rfq_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by RFQ number or title...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'procurement:rfq_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New RFQ</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RFQs Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>RFQs</h5>
+                <span class="text-muted">{{ rfqs|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>RFQ Number</th>
+                                <th>Title</th>
+                                <th>Linked PR</th>
+                                <th>Vendors</th>
+                                <th>Deadline</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rfq in rfqs %}
+                            <tr>
+                                <td><a href="{% url 'procurement:rfq_detail' rfq.pk %}" class="fw-medium">{{ rfq.rfq_number }}</a></td>
+                                <td>{{ rfq.title|truncatewords:6 }}</td>
+                                <td>
+                                    {% if rfq.requisition %}
+                                        <a href="{% url 'procurement:requisition_detail' rfq.requisition.pk %}">{{ rfq.requisition.requisition_number }}</a>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge bg-soft-primary text-primary">{{ rfq.rfq_vendors.count }}</span></td>
+                                <td>{{ rfq.submission_deadline|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    {% if rfq.status == 'closed' or rfq.status == 'evaluated' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> {{ rfq.get_status_display }}</span>
+                                    {% elif rfq.status == 'sent' or rfq.status == 'received' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> {{ rfq.get_status_display }}</span>
+                                    {% elif rfq.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ rfq.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'procurement:rfq_detail' rfq.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if rfq.status == 'draft' %}
+                                        <a href="{% url 'procurement:rfq_edit' rfq.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-search-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No RFQs found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first RFQ.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
