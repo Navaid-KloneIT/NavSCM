@@ -212,7 +212,6 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 
 | # | Module | Description | Status |
 |---|--------|-------------|--------|
-| 1 | **Procurement Management** | Purchase requisitions, RFQs, POs, vendor portal, invoice reconciliation | Done |
 | 2 | **Supplier Relationship Management (SRM)** | Supplier onboarding, scorecards, contract management, catalog management, risk assessment | Planned |
 | 3 | **Inventory Management** | Stock control, warehouse transfers, stock adjustments, reorder automation, inventory valuation (FIFO/LIFO/WA) | Planned |
 | 4 | **Warehouse Management (WMS)** | Inbound/outbound operations, bin/location management, cycle counting, yard management | Planned |
