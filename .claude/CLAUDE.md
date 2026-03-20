@@ -110,5 +110,91 @@ Run the `/frontend-design` skill for the full pattern reference.
 
 ---
 
+### CRUD Completeness Rules (Preventing Missing Actions)
+
+Every new module MUST include all CRUD operations from the start. Never ship a module with only list/add/view — Edit and Delete are mandatory.
+
+1. **Every model that has a list page MUST have these views:**
+   - `list_view` — with search + filters
+   - `create_view` — add form
+   - `detail_view` — read-only detail page (for models with enough fields)
+   - `edit_view` — edit form (same template as create, pre-filled)
+   - `delete_view` — POST-only with confirmation, redirects to list
+
+2. **Every list template MUST have an Actions column with:**
+   - View button (eye icon) — links to detail page
+   - Edit button (pencil icon) — links to edit form
+   - Delete button (bin icon) — POST form with `onclick="return confirm('...')"` and `{% csrf_token %}`
+   - Conditional display: wrap Edit/Delete in `{% if obj.status == 'draft' %}` when status-dependent
+
+3. **Every detail template MUST have an Actions sidebar with:**
+   - Edit button — links to edit form (conditional on status)
+   - Delete button — POST form with confirm dialog (conditional on status)
+   - Back to List link
+
+4. **Delete view pattern:**
+   ```python
+   @login_required
+   def model_delete_view(request, pk):
+       obj = get_object_or_404(Model, pk=pk, tenant=request.tenant)
+       if request.method == 'POST':
+           obj.delete()
+           messages.success(request, 'Deleted successfully.')
+           return redirect('app:model_list')
+       return redirect('app:model_list')
+   ```
+
+5. **Delete URL pattern:**
+   - Always add: `path('models/<int:pk>/delete/', views.model_delete_view, name='model_delete')`
+
+---
+
+### Seed Command Rules (Preventing Data Issues)
+
+1. **Idempotent by default:**
+   - Seed commands MUST be safe to run multiple times without `--flush`
+   - Use `get_or_create` for models with unique constraints
+   - For models with auto-generated numbers (PR-00001, PO-00001), check existence before creating:
+     ```python
+     existing = Model.objects.filter(tenant=tenant, number=number).first()
+     if existing:
+         results.append(existing)
+         continue
+     ```
+   - Never use bare `.save()` or `.create()` for models with unique_together constraints
+
+2. **Always skip if data exists:**
+   - Check `if Model.objects.filter(tenant=tenant).exists()` at the start
+   - Print a warning: `"Data already exists. Use --flush to re-seed."`
+
+3. **Print login instructions:**
+   - After seeding, always print which tenant admin accounts to use
+   - Always warn: `"Superuser 'admin' has no tenant — data won't appear when logged in as admin"`
+
+4. **`__init__.py` files:**
+   - When creating `management/commands/` directories, ALWAYS create both:
+     - `management/__init__.py`
+     - `management/commands/__init__.py`
+
+---
+
+### Multi-Tenancy Rules (Preventing Data Visibility Issues)
+
+1. **Superuser has no tenant:**
+   - The `admin` superuser has `tenant=None`
+   - All procurement/module views filter by `tenant=request.tenant`
+   - When `request.tenant` is `None`, queries return empty results — this is BY DESIGN
+   - Always instruct users to log in as a **tenant admin** (e.g., `admin_<slug>`) to see module data
+
+2. **Every view MUST filter by tenant:**
+   - `Model.objects.filter(tenant=request.tenant)` — no exceptions
+   - Never use `Model.objects.all()` in tenant-scoped views
+
+3. **Every model MUST have a tenant FK:**
+   - Except User, Role (which have it already) and pure join/through tables
+   - Always include: `tenant = models.ForeignKey('core.Tenant', on_delete=models.CASCADE, related_name='...')`
+
+---
+
 ### Vulnerability
 When you find a security vulnerability, flag it immediately with a WARNING comment and suggest a secure alternative. Never implement insecure patterns even if asked.
