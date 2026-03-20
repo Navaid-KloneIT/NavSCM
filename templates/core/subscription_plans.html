@@ -34,11 +34,11 @@
                 <div class="row">
                     <div class="col-md-2">
                         <p class="text-muted mb-1">Plan</p>
-                        <span class="badge bg-primary-subtle text-primary fs-12">{{ subscription.plan_name }}</span>
+                        <span class="badge bg-primary-subtle text-primary fs-12">{{ subscription.get_plan_display }}</span>
                     </div>
                     <div class="col-md-2">
                         <p class="text-muted mb-1">Status</p>
-                        {% if subscription.is_active %}
+                        {% if subscription.status == 'active' %}
                             <span class="badge bg-success-subtle text-success">Active</span>
                         {% else %}
                             <span class="badge bg-danger-subtle text-danger">Inactive</span>
@@ -50,7 +50,7 @@
                     </div>
                     <div class="col-md-2">
                         <p class="text-muted mb-1">Max Storage</p>
-                        <h6 class="mb-0">{{ subscription.max_storage }}</h6>
+                        <h6 class="mb-0">{{ subscription.max_storage_gb }}</h6>
                     </div>
                     <div class="col-md-2">
                         <p class="text-muted mb-1">Start Date</p>
@@ -71,9 +71,9 @@
 <div class="row">
     <!-- Free Plan -->
     <div class="col-xl-3 col-md-6">
-        <div class="card{% if subscription.plan_name == 'Free' %} border border-primary{% endif %}">
+        <div class="card{% if subscription.get_plan_display == 'Free' %} border border-primary{% endif %}">
             <div class="card-body text-center p-4">
-                {% if subscription.plan_name == 'Free' %}
+                {% if subscription.get_plan_display == 'Free' %}
                 <span class="badge bg-primary position-absolute top-0 end-0 m-3">Current Plan</span>
                 {% endif %}
                 <div class="avatar-md mx-auto mb-3">
@@ -92,7 +92,7 @@
                     <li class="py-1 text-muted"><i class="ri-close-line text-danger me-2"></i>Advanced analytics</li>
                     <li class="py-1 text-muted"><i class="ri-close-line text-danger me-2"></i>Custom integrations</li>
                 </ul>
-                {% if subscription.plan_name == 'Free' %}
+                {% if subscription.get_plan_display == 'Free' %}
                 <button class="btn btn-soft-primary w-100" disabled>Current Plan</button>
                 {% else %}
                 <a href="javascript: void(0);" class="btn btn-soft-primary w-100">Select Plan</a>
@@ -103,9 +103,9 @@
 
     <!-- Starter Plan -->
     <div class="col-xl-3 col-md-6">
-        <div class="card{% if subscription.plan_name == 'Starter' %} border border-primary{% endif %}">
+        <div class="card{% if subscription.get_plan_display == 'Starter' %} border border-primary{% endif %}">
             <div class="card-body text-center p-4">
-                {% if subscription.plan_name == 'Starter' %}
+                {% if subscription.get_plan_display == 'Starter' %}
                 <span class="badge bg-primary position-absolute top-0 end-0 m-3">Current Plan</span>
                 {% endif %}
                 <div class="avatar-md mx-auto mb-3">
@@ -124,7 +124,7 @@
                     <li class="py-1"><i class="ri-check-line text-success me-2"></i>Basic analytics</li>
                     <li class="py-1 text-muted"><i class="ri-close-line text-danger me-2"></i>Custom integrations</li>
                 </ul>
-                {% if subscription.plan_name == 'Starter' %}
+                {% if subscription.get_plan_display == 'Starter' %}
                 <button class="btn btn-soft-primary w-100" disabled>Current Plan</button>
                 {% else %}
                 <a href="javascript: void(0);" class="btn btn-soft-info w-100">Select Plan</a>
@@ -135,9 +135,9 @@
 
     <!-- Professional Plan -->
     <div class="col-xl-3 col-md-6">
-        <div class="card{% if subscription.plan_name == 'Professional' %} border border-primary{% endif %}">
+        <div class="card{% if subscription.get_plan_display == 'Professional' %} border border-primary{% endif %}">
             <div class="card-body text-center p-4">
-                {% if subscription.plan_name == 'Professional' %}
+                {% if subscription.get_plan_display == 'Professional' %}
                 <span class="badge bg-primary position-absolute top-0 end-0 m-3">Current Plan</span>
                 {% endif %}
                 <div class="avatar-md mx-auto mb-3">
@@ -156,7 +156,7 @@
                     <li class="py-1"><i class="ri-check-line text-success me-2"></i>Advanced analytics</li>
                     <li class="py-1"><i class="ri-check-line text-success me-2"></i>Custom integrations</li>
                 </ul>
-                {% if subscription.plan_name == 'Professional' %}
+                {% if subscription.get_plan_display == 'Professional' %}
                 <button class="btn btn-soft-primary w-100" disabled>Current Plan</button>
                 {% else %}
                 <a href="javascript: void(0);" class="btn btn-soft-warning w-100">Select Plan</a>
@@ -167,9 +167,9 @@
 
     <!-- Enterprise Plan -->
     <div class="col-xl-3 col-md-6">
-        <div class="card{% if subscription.plan_name == 'Enterprise' %} border border-primary{% endif %}">
+        <div class="card{% if subscription.get_plan_display == 'Enterprise' %} border border-primary{% endif %}">
             <div class="card-body text-center p-4">
-                {% if subscription.plan_name == 'Enterprise' %}
+                {% if subscription.get_plan_display == 'Enterprise' %}
                 <span class="badge bg-primary position-absolute top-0 end-0 m-3">Current Plan</span>
                 {% endif %}
                 <div class="avatar-md mx-auto mb-3">
@@ -188,7 +188,7 @@
                     <li class="py-1"><i class="ri-check-line text-success me-2"></i>Advanced analytics</li>
                     <li class="py-1"><i class="ri-check-line text-success me-2"></i>Custom integrations</li>
                 </ul>
-                {% if subscription.plan_name == 'Enterprise' %}
+                {% if subscription.get_plan_display == 'Enterprise' %}
                 <button class="btn btn-soft-primary w-100" disabled>Current Plan</button>
                 {% else %}
                 <a href="javascript: void(0);" class="btn btn-primary w-100">Contact Sales</a>
