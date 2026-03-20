@@ -1,20 +1,45 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block title %}Permissions{% endblock %}
 
 {% block content %}
-<!-- Page Title -->
-<div class="row">
+<div class="page-title-box">
+    <h4>Permissions</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHCM</a></li>
+            <li class="breadcrumb-item">User Management</li>
+            <li class="breadcrumb-item active">Permissions</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search -->
+<div class="row mb-4">
     <div class="col-12">
-        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-            <h4 class="mb-sm-0">Permissions</h4>
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">User Management</a></li>
-                    <li class="breadcrumb-item active">Permissions</li>
-                </ol>
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'accounts:permission_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label">Search Permissions</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by permission name...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'accounts:permission_list' %}" class="btn btn-soft-secondary w-100">
+                                <i class="ri-refresh-line me-1"></i> Reset
+                            </a>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -23,36 +48,33 @@
 <!-- Permissions Matrix -->
 <div class="row">
     <div class="col-12">
-        <div class="card">
+        <div class="card table-card">
             <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="ri-lock-line me-2 text-primary"></i>Role-Permission Matrix
-                </h5>
+                <h5><i class="ri-lock-line me-1 text-primary"></i> Role-Permission Matrix</h5>
+                <span class="text-muted">{{ permission_matrix|length }} permission{{ permission_matrix|length|pluralize }}</span>
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 {% if roles %}
                 <div class="table-responsive">
-                    <table class="table table-hover table-bordered align-middle mb-0">
-                        <thead class="table-light">
+                    <table class="table mb-0">
+                        <thead>
                             <tr>
-                                <th scope="col" class="bg-light" style="min-width: 200px;">Permission</th>
+                                <th style="min-width: 220px;">Permission</th>
                                 {% for role in roles %}
-                                <th scope="col" class="text-center">{{ role.name }}</th>
+                                <th class="text-center">{{ role.name }}</th>
                                 {% endfor %}
                             </tr>
                         </thead>
                         <tbody>
-                            {% for perm in permissions %}
+                            {% for perm in permission_matrix %}
                             <tr>
                                 <td>
                                     <span class="fw-medium">{{ perm.name }}</span>
-                                    {% if perm.codename %}
-                                    <br><small class="text-muted">{{ perm.codename }}</small>
-                                    {% endif %}
+                                    <div class="text-muted" style="font-size: 11px;">{{ perm.codename }}</div>
                                 </td>
-                                {% for role in roles %}
+                                {% for has_perm in perm.checks %}
                                 <td class="text-center">
-                                    {% if perm in role.permissions.all %}
+                                    {% if has_perm %}
                                         <i class="ri-check-line text-success fs-5"></i>
                                     {% else %}
                                         <span class="text-muted">&mdash;</span>
@@ -62,8 +84,18 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="{{ roles|length|add:1 }}" class="text-center py-4 text-muted">
-                                    No permissions defined.
+                                <td colspan="{{ roles|length|add:1 }}" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-lock-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No permissions found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q %}
+                                                Try adjusting your search criteria.
+                                            {% else %}
+                                                Permissions will appear here once roles have permissions assigned.
+                                            {% endif %}
+                                        </p>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -72,13 +104,11 @@
                 </div>
                 {% else %}
                 <div class="text-center py-5">
-                    <div class="avatar-md mx-auto mb-3">
-                        <div class="avatar-title bg-light text-secondary rounded-circle fs-1">
-                            <i class="ri-lock-line"></i>
-                        </div>
+                    <div class="text-muted">
+                        <i class="ri-shield-user-line" style="font-size: 48px; opacity: 0.3;"></i>
+                        <p class="mt-2 mb-1">No roles found</p>
+                        <p class="mb-0" style="font-size: 13px;">Create roles first to view the permission matrix.</p>
                     </div>
-                    <h5 class="text-muted mb-1">No roles found</h5>
-                    <p class="text-muted mb-0">Create roles first to view the permission matrix.</p>
                 </div>
                 {% endif %}
             </div>
