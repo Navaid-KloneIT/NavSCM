@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tenant.name }}{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Tenant Details</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="/">NavHCM</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'core:tenant_list' %}">Tenants</a></li>
+                    <li class="breadcrumb-item active">{{ tenant.name }}</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tenant Info Card -->
+<div class="row">
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="avatar avatar-xl mx-auto mb-3" style="background-color: {{ tenant.primary_color }}; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #fff;">
+                    {{ tenant.name|first|upper }}
+                </div>
+                <h5 class="mb-1">{{ tenant.name }}</h5>
+                <p class="text-muted mb-2">
+                    <span class="badge bg-light text-dark">{{ tenant.slug }}</span>
+                </p>
+                {% if tenant.is_active %}
+                    <span class="status-badge badge-soft-success">
+                        <span class="status-dot bg-success"></span>
+                        Active
+                    </span>
+                {% else %}
+                    <span class="status-badge badge-soft-danger">
+                        <span class="status-dot bg-danger"></span>
+                        Inactive
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted"><i class="ri-team-line me-2"></i>Users</span>
+                    <span class="fw-medium">{{ user_count }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted"><i class="ri-shield-user-line me-2"></i>Roles</span>
+                    <span class="fw-medium">{{ role_count }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted"><i class="ri-vip-crown-line me-2"></i>Plan</span>
+                    <span class="fw-medium">
+                        {% if subscription %}
+                            {{ subscription.get_plan_display }}
+                        {% else %}
+                            No Plan
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-8">
+        <!-- Details Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-information-line me-2 text-primary"></i>Tenant Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <th style="width: 200px;" class="text-muted">Name</th>
+                                <td>{{ tenant.name }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Slug</th>
+                                <td><span class="badge bg-light text-dark">{{ tenant.slug }}</span></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Domain</th>
+                                <td>{{ tenant.domain|default:"-" }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Primary Color</th>
+                                <td>
+                                    <span class="d-inline-block rounded-circle me-1" style="width: 14px; height: 14px; background-color: {{ tenant.primary_color }};"></span>
+                                    {{ tenant.primary_color }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Status</th>
+                                <td>
+                                    {% if tenant.is_active %}
+                                        <span class="status-badge badge-soft-success">
+                                            <span class="status-dot bg-success"></span>
+                                            Active
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-danger">
+                                            <span class="status-dot bg-danger"></span>
+                                            Inactive
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Created</th>
+                                <td>{{ tenant.created_at|date:"M d, Y h:i A" }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Last Updated</th>
+                                <td>{{ tenant.updated_at|date:"M d, Y h:i A" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {% if subscription %}
+        <!-- Subscription Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-vip-crown-line me-2 text-primary"></i>Subscription
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <th style="width: 200px;" class="text-muted">Plan</th>
+                                <td>{{ subscription.get_plan_display }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Status</th>
+                                <td>
+                                    {% if subscription.status == 'active' %}
+                                        <span class="status-badge badge-soft-success">
+                                            <span class="status-dot bg-success"></span>
+                                            {{ subscription.get_status_display }}
+                                        </span>
+                                    {% elif subscription.status == 'trial' %}
+                                        <span class="status-badge badge-soft-info">
+                                            <span class="status-dot bg-info"></span>
+                                            {{ subscription.get_status_display }}
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-danger">
+                                            <span class="status-dot bg-danger"></span>
+                                            {{ subscription.get_status_display }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Max Users</th>
+                                <td>{{ subscription.max_users }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Max Storage</th>
+                                <td>{{ subscription.max_storage_gb }} GB</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Start Date</th>
+                                <td>{{ subscription.start_date|date:"M d, Y" }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">End Date</th>
+                                <td>{{ subscription.end_date|date:"M d, Y"|default:"-" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-history-line me-2 text-primary"></i>Recent Activity
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Model</th>
+                                <th>User</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in recent_logs %}
+                            <tr>
+                                <td>
+                                    {% if log.action == 'create' %}
+                                        <span class="badge badge-soft-success">{{ log.action }}</span>
+                                    {% elif log.action == 'update' %}
+                                        <span class="badge badge-soft-info">{{ log.action }}</span>
+                                    {% elif log.action == 'delete' %}
+                                        <span class="badge badge-soft-danger">{{ log.action }}</span>
+                                    {% else %}
+                                        <span class="badge badge-soft-secondary">{{ log.action }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ log.model_name }}</td>
+                                <td>{{ log.user|default:"-" }}</td>
+                                <td>{{ log.timestamp|date:"M d, Y h:i A" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4">
+                                    <span class="text-muted">No recent activity</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Back Button -->
+<div class="row">
+    <div class="col-12">
+        <a href="{% url 'core:tenant_list' %}" class="btn btn-soft-secondary">
+            <i class="ri-arrow-left-line me-1"></i> Back to Tenants
+        </a>
+    </div>
+</div>
+{% endblock %}
