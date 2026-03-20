@@ -104,7 +104,7 @@
                                 <td>{{ tenant.created_at|date:"M d, Y" }}</td>
                                 <td>
                                     <div class="d-flex gap-1">
-                                        <a href="{% url 'core:tenant_list' %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="View">
+                                        <a href="{% url 'core:tenant_detail' tenant.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="View">
                                             <i class="ri-eye-line"></i>
                                         </a>
                                     </div>
