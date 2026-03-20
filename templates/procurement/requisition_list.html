@@ -120,6 +120,12 @@
                                         {% if pr.status == 'draft' or pr.status == 'rejected' %}
                                         <a href="{% url 'procurement:requisition_edit' pr.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit"><i class="ri-pencil-line"></i></a>
                                         {% endif %}
+                                        {% if pr.status == 'draft' or pr.status == 'cancelled' %}
+                                        <form method="POST" action="{% url 'procurement:requisition_delete' pr.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this requisition?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
