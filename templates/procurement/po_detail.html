@@ -229,6 +229,15 @@
                     </form>
                 {% endif %}
 
+                {% if po.status == 'draft' or po.status == 'cancelled' %}
+                    <form method="POST" action="{% url 'procurement:po_delete' po.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-soft-danger w-100 mb-2" onclick="return confirm('Are you sure you want to delete this PO?')">
+                            <i class="ri-delete-bin-line me-1"></i> Delete PO
+                        </button>
+                    </form>
+                {% endif %}
+
                 <a href="{% url 'procurement:po_list' %}" class="btn btn-light w-100">
                     <i class="ri-arrow-left-line me-1"></i> Back to List
                 </a>
