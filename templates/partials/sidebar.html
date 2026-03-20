@@ -114,6 +114,155 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Procurement <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Vendors -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'vendor_list' or request.resolver_match.url_name == 'vendor_create' or request.resolver_match.url_name == 'vendor_detail' or request.resolver_match.url_name == 'vendor_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-store-2-line"></i>
+                    <span class="menu-text">Vendors</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'vendor_list' or request.resolver_match.url_name == 'vendor_create' or request.resolver_match.url_name == 'vendor_detail' or request.resolver_match.url_name == 'vendor_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:vendor_list' %}" class="menu-link {% if request.resolver_match.url_name == 'vendor_list' %}active{% endif %}">
+                            <span class="menu-text">All Vendors</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:vendor_create' %}" class="menu-link {% if request.resolver_match.url_name == 'vendor_create' %}active{% endif %}">
+                            <span class="menu-text">Add Vendor</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Items & Categories -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'item_list' or request.resolver_match.url_name == 'item_create' or request.resolver_match.url_name == 'item_edit' or request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'category_create' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-box-3-line"></i>
+                    <span class="menu-text">Items &amp; Categories</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'item_list' or request.resolver_match.url_name == 'item_create' or request.resolver_match.url_name == 'item_edit' or request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'category_create' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:item_list' %}" class="menu-link {% if request.resolver_match.url_name == 'item_list' %}active{% endif %}">
+                            <span class="menu-text">All Items</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:category_list' %}" class="menu-link {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}">
+                            <span class="menu-text">Categories</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Purchase Requisitions -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'requisition_list' or request.resolver_match.url_name == 'requisition_create' or request.resolver_match.url_name == 'requisition_detail' or request.resolver_match.url_name == 'requisition_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-list-3-line"></i>
+                    <span class="menu-text">Requisitions</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'requisition_list' or request.resolver_match.url_name == 'requisition_create' or request.resolver_match.url_name == 'requisition_detail' or request.resolver_match.url_name == 'requisition_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:requisition_list' %}" class="menu-link {% if request.resolver_match.url_name == 'requisition_list' %}active{% endif %}">
+                            <span class="menu-text">All Requisitions</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:requisition_create' %}" class="menu-link {% if request.resolver_match.url_name == 'requisition_create' %}active{% endif %}">
+                            <span class="menu-text">New Requisition</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- RFQ Management -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'rfq_list' or request.resolver_match.url_name == 'rfq_create' or request.resolver_match.url_name == 'rfq_detail' or request.resolver_match.url_name == 'rfq_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-search-line"></i>
+                    <span class="menu-text">RFQ Management</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'rfq_list' or request.resolver_match.url_name == 'rfq_create' or request.resolver_match.url_name == 'rfq_detail' or request.resolver_match.url_name == 'rfq_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:rfq_list' %}" class="menu-link {% if request.resolver_match.url_name == 'rfq_list' %}active{% endif %}">
+                            <span class="menu-text">All RFQs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:rfq_create' %}" class="menu-link {% if request.resolver_match.url_name == 'rfq_create' %}active{% endif %}">
+                            <span class="menu-text">New RFQ</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Purchase Orders -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'po_list' or request.resolver_match.url_name == 'po_create' or request.resolver_match.url_name == 'po_detail' or request.resolver_match.url_name == 'po_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-shopping-cart-line"></i>
+                    <span class="menu-text">Purchase Orders</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'po_list' or request.resolver_match.url_name == 'po_create' or request.resolver_match.url_name == 'po_detail' or request.resolver_match.url_name == 'po_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:po_list' %}" class="menu-link {% if request.resolver_match.url_name == 'po_list' %}active{% endif %}">
+                            <span class="menu-text">All POs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:po_create' %}" class="menu-link {% if request.resolver_match.url_name == 'po_create' %}active{% endif %}">
+                            <span class="menu-text">New PO</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Goods Receipt -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'grn_list' or request.resolver_match.url_name == 'grn_create' or request.resolver_match.url_name == 'grn_detail' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-inbox-archive-line"></i>
+                    <span class="menu-text">Goods Receipt</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'grn_list' or request.resolver_match.url_name == 'grn_create' or request.resolver_match.url_name == 'grn_detail' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:grn_list' %}" class="menu-link {% if request.resolver_match.url_name == 'grn_list' %}active{% endif %}">
+                            <span class="menu-text">All GRNs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:grn_create' %}" class="menu-link {% if request.resolver_match.url_name == 'grn_create' %}active{% endif %}">
+                            <span class="menu-text">New GRN</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Invoices & Reconciliation -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'invoice_list' or request.resolver_match.url_name == 'invoice_create' or request.resolver_match.url_name == 'invoice_detail' or request.resolver_match.url_name == 'reconciliation' or request.resolver_match.url_name == 'reconciliation_create' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-bill-line"></i>
+                    <span class="menu-text">Invoices &amp; Matching</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'invoice_list' or request.resolver_match.url_name == 'invoice_create' or request.resolver_match.url_name == 'invoice_detail' or request.resolver_match.url_name == 'reconciliation' or request.resolver_match.url_name == 'reconciliation_create' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:invoice_list' %}" class="menu-link {% if request.resolver_match.url_name == 'invoice_list' %}active{% endif %}">
+                            <span class="menu-text">All Invoices</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:reconciliation' %}" class="menu-link {% if request.resolver_match.url_name == 'reconciliation' %}active{% endif %}">
+                            <span class="menu-text">Reconciliation</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Audit &amp; Security <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Audit Logs -->
