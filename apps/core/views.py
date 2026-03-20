@@ -1,3 +1,4 @@
+import io
 from datetime import timedelta
 
 from django.contrib import messages
@@ -5,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
 
 from .models import AuditLog, Subscription, Tenant
 
@@ -197,38 +200,32 @@ def invoice_download_view(request, invoice_number):
     tenant_name = subscription.tenant.name
     tenant_domain = subscription.tenant.domain or 'company.com'
 
-    # Generate a plain-text invoice file for download
-    lines = [
-        '=' * 60,
-        f'                    INVOICE',
-        '=' * 60,
-        '',
-        f'  Invoice Number:   {invoice["number"]}',
-        f'  Date:             {invoice["date"].strftime("%B %d, %Y")}',
-        f'  Status:           {invoice["status"].upper()}',
-        '',
-        '-' * 60,
-        f'  Bill To:',
-        f'    {tenant_name}',
-        f'    billing@{tenant_domain}',
-        '',
-        '-' * 60,
-        f'  Description                          Amount',
-        '-' * 60,
-        f'  {invoice["plan"]} Plan (Monthly)               ${invoice["amount"]}.00',
-        '',
-        '-' * 60,
-        f'  Total:                                ${invoice["amount"]}.00',
-        '=' * 60,
-        '',
-        '  Thank you for your business!',
-        '',
-    ]
+    # Render HTML template to string
+    html_string = render_to_string('core/invoice_pdf.html', {
+        'invoice': {
+            'number': invoice['number'],
+            'date': invoice['date'].strftime('%B %d, %Y'),
+            'amount': invoice['amount'],
+            'status': invoice['status'],
+            'status_display': invoice['status'].upper(),
+            'plan': invoice['plan'],
+        },
+        'tenant_name': tenant_name,
+        'tenant_domain': tenant_domain,
+        'billing_email': f'billing@{tenant_domain}',
+    })
 
-    content = '\n'.join(lines)
+    # Generate PDF
+    pdf_buffer = io.BytesIO()
+    pisa_status = pisa.CreatePDF(html_string, dest=pdf_buffer)
 
-    response = HttpResponse(content, content_type='text/plain')
-    response['Content-Disposition'] = f'attachment; filename="{invoice["number"]}.txt"'
+    if pisa_status.err:
+        messages.error(request, 'Failed to generate PDF.')
+        return redirect('core:subscription_billing')
+
+    pdf_buffer.seek(0)
+    response = HttpResponse(pdf_buffer.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{invoice["number"]}.pdf"'
     return response
 
 
