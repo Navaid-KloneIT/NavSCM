@@ -244,7 +244,12 @@ def role_list_view(request):
 @login_required
 def permission_list_view(request):
     tenant = request.tenant
-    roles = list(Role.objects.filter(tenant=tenant, is_active=True))
+    if tenant:
+        roles = list(Role.objects.filter(tenant=tenant, is_active=True))
+    elif request.user.is_superuser:
+        roles = list(Role.objects.filter(is_active=True))
+    else:
+        roles = []
 
     # Collect all unique permissions across all roles
     all_permissions = set()
