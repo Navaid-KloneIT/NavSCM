@@ -205,3 +205,29 @@ All configuration is managed via the `.env` file using `python-decouple`. See `.
 | `DB_PASSWORD` | *(empty)* | Database password |
 | `DB_HOST` | `localhost` | Database host |
 | `DB_PORT` | `3306` | Database port |
+
+## Roadmap
+
+A high-level overview of planned modules for the NavSCM platform. Each module will follow the same multi-tenant architecture, design patterns, and UI conventions established in the existing codebase.
+
+| # | Module | Description | Status |
+|---|--------|-------------|--------|
+| 1 | **Procurement Management** | Purchase requisitions, RFQs, POs, vendor portal, invoice reconciliation | Done |
+| 2 | **Supplier Relationship Management (SRM)** | Supplier onboarding, scorecards, contract management, catalog management, risk assessment | Planned |
+| 3 | **Inventory Management** | Stock control, warehouse transfers, stock adjustments, reorder automation, inventory valuation (FIFO/LIFO/WA) | Planned |
+| 4 | **Warehouse Management (WMS)** | Inbound/outbound operations, bin/location management, cycle counting, yard management | Planned |
+| 5 | **Order Management (OMS)** | Order capture, validation, allocation, backorder management, customer notifications | Planned |
+| 6 | **Transportation Management (TMS)** | Route planning, freight audit, carrier management, shipment tracking, load optimization | Planned |
+| 7 | **Demand Planning & Forecasting** | Sales forecasting, seasonality analysis, demand sensing, collaborative planning, safety stock calculation | Planned |
+| 8 | **Manufacturing / Production** | Bill of materials (BOM), production scheduling, work orders, MRP, shop floor control | Planned |
+| 9 | **Quality Management (QMS)** | Quality inspection, non-conformance reports, CAPA, audit management, certificates of analysis | Planned |
+| 10 | **Returns Management** | RMA workflows, refund processing, disposition management, return portal, warranty claims | Planned |
+| 11 | **Supply Chain Analytics** | Inventory dashboards, procurement analytics, logistics KPIs, financial reporting, predictive analytics | Planned |
+| 12 | **Contract & Compliance** | Contract repository, compliance tracking, trade documentation, license management, sustainability tracking | Planned |
+| 13 | **Asset Management** | Asset registry, preventive/breakdown maintenance, spare parts inventory, asset depreciation | Planned |
+| 14 | **Labor Management** | Labor planning, time & attendance, task assignment, performance tracking, payroll integration | Planned |
+| 15 | **Cold Chain Management** | Temperature monitoring (IoT), excursion management, cold storage inventory, compliance reporting | Planned |
+| 16 | **Customer Portal** | Order tracking, account management, document retrieval, support ticketing, catalog browsing | Planned |
+| 17 | **3PL Management** | Client billing, inventory segregation, SLA management, client integration, warehouse rental | Planned |
+| 18 | **Finance & Accounting Integration** | Accounts payable/receivable, landed cost calculation, budgeting, tax management | Planned |
+| 19 | **Integration & API Gateway** | ERP connectors (SAP, Oracle), e-commerce integration, IoT gateway, EDI, webhooks | Planned |
