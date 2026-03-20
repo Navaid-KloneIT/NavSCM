@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'procurement:requisition_list' %}">Requisitions</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Requisition Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Department</label>
+                            {{ form.department }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Priority</label>
+                            {{ form.priority }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Required Date</label>
+                            {{ form.required_date }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Line Items -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Line Items</h5>
+                    <button type="button" class="btn btn-sm btn-soft-success" id="add-item-btn">
+                        <i class="ri-add-line me-1"></i> Add Line
+                    </button>
+                </div>
+                <div class="card-body">
+                    {{ formset.management_form }}
+                    <div id="formset-container">
+                        {% for item_form in formset %}
+                        <div class="formset-row border rounded p-3 mb-3 {% if item_form.instance.pk %}{% else %}{% endif %}">
+                            <div class="row g-3">
+                                {% if item_form.instance.pk %}
+                                    {{ item_form.id }}
+                                {% endif %}
+                                <div class="col-md-3">
+                                    <label class="form-label">Item</label>
+                                    {{ item_form.item }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Description</label>
+                                    {{ item_form.description }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Quantity</label>
+                                    {{ item_form.quantity }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Est. Unit Price</label>
+                                    {{ item_form.estimated_unit_price }}
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <div class="form-check">
+                                        {{ item_form.DELETE }}
+                                        <label class="form-check-label text-danger">Remove</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2">
+                        <i class="ri-save-line me-1"></i> Save Requisition
+                    </button>
+                    <a href="{% url 'procurement:requisition_list' %}" class="btn btn-light w-100">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('formset-container');
+    const addBtn = document.getElementById('add-item-btn');
+    const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+
+    addBtn.addEventListener('click', function() {
+        const formCount = parseInt(totalForms.value);
+        const lastForm = container.querySelector('.formset-row:last-child');
+        if (!lastForm) return;
+
+        const newForm = lastForm.cloneNode(true);
+        // Update form index
+        newForm.innerHTML = newForm.innerHTML.replace(
+            /items-\d+-/g, 'items-' + formCount + '-'
+        );
+        newForm.innerHTML = newForm.innerHTML.replace(
+            /items-\d+-/g, 'items-' + formCount + '-'
+        );
+        // Clear values
+        newForm.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(function(input) {
+            input.value = '';
+        });
+        newForm.querySelectorAll('select').forEach(function(select) {
+            select.selectedIndex = 0;
+        });
+        newForm.querySelectorAll('input[type=checkbox]').forEach(function(cb) {
+            cb.checked = false;
+        });
+        // Remove hidden id field (new form)
+        const idField = newForm.querySelector('input[name$="-id"]');
+        if (idField) idField.value = '';
+
+        container.appendChild(newForm);
+        totalForms.value = formCount + 1;
+    });
+});
+</script>
+{% endblock %}
