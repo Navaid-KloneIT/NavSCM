@@ -32,7 +32,8 @@
       "Bash(python -c \"import django; print\\(django.get_version\\(\\)\\)\")",
       "Bash(pip install:*)",
       "Bash(python -c \"import django; print\\(django.__file__\\)\")",
-      "Bash(pip3 install:*)"
+      "Bash(pip3 install:*)",
+      "Bash(find /c/xampp/htdocs/NavSCM -type f -name *tenant*)"
     ]
   }
 }
