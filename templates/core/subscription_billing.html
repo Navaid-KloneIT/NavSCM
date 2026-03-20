@@ -20,6 +20,19 @@
     </div>
 </div>
 
+{% if messages %}
+<div class="row">
+    <div class="col-12">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
 {% if subscription %}
 <!-- Billing Summary Cards -->
 <div class="row mb-3">
@@ -106,17 +119,23 @@
                 <div class="d-flex align-items-center mb-3">
                     <div class="avatar-sm flex-shrink-0 me-3">
                         <div class="avatar-title bg-dark text-white rounded fs-4">
-                            <i class="ri-visa-line"></i>
+                            {% if payment_method.card_brand == 'Visa' %}
+                                <i class="ri-visa-line"></i>
+                            {% elif payment_method.card_brand == 'Mastercard' %}
+                                <i class="ri-mastercard-line"></i>
+                            {% else %}
+                                <i class="ri-bank-card-line"></i>
+                            {% endif %}
                         </div>
                     </div>
                     <div>
-                        <h6 class="mb-0">Visa ending in 4242</h6>
-                        <small class="text-muted">Expires 12/2027</small>
+                        <h6 class="mb-0">{{ payment_method.card_brand }} ending in {{ payment_method.card_last4 }}</h6>
+                        <small class="text-muted">Expires {{ payment_method.card_expiry }}</small>
                     </div>
                 </div>
-                <a href="javascript: void(0);" class="btn btn-sm btn-soft-primary w-100">
+                <button type="button" class="btn btn-sm btn-soft-primary w-100" data-bs-toggle="modal" data-bs-target="#updatePaymentModal">
                     <i class="ri-edit-line me-1"></i> Update Payment Method
-                </a>
+                </button>
             </div>
         </div>
 
@@ -178,7 +197,7 @@
                                 </td>
                                 <td>{{ invoice.date|date:"M d, Y" }}</td>
                                 <td><span class="badge bg-light text-dark">{{ invoice.plan }}</span></td>
-                                <td class="fw-medium">{{ invoice.amount }}</td>
+                                <td class="fw-medium">${{ invoice.amount }}.00</td>
                                 <td>
                                     {% if invoice.status == 'paid' %}
                                         <span class="status-badge badge-soft-success">
@@ -198,7 +217,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="javascript: void(0);" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="Download">
+                                    <a href="{% url 'core:invoice_download' invoice.number %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="Download">
                                         <i class="ri-download-2-line"></i>
                                     </a>
                                 </td>
@@ -217,6 +236,56 @@
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Payment Method Modal -->
+<div class="modal fade" id="updatePaymentModal" tabindex="-1" aria-labelledby="updatePaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{% url 'core:subscription_billing' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updatePaymentModalLabel">
+                        <i class="ri-bank-card-line me-2 text-primary"></i>Update Payment Method
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="card_holder" class="form-label">Cardholder Name <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="ri-user-line"></i></span>
+                            <input type="text" class="form-control" id="card_holder" name="card_holder"
+                                   placeholder="John Doe" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="card_number" class="form-label">Card Number <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="ri-bank-card-line"></i></span>
+                            <input type="text" class="form-control" id="card_number" name="card_number"
+                                   placeholder="4242 4242 4242 4242" maxlength="19" required>
+                        </div>
+                        <div class="form-text">Enter a 13-19 digit card number.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="card_expiry" class="form-label">Expiry Date <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="ri-calendar-line"></i></span>
+                            <input type="text" class="form-control" id="card_expiry" name="card_expiry"
+                                   placeholder="MM/YY" maxlength="5" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-soft-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ri-save-line me-1"></i> Save Payment Method
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
