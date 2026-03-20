@@ -949,3 +949,122 @@ def reconciliation_create_view(request):
         'grns': grns,
         'title': 'Create Three-Way Match',
     })
+
+
+# =============================================================================
+# DELETE VIEWS
+# =============================================================================
+
+@login_required
+def category_delete_view(request, pk):
+    tenant = request.tenant
+    category = get_object_or_404(ItemCategory, pk=pk, tenant=tenant)
+    if request.method == 'POST':
+        name = category.name
+        category.delete()
+        messages.success(request, f'Category "{name}" deleted successfully.')
+        return redirect('procurement:category_list')
+    return redirect('procurement:category_list')
+
+
+@login_required
+def item_delete_view(request, pk):
+    tenant = request.tenant
+    item = get_object_or_404(Item, pk=pk, tenant=tenant)
+    if request.method == 'POST':
+        name = item.name
+        item.delete()
+        messages.success(request, f'Item "{name}" deleted successfully.')
+        return redirect('procurement:item_list')
+    return redirect('procurement:item_list')
+
+
+@login_required
+def vendor_delete_view(request, pk):
+    tenant = request.tenant
+    vendor = get_object_or_404(Vendor, pk=pk, tenant=tenant)
+    if request.method == 'POST':
+        # Check if vendor has linked POs
+        if vendor.purchase_orders.exists():
+            messages.error(request, f'Cannot delete vendor "{vendor.name}" — it has linked purchase orders.')
+            return redirect('procurement:vendor_detail', pk=pk)
+        name = vendor.name
+        vendor.delete()
+        messages.success(request, f'Vendor "{name}" deleted successfully.')
+        return redirect('procurement:vendor_list')
+    return redirect('procurement:vendor_list')
+
+
+@login_required
+def requisition_delete_view(request, pk):
+    tenant = request.tenant
+    requisition = get_object_or_404(PurchaseRequisition, pk=pk, tenant=tenant)
+    if request.method == 'POST':
+        if requisition.status not in ('draft', 'cancelled'):
+            messages.error(request, 'Only draft or cancelled requisitions can be deleted.')
+            return redirect('procurement:requisition_detail', pk=pk)
+        number = requisition.requisition_number
+        requisition.delete()
+        messages.success(request, f'Requisition {number} deleted successfully.')
+        return redirect('procurement:requisition_list')
+    return redirect('procurement:requisition_list')
+
+
+@login_required
+def rfq_delete_view(request, pk):
+    tenant = request.tenant
+    rfq = get_object_or_404(RFQ, pk=pk, tenant=tenant)
+    if request.method == 'POST':
+        if rfq.status not in ('draft', 'cancelled'):
+            messages.error(request, 'Only draft or cancelled RFQs can be deleted.')
+            return redirect('procurement:rfq_detail', pk=pk)
+        number = rfq.rfq_number
+        rfq.delete()
+        messages.success(request, f'RFQ {number} deleted successfully.')
+        return redirect('procurement:rfq_list')
+    return redirect('procurement:rfq_list')
+
+
+@login_required
+def po_delete_view(request, pk):
+    tenant = request.tenant
+    po = get_object_or_404(PurchaseOrder, pk=pk, tenant=tenant)
+    if request.method == 'POST':
+        if po.status not in ('draft', 'cancelled'):
+            messages.error(request, 'Only draft or cancelled purchase orders can be deleted.')
+            return redirect('procurement:po_detail', pk=pk)
+        number = po.po_number
+        po.delete()
+        messages.success(request, f'Purchase Order {number} deleted successfully.')
+        return redirect('procurement:po_list')
+    return redirect('procurement:po_list')
+
+
+@login_required
+def grn_delete_view(request, pk):
+    tenant = request.tenant
+    grn = get_object_or_404(GoodsReceiptNote, pk=pk, tenant=tenant)
+    if request.method == 'POST':
+        if grn.status != 'draft':
+            messages.error(request, 'Only draft GRNs can be deleted.')
+            return redirect('procurement:grn_detail', pk=pk)
+        number = grn.grn_number
+        grn.delete()
+        messages.success(request, f'GRN {number} deleted successfully.')
+        return redirect('procurement:grn_list')
+    return redirect('procurement:grn_list')
+
+
+@login_required
+def invoice_delete_view(request, pk):
+    tenant = request.tenant
+    invoice = get_object_or_404(VendorInvoice, pk=pk, tenant=tenant)
+    if request.method == 'POST':
+        if invoice.status not in ('pending',):
+            messages.error(request, 'Only pending invoices can be deleted.')
+            return redirect('procurement:invoice_detail', pk=pk)
+        number = invoice.invoice_number
+        invoice.delete()
+        messages.success(request, f'Invoice {number} deleted successfully.')
+        return redirect('procurement:invoice_list')
+    return redirect('procurement:invoice_list')
