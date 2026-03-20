@@ -1,6 +1,6 @@
-# NavHCM - Human Capital Management System
+# NavSCM - Supply Chain Management System
 
-A multi-tenant HCM application built with Django and Bootstrap 5.
+A multi-tenant SCM application built with Django and Bootstrap 5.
 
 ## Tech Stack
 
@@ -21,6 +21,18 @@ The technical backbone enabling the SaaS/Multi-tenant nature of the application.
 - **Role-Based Access Control (RBAC)** - Granular permission settings for users within each tenant
 - **Theme & Customization** - White-labeling options allowing tenants to apply their branding/logo
 - **Audit Logs & Security** - System-wide logs for data access, changes, and security incident monitoring
+
+### Module 2: Procurement Management
+
+Manages the purchasing of goods and services to ensure cost-effectiveness and timely delivery.
+
+- **Purchase Requisition** - Internal requests for goods with approval workflows (draft → pending → approved/rejected), priority levels, and line items with estimated pricing
+- **Request for Quotation (RFQ)** - Creation and distribution of RFQs to multiple vendors, quote comparison matrix, and vendor response tracking
+- **Purchase Order (PO) Management** - Generation, approval, amendment, and cancellation of purchase orders with line item tracking and partial receipt support
+- **Vendor Portal** - Vendor contacts, PO acknowledgement, and shipment status tracking (preparing → shipped → in transit → delivered)
+- **Invoice Reconciliation** - Three-way matching of Purchase Order, Goods Receipt Note (GRN), and Vendor Invoice with automated quantity and price matching
+- **Vendor Management** - Vendor master data with contact details, payment terms, tax ID, and activity tracking
+- **Item Catalog** - Categorized item/service catalog with unit of measure, pricing, and active/inactive status
 
 ### Authentication & User Management
 - Login, registration, forgot password
@@ -146,7 +158,13 @@ NavSCM/
 ├── apps/
 │   ├── core/              # Tenant model, middleware, context processors
 │   ├── accounts/          # Auth, users, roles, profiles, invites
-│   └── dashboard/         # Dashboard views & stats
+│   ├── dashboard/         # Dashboard views & stats
+│   └── procurement/       # Procurement management module
+│       ├── models.py      # Vendor, Item, PR, RFQ, PO, GRN, Invoice, 3-Way Match
+│       ├── views.py       # All procurement CRUD & workflow views
+│       ├── forms.py       # Forms & inline formsets for all models
+│       ├── urls.py        # URL routing (/procurement/*)
+│       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
 │   ├── css/style.css      # Custom theme CSS (blue & white)
@@ -156,7 +174,17 @@ NavSCM/
 │   ├── partials/          # Sidebar, topbar, footer, preloader, theme settings
 │   ├── auth/              # Login, register, forgot password
 │   ├── dashboard/         # Dashboard index
-│   └── accounts/          # User list, invite, profile
+│   ├── accounts/          # User list, invite, profile
+│   └── procurement/       # Procurement templates
+│       ├── vendor_*.html      # Vendor list, form, detail
+│       ├── item_*.html        # Item catalog list, form
+│       ├── category_*.html    # Category list, form
+│       ├── requisition_*.html # Purchase requisition list, form, detail
+│       ├── rfq_*.html         # RFQ list, form, detail
+│       ├── po_*.html          # Purchase order list, form, detail
+│       ├── grn_*.html         # Goods receipt list, form, detail
+│       ├── invoice_*.html     # Vendor invoice list, form, detail
+│       └── reconciliation*.html # 3-way match dashboard & form
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
