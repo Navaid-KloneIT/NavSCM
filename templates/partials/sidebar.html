@@ -263,6 +263,123 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Supplier Management <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Supplier Onboarding -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'onboarding_list' or request.resolver_match.url_name == 'onboarding_create' or request.resolver_match.url_name == 'onboarding_detail' or request.resolver_match.url_name == 'onboarding_edit' or request.resolver_match.url_name == 'question_list' or request.resolver_match.url_name == 'question_create' or request.resolver_match.url_name == 'question_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-user-add-line"></i>
+                    <span class="menu-text">Supplier Onboarding</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'onboarding_list' or request.resolver_match.url_name == 'onboarding_create' or request.resolver_match.url_name == 'onboarding_detail' or request.resolver_match.url_name == 'onboarding_edit' or request.resolver_match.url_name == 'question_list' or request.resolver_match.url_name == 'question_create' or request.resolver_match.url_name == 'question_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'srm:onboarding_list' %}" class="menu-link {% if request.resolver_match.url_name == 'onboarding_list' or request.resolver_match.url_name == 'onboarding_detail' or request.resolver_match.url_name == 'onboarding_edit' %}active{% endif %}">
+                            <span class="menu-text">All Onboardings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'srm:onboarding_create' %}" class="menu-link {% if request.resolver_match.url_name == 'onboarding_create' %}active{% endif %}">
+                            <span class="menu-text">New Onboarding</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'srm:question_list' %}" class="menu-link {% if request.resolver_match.url_name == 'question_list' or request.resolver_match.url_name == 'question_create' or request.resolver_match.url_name == 'question_edit' %}active{% endif %}">
+                            <span class="menu-text">Questions</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Supplier Scorecards -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'scorecard_list' or request.resolver_match.url_name == 'scorecard_create' or request.resolver_match.url_name == 'scorecard_detail' or request.resolver_match.url_name == 'scorecard_edit' or request.resolver_match.url_name == 'period_list' or request.resolver_match.url_name == 'period_create' or request.resolver_match.url_name == 'period_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-star-line"></i>
+                    <span class="menu-text">Supplier Scorecards</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'scorecard_list' or request.resolver_match.url_name == 'scorecard_create' or request.resolver_match.url_name == 'scorecard_detail' or request.resolver_match.url_name == 'scorecard_edit' or request.resolver_match.url_name == 'period_list' or request.resolver_match.url_name == 'period_create' or request.resolver_match.url_name == 'period_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'srm:scorecard_list' %}" class="menu-link {% if request.resolver_match.url_name == 'scorecard_list' or request.resolver_match.url_name == 'scorecard_detail' or request.resolver_match.url_name == 'scorecard_edit' %}active{% endif %}">
+                            <span class="menu-text">All Scorecards</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'srm:scorecard_create' %}" class="menu-link {% if request.resolver_match.url_name == 'scorecard_create' %}active{% endif %}">
+                            <span class="menu-text">New Scorecard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'srm:period_list' %}" class="menu-link {% if request.resolver_match.url_name == 'period_list' or request.resolver_match.url_name == 'period_create' or request.resolver_match.url_name == 'period_edit' %}active{% endif %}">
+                            <span class="menu-text">Evaluation Periods</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Contracts -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'contract_list' or request.resolver_match.url_name == 'contract_create' or request.resolver_match.url_name == 'contract_detail' or request.resolver_match.url_name == 'contract_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-text-line"></i>
+                    <span class="menu-text">Contracts</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'contract_list' or request.resolver_match.url_name == 'contract_create' or request.resolver_match.url_name == 'contract_detail' or request.resolver_match.url_name == 'contract_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'srm:contract_list' %}" class="menu-link {% if request.resolver_match.url_name == 'contract_list' or request.resolver_match.url_name == 'contract_detail' or request.resolver_match.url_name == 'contract_edit' %}active{% endif %}">
+                            <span class="menu-text">All Contracts</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'srm:contract_create' %}" class="menu-link {% if request.resolver_match.url_name == 'contract_create' %}active{% endif %}">
+                            <span class="menu-text">New Contract</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Supplier Catalogs -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'catalog_list' or request.resolver_match.url_name == 'catalog_create' or request.resolver_match.url_name == 'catalog_detail' or request.resolver_match.url_name == 'catalog_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-book-open-line"></i>
+                    <span class="menu-text">Supplier Catalogs</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'catalog_list' or request.resolver_match.url_name == 'catalog_create' or request.resolver_match.url_name == 'catalog_detail' or request.resolver_match.url_name == 'catalog_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'srm:catalog_list' %}" class="menu-link {% if request.resolver_match.url_name == 'catalog_list' or request.resolver_match.url_name == 'catalog_detail' or request.resolver_match.url_name == 'catalog_edit' %}active{% endif %}">
+                            <span class="menu-text">All Catalogs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'srm:catalog_create' %}" class="menu-link {% if request.resolver_match.url_name == 'catalog_create' %}active{% endif %}">
+                            <span class="menu-text">New Catalog</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Risk Management -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'risk_list' or request.resolver_match.url_name == 'risk_create' or request.resolver_match.url_name == 'risk_detail' or request.resolver_match.url_name == 'risk_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-shield-check-line"></i>
+                    <span class="menu-text">Risk Management</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'risk_list' or request.resolver_match.url_name == 'risk_create' or request.resolver_match.url_name == 'risk_detail' or request.resolver_match.url_name == 'risk_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'srm:risk_list' %}" class="menu-link {% if request.resolver_match.url_name == 'risk_list' or request.resolver_match.url_name == 'risk_detail' or request.resolver_match.url_name == 'risk_edit' %}active{% endif %}">
+                            <span class="menu-text">All Assessments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'srm:risk_create' %}" class="menu-link {% if request.resolver_match.url_name == 'risk_create' %}active{% endif %}">
+                            <span class="menu-text">New Assessment</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Audit &amp; Security <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Audit Logs -->
