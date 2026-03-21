@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Supplier Scorecards{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Supplier Scorecards</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Supplier Management</li>
+            <li class="breadcrumb-item active">Scorecards</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'srm:scorecard_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Rating</label>
+                            <select class="form-select" name="rating">
+                                <option value="">All</option>
+                                {% for value, label in rating_choices %}
+                                <option value="{{ value }}" {% if request.GET.rating == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Vendor</label>
+                            <select class="form-select" name="vendor">
+                                <option value="">All</option>
+                                {% for v in vendors %}
+                                <option value="{{ v.pk }}" {% if request.GET.vendor == v.pk|stringformat:"d" %}selected{% endif %}>{{ v.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'srm:scorecard_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Scorecard</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scorecards Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Scorecards</h5>
+                <span class="text-muted">{{ scorecards|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Number</th>
+                                <th>Vendor</th>
+                                <th>Period</th>
+                                <th>Overall Score</th>
+                                <th>Rating</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sc in scorecards %}
+                            <tr>
+                                <td><a href="{% url 'srm:scorecard_detail' sc.pk %}" class="fw-medium">{{ sc.number }}</a></td>
+                                <td>{{ sc.vendor.name }}</td>
+                                <td>{{ sc.period.name }}</td>
+                                <td><span class="fw-medium">{{ sc.overall_score|floatformat:1 }}</span></td>
+                                <td>
+                                    {% if sc.rating == 'excellent' %}
+                                        <span class="badge bg-success">Excellent</span>
+                                    {% elif sc.rating == 'good' %}
+                                        <span class="badge bg-info">Good</span>
+                                    {% elif sc.rating == 'satisfactory' %}
+                                        <span class="badge bg-primary">Satisfactory</span>
+                                    {% elif sc.rating == 'needs_improvement' %}
+                                        <span class="badge bg-warning text-dark">Needs Improvement</span>
+                                    {% elif sc.rating == 'poor' %}
+                                        <span class="badge bg-danger">Poor</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ sc.get_rating_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if sc.status == 'approved' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Approved</span>
+                                    {% elif sc.status == 'submitted' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Submitted</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'srm:scorecard_detail' sc.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if sc.status == 'draft' %}
+                                        <a href="{% url 'srm:scorecard_edit' sc.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit"><i class="ri-pencil-line"></i></a>
+                                        <form method="POST" action="{% url 'srm:scorecard_delete' sc.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this scorecard?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-star-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No scorecards found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.rating or request.GET.vendor %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first supplier scorecard.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
