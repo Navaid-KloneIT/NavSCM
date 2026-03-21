@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Scorecard: {{ scorecard.scorecard_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ scorecard.scorecard_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'srm:scorecard_list' %}">Scorecards</a></li>
+            <li class="breadcrumb-item active">{{ scorecard.scorecard_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <!-- Scorecard Info -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Scorecard Info</h5>
+                <div>
+                    {% if scorecard.status == 'draft' %}
+                        <a href="{% url 'srm:scorecard_edit' scorecard.pk %}" class="btn btn-sm btn-soft-warning">
+                            <i class="ri-pencil-line"></i>
+                        </a>
+                        <form method="POST" action="{% url 'srm:scorecard_delete' scorecard.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-soft-danger" onclick="return confirm('Are you sure you want to delete this scorecard?')">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="ps-3">Number</th>
+                            <td>{{ scorecard.scorecard_number }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Vendor</th>
+                            <td>{{ scorecard.vendor.name }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Period</th>
+                            <td>{{ scorecard.get_period_display }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if scorecard.status == 'approved' %}
+                                    <span class="badge bg-soft-success text-success">Approved</span>
+                                {% elif scorecard.status == 'submitted' %}
+                                    <span class="badge bg-soft-warning text-warning">Submitted</span>
+                                {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">Draft</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Rating</th>
+                            <td>
+                                {% if scorecard.rating == 'excellent' %}
+                                    <span class="badge bg-soft-success text-success">Excellent</span>
+                                {% elif scorecard.rating == 'good' %}
+                                    <span class="badge bg-soft-info text-info">Good</span>
+                                {% elif scorecard.rating == 'satisfactory' %}
+                                    <span class="badge bg-soft-primary text-primary">Satisfactory</span>
+                                {% elif scorecard.rating == 'needs_improvement' %}
+                                    <span class="badge bg-soft-warning text-warning">Needs Improvement</span>
+                                {% elif scorecard.rating == 'poor' %}
+                                    <span class="badge bg-soft-danger text-danger">Poor</span>
+                                {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ scorecard.get_rating_display|default:"-" }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Delivery Score</th>
+                            <td>{{ scorecard.delivery_score|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Quality Score</th>
+                            <td>{{ scorecard.quality_score|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Price Score</th>
+                            <td>{{ scorecard.price_score|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Responsiveness Score</th>
+                            <td>{{ scorecard.responsiveness_score|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Overall Score</th>
+                            <td><strong>{{ scorecard.overall_score|default:"-" }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Evaluated By</th>
+                            <td>{{ scorecard.evaluated_by.get_full_name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Approved By</th>
+                            <td>{{ scorecard.approved_by.get_full_name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Created</th>
+                            <td>{{ scorecard.created_at|date:"M d, Y H:i"|default:"-" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if scorecard.notes %}
+        <div class="card">
+            <div class="card-header"><h5>Notes</h5></div>
+            <div class="card-body">{{ scorecard.notes|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Criteria Table -->
+    <div class="col-lg-8">
+        <div class="card table-card">
+            <div class="card-header"><h5>Evaluation Criteria</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Category</th>
+                                <th>Criteria Name</th>
+                                <th>Weight</th>
+                                <th>Score</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in criteria %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ c.get_category_display|default:"-" }}</td>
+                                <td>{{ c.criteria_name|default:"-" }}</td>
+                                <td>{{ c.weight|default:"-" }}</td>
+                                <td>{{ c.score|default:"-" }}</td>
+                                <td>{{ c.notes|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="6" class="text-center py-3 text-muted">No evaluation criteria defined.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
