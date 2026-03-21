@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Catalog: {{ catalog.catalog_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ catalog.catalog_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'srm:catalog_list' %}">Catalogs</a></li>
+            <li class="breadcrumb-item active">{{ catalog.catalog_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <!-- Left Column: Info & Actions -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Catalog Info</h5>
+                <div class="d-flex gap-1">
+                    {% if catalog.status == 'draft' %}
+                    <a href="{% url 'srm:catalog_edit' catalog.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                    <form method="POST" action="{% url 'srm:catalog_delete' catalog.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this catalog?')"><i class="ri-delete-bin-line"></i></button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="ps-3">Number</th>
+                            <td>{{ catalog.catalog_number }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Vendor</th>
+                            <td>{{ catalog.vendor.name }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Name</th>
+                            <td>{{ catalog.name }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if catalog.status == 'active' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> {{ catalog.get_status_display }}</span>
+                                {% elif catalog.status == 'inactive' %}
+                                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> {{ catalog.get_status_display }}</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ catalog.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Effective Date</th>
+                            <td>{{ catalog.effective_date|date:"M d, Y"|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Expiry Date</th>
+                            <td>{{ catalog.expiry_date|date:"M d, Y"|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Created By</th>
+                            <td>{{ catalog.created_by.get_full_name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Created</th>
+                            <td>{{ catalog.created_at|date:"M d, Y H:i"|default:"-" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if catalog.notes %}
+        <div class="card">
+            <div class="card-header"><h5>Notes</h5></div>
+            <div class="card-body">{{ catalog.notes|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-body">
+                <a href="{% url 'srm:catalog_list' %}" class="btn btn-light w-100">
+                    <i class="ri-arrow-left-line me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Catalog Items -->
+    <div class="col-lg-8">
+        <div class="card table-card">
+            <div class="card-header"><h5>Catalog Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Item</th>
+                                <th>Description</th>
+                                <th>UOM</th>
+                                <th>Unit Price</th>
+                                <th>Min Qty</th>
+                                <th>Lead Time</th>
+                                <th>Active</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    {% if item.item %}
+                                        {{ item.item.name }}
+                                    {% else %}
+                                        {{ item.supplier_part_number|default:"-" }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.description|default:"-" }}</td>
+                                <td>{{ item.unit_of_measure|default:"-" }}</td>
+                                <td>{{ item.unit_price }}</td>
+                                <td>{{ item.min_order_quantity|default:"-" }}</td>
+                                <td>
+                                    {% if item.lead_time_days %}
+                                        {{ item.lead_time_days }} days
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.is_active %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-book-open-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No catalog items found</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
