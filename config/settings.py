@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'apps.accounts',
     'apps.dashboard',
     'apps.procurement',
+    'apps.srm',
 ]
 
 # ==============================================================================
