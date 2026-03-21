@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Contract: {{ contract.contract_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ contract.contract_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'srm:contract_list' %}">Contracts</a></li>
+            <li class="breadcrumb-item active">{{ contract.contract_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <!-- Contract Info -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Contract Info</h5>
+                <div>
+                    {% if contract.status == 'draft' %}
+                        <a href="{% url 'srm:contract_edit' contract.pk %}" class="btn btn-sm btn-soft-warning">
+                            <i class="ri-pencil-line"></i>
+                        </a>
+                        <form method="POST" action="{% url 'srm:contract_delete' contract.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-soft-danger" onclick="return confirm('Are you sure you want to delete this contract?')">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="ps-3">Number</th>
+                            <td>{{ contract.contract_number }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Vendor</th>
+                            <td>{{ contract.vendor.name }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Title</th>
+                            <td>{{ contract.title }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Type</th>
+                            <td>
+                                <span class="badge bg-soft-info text-info">{{ contract.get_contract_type_display }}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if contract.status == 'draft' %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                                {% elif contract.status == 'active' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                {% elif contract.status == 'expired' %}
+                                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Expired</span>
+                                {% elif contract.status == 'terminated' %}
+                                    <span class="status-badge badge-soft-dark"><span class="status-dot bg-dark"></span> Terminated</span>
+                                {% elif contract.status == 'renewed' %}
+                                    <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Renewed</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ contract.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Start Date</th>
+                            <td>{{ contract.start_date|date:"M d, Y"|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">End Date</th>
+                            <td>{{ contract.end_date|date:"M d, Y"|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Value</th>
+                            <td>{{ contract.currency }} {{ contract.value }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Payment Terms</th>
+                            <td>{{ contract.get_payment_terms_display|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Auto Renew</th>
+                            <td>{% if contract.auto_renew %}Yes{% else %}No{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Renewal Notice</th>
+                            <td>{% if contract.renewal_notice_days %}{{ contract.renewal_notice_days }} days{% else %}-{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Created By</th>
+                            <td>{{ contract.created_by.get_full_name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Created</th>
+                            <td>{{ contract.created_at|date:"M d, Y H:i"|default:"-" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if contract.is_expiring_soon %}
+        <div class="alert alert-warning d-flex align-items-center" role="alert">
+            <i class="ri-alarm-warning-line me-2" style="font-size: 20px;"></i>
+            <div>Contract expiring in {{ contract.days_until_expiry }} days!</div>
+        </div>
+        {% endif %}
+
+        {% if contract.description %}
+        <div class="card">
+            <div class="card-header"><h5>Description</h5></div>
+            <div class="card-body">{{ contract.description|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+
+        {% if contract.notes %}
+        <div class="card">
+            <div class="card-header"><h5>Notes</h5></div>
+            <div class="card-body">{{ contract.notes|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+
+        {% if contract.terms_conditions %}
+        <div class="card">
+            <div class="card-header"><h5>Terms & Conditions</h5></div>
+            <div class="card-body">{{ contract.terms_conditions|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-8">
+        <!-- Milestones -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Milestones</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Completed At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for milestone in milestones %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ milestone.title|default:"-" }}</td>
+                                <td>{{ milestone.description|default:"-" }}</td>
+                                <td>{{ milestone.due_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    {% if milestone.status == 'pending' %}
+                                        <span class="badge bg-soft-warning text-warning">Pending</span>
+                                    {% elif milestone.status == 'completed' %}
+                                        <span class="badge bg-soft-success text-success">Completed</span>
+                                    {% elif milestone.status == 'overdue' %}
+                                        <span class="badge bg-soft-danger text-danger">Overdue</span>
+                                    {% else %}
+                                        <span class="badge bg-soft-secondary text-secondary">{{ milestone.get_status_display|default:"-" }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ milestone.completed_at|date:"M d, Y H:i"|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-flag-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No milestones defined for this contract.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Documents</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Uploaded By</th>
+                                <th>Uploaded At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in documents %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ doc.title|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-soft-info text-info">{{ doc.get_document_type_display|default:"-" }}</span>
+                                </td>
+                                <td>{{ doc.uploaded_by.get_full_name|default:"-" }}</td>
+                                <td>{{ doc.uploaded_at|date:"M d, Y H:i"|default:"-" }}</td>
+                                <td>
+                                    {% if doc.file %}
+                                    <a href="{{ doc.file.url }}" class="btn btn-sm btn-soft-primary" title="Download" target="_blank">
+                                        <i class="ri-download-line"></i>
+                                    </a>
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-upload-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No documents uploaded for this contract.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
