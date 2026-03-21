@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'srm:scorecard_list' %}">Scorecards</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Scorecard Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Vendor *</label>
+                            {{ form.vendor }}
+                            {% if form.vendor.errors %}<div class="text-danger small">{{ form.vendor.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Period *</label>
+                            {{ form.period }}
+                            {% if form.period.errors %}<div class="text-danger small">{{ form.period.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Delivery Score</label>
+                            {{ form.delivery_score }}
+                            {% if form.delivery_score.errors %}<div class="text-danger small">{{ form.delivery_score.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Quality Score</label>
+                            {{ form.quality_score }}
+                            {% if form.quality_score.errors %}<div class="text-danger small">{{ form.quality_score.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Price Score</label>
+                            {{ form.price_score }}
+                            {% if form.price_score.errors %}<div class="text-danger small">{{ form.price_score.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Responsiveness Score</label>
+                            {{ form.responsiveness_score }}
+                            {% if form.responsiveness_score.errors %}<div class="text-danger small">{{ form.responsiveness_score.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Rating</label>
+                            {{ form.rating }}
+                            {% if form.rating.errors %}<div class="text-danger small">{{ form.rating.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluation Criteria -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Evaluation Criteria</h5>
+                    <button type="button" class="btn btn-sm btn-soft-success" id="add-criteria-btn">
+                        <i class="ri-add-line me-1"></i> Add Line
+                    </button>
+                </div>
+                <div class="card-body">
+                    {{ formset.management_form }}
+                    <div id="criteria-container">
+                        {% for criteria_form in formset %}
+                        <div class="formset-row border rounded p-3 mb-3">
+                            <div class="row g-3">
+                                {% if criteria_form.instance.pk %}{{ criteria_form.id }}{% endif %}
+                                <div class="col-md-2">
+                                    <label class="form-label">Category</label>
+                                    {{ criteria_form.category }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Criteria Name</label>
+                                    {{ criteria_form.criteria_name }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Weight</label>
+                                    {{ criteria_form.weight }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Score</label>
+                                    {{ criteria_form.score }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Notes</label>
+                                    {{ criteria_form.notes }}
+                                </div>
+                                <div class="col-md-1 d-flex align-items-end">
+                                    <div class="form-check">
+                                        {{ criteria_form.DELETE }}
+                                        <label class="form-check-label text-danger">Remove</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Scorecard</button>
+                    <a href="{% url 'srm:scorecard_list' %}" class="btn btn-light w-100">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('criteria-container');
+    const addBtn = document.getElementById('add-criteria-btn');
+    const totalForms = document.getElementById('id_criteria-TOTAL_FORMS');
+
+    addBtn.addEventListener('click', function() {
+        const formCount = parseInt(totalForms.value);
+        const lastForm = container.querySelector('.formset-row:last-child');
+        if (!lastForm) return;
+
+        const newForm = lastForm.cloneNode(true);
+        newForm.innerHTML = newForm.innerHTML.replace(/criteria-\d+-/g, 'criteria-' + formCount + '-');
+        newForm.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(i => i.value = '');
+        newForm.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+        newForm.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+        const idField = newForm.querySelector('input[name$="-id"]');
+        if (idField) idField.value = '';
+        container.appendChild(newForm);
+        totalForms.value = formCount + 1;
+    });
+});
+</script>
+{% endblock %}
