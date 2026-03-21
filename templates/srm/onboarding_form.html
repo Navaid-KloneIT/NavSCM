@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'srm:onboarding_list' %}">Onboarding</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Onboarding Details -->
+            <div class="card">
+                <div class="card-header"><h5>Onboarding Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Vendor *</label>
+                            {{ form.vendor }}
+                            {% if form.vendor.errors %}<div class="text-danger small">{{ form.vendor.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Qualification Responses -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Qualification Responses</h5>
+                    <button type="button" class="btn btn-sm btn-soft-success" id="add-response-btn">
+                        <i class="ri-add-line me-1"></i> Add Line
+                    </button>
+                </div>
+                <div class="card-body">
+                    {{ responses_formset.management_form }}
+                    <div id="responses-container">
+                        {% for rf in responses_formset %}
+                        <div class="formset-row border rounded p-3 mb-3">
+                            <div class="row g-3">
+                                {% if rf.instance.pk %}
+                                    {{ rf.id }}
+                                {% endif %}
+                                <div class="col-md-4">
+                                    <label class="form-label">Question</label>
+                                    {{ rf.question }}
+                                    {% if rf.question.errors %}<div class="text-danger small">{{ rf.question.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Response</label>
+                                    {{ rf.response_text }}
+                                    {% if rf.response_text.errors %}<div class="text-danger small">{{ rf.response_text.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Attachments Note</label>
+                                    {{ rf.attachments_note }}
+                                    {% if rf.attachments_note.errors %}<div class="text-danger small">{{ rf.attachments_note.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <div class="form-check">
+                                        {{ rf.DELETE }}
+                                        <label class="form-check-label text-danger">Remove</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Due Diligence Checks -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Due Diligence Checks</h5>
+                    <button type="button" class="btn btn-sm btn-soft-success" id="add-check-btn">
+                        <i class="ri-add-line me-1"></i> Add Line
+                    </button>
+                </div>
+                <div class="card-body">
+                    {{ checks_formset.management_form }}
+                    <div id="checks-container">
+                        {% for cf in checks_formset %}
+                        <div class="formset-row border rounded p-3 mb-3">
+                            <div class="row g-3">
+                                {% if cf.instance.pk %}
+                                    {{ cf.id }}
+                                {% endif %}
+                                <div class="col-md-3">
+                                    <label class="form-label">Check Type</label>
+                                    {{ cf.check_type }}
+                                    {% if cf.check_type.errors %}<div class="text-danger small">{{ cf.check_type.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Description</label>
+                                    {{ cf.description }}
+                                    {% if cf.description.errors %}<div class="text-danger small">{{ cf.description.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Status</label>
+                                    {{ cf.status }}
+                                    {% if cf.status.errors %}<div class="text-danger small">{{ cf.status.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Notes</label>
+                                    {{ cf.notes }}
+                                    {% if cf.notes.errors %}<div class="text-danger small">{{ cf.notes.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <div class="form-check">
+                                        {{ cf.DELETE }}
+                                        <label class="form-check-label text-danger">Remove</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2">
+                        <i class="ri-save-line me-1"></i> Save Onboarding
+                    </button>
+                    <a href="{% url 'srm:onboarding_list' %}" class="btn btn-light w-100">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Qualification Responses formset
+    (function() {
+        var container = document.getElementById('responses-container');
+        var addBtn = document.getElementById('add-response-btn');
+        var totalForms = document.getElementById('id_responses-TOTAL_FORMS');
+
+        addBtn.addEventListener('click', function() {
+            var formCount = parseInt(totalForms.value);
+            var lastForm = container.querySelector('.formset-row:last-child');
+            if (!lastForm) return;
+
+            var newForm = lastForm.cloneNode(true);
+            newForm.innerHTML = newForm.innerHTML.replace(
+                /responses-\d+-/g, 'responses-' + formCount + '-'
+            );
+            newForm.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(function(input) {
+                input.value = '';
+            });
+            newForm.querySelectorAll('textarea').forEach(function(ta) {
+                ta.value = '';
+            });
+            newForm.querySelectorAll('select').forEach(function(select) {
+                select.selectedIndex = 0;
+            });
+            newForm.querySelectorAll('input[type=checkbox]').forEach(function(cb) {
+                cb.checked = false;
+            });
+            var idField = newForm.querySelector('input[name$="-id"]');
+            if (idField) idField.value = '';
+
+            container.appendChild(newForm);
+            totalForms.value = formCount + 1;
+        });
+    })();
+
+    // Due Diligence Checks formset
+    (function() {
+        var container = document.getElementById('checks-container');
+        var addBtn = document.getElementById('add-check-btn');
+        var totalForms = document.getElementById('id_checks-TOTAL_FORMS');
+
+        addBtn.addEventListener('click', function() {
+            var formCount = parseInt(totalForms.value);
+            var lastForm = container.querySelector('.formset-row:last-child');
+            if (!lastForm) return;
+
+            var newForm = lastForm.cloneNode(true);
+            newForm.innerHTML = newForm.innerHTML.replace(
+                /checks-\d+-/g, 'checks-' + formCount + '-'
+            );
+            newForm.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(function(input) {
+                input.value = '';
+            });
+            newForm.querySelectorAll('textarea').forEach(function(ta) {
+                ta.value = '';
+            });
+            newForm.querySelectorAll('select').forEach(function(select) {
+                select.selectedIndex = 0;
+            });
+            newForm.querySelectorAll('input[type=checkbox]').forEach(function(cb) {
+                cb.checked = false;
+            });
+            var idField = newForm.querySelector('input[name$="-id"]');
+            if (idField) idField.value = '';
+
+            container.appendChild(newForm);
+            totalForms.value = formCount + 1;
+        });
+    })();
+});
+</script>
+{% endblock %}
