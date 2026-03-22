@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Stock: {{ stock_item.item.name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ stock_item.item.code }} - {{ stock_item.item.name }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'inventory:stock_list' %}">Stock Items</a></li>
+            <li class="breadcrumb-item active">{{ stock_item.item.code }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><h5>Stock Information</h5></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Item</th><td>{{ stock_item.item.code }} - {{ stock_item.item.name }}</td></tr>
+                        <tr><th class="ps-3">Warehouse</th><td>{{ stock_item.warehouse.name }}</td></tr>
+                        <tr><th class="ps-3">Location</th><td>{{ stock_item.location.name|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">UOM</th><td>{{ stock_item.item.get_unit_of_measure_display }}</td></tr>
+                        <tr><th class="ps-3">Batch #</th><td>{{ stock_item.batch_number|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Serial #</th><td>{{ stock_item.serial_number|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Expiry Date</th><td>{{ stock_item.expiry_date|date:"M d, Y"|default:"-" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><h5>Quantities & Costs</h5></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="ps-3">On Hand</th>
+                            <td class="fw-medium">{{ stock_item.quantity_on_hand }}</td>
+                        </tr>
+                        <tr><th class="ps-3">Reserved</th><td>{{ stock_item.quantity_reserved }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Available</th>
+                            <td>
+                                {% if stock_item.is_below_reorder %}
+                                    <span class="text-danger fw-medium">{{ stock_item.quantity_available }}</span>
+                                    <span class="badge bg-soft-danger text-danger ms-1">Below Reorder</span>
+                                {% elif stock_item.is_below_safety %}
+                                    <span class="text-warning fw-medium">{{ stock_item.quantity_available }}</span>
+                                    <span class="badge bg-soft-warning text-warning ms-1">Below Safety</span>
+                                {% else %}
+                                    <span class="text-success fw-medium">{{ stock_item.quantity_available }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Reorder Point</th><td>{{ stock_item.reorder_point }}</td></tr>
+                        <tr><th class="ps-3">Reorder Qty</th><td>{{ stock_item.reorder_quantity }}</td></tr>
+                        <tr><th class="ps-3">Safety Stock</th><td>{{ stock_item.safety_stock }}</td></tr>
+                        <tr><th class="ps-3">Unit Cost</th><td>{{ stock_item.unit_cost }}</td></tr>
+                        <tr><th class="ps-3">Last Received</th><td>{{ stock_item.last_received_date|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Last Issued</th><td>{{ stock_item.last_issued_date|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <a href="{% url 'inventory:stock_list' %}" class="btn btn-light"><i class="ri-arrow-left-line me-1"></i> Back to Stock Items</a>
+    </div>
+</div>
+{% endblock %}
