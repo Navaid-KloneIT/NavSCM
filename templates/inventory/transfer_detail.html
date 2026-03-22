@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Transfer: {{ transfer.transfer_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ transfer.transfer_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'inventory:transfer_list' %}">Transfers</a></li>
+            <li class="breadcrumb-item active">{{ transfer.transfer_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Transfer Info</h5>
+                <div>
+                    {% if transfer.status == 'draft' %}
+                        <a href="{% url 'inventory:transfer_edit' transfer.pk %}" class="btn btn-sm btn-soft-warning"><i class="ri-pencil-line"></i></a>
+                        <form method="POST" action="{% url 'inventory:transfer_delete' transfer.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-soft-danger" onclick="return confirm('Delete this transfer?')"><i class="ri-delete-bin-line"></i></button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Number</th><td>{{ transfer.transfer_number }}</td></tr>
+                        <tr><th class="ps-3">Source</th><td>{{ transfer.source_warehouse.name }}</td></tr>
+                        <tr><th class="ps-3">Destination</th><td>{{ transfer.destination_warehouse.name }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if transfer.status == 'draft' %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                                {% elif transfer.status == 'pending' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                {% elif transfer.status == 'in_transit' %}
+                                    <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> In Transit</span>
+                                {% elif transfer.status == 'received' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Received</span>
+                                {% elif transfer.status == 'cancelled' %}
+                                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ transfer.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Transfer Date</th><td>{{ transfer.transfer_date|date:"M d, Y"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Received Date</th><td>{{ transfer.received_date|date:"M d, Y"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Requested By</th><td>{{ transfer.requested_by.get_full_name|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Approved By</th><td>{{ transfer.approved_by.get_full_name|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ transfer.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Workflow Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if transfer.status == 'draft' %}
+                <form method="POST" action="{% url 'inventory:transfer_submit' transfer.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-send-plane-line me-1"></i> Submit for Approval</button>
+                </form>
+                <form method="POST" action="{% url 'inventory:transfer_cancel' transfer.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger w-100" onclick="return confirm('Cancel this transfer?')"><i class="ri-close-circle-line me-1"></i> Cancel Transfer</button>
+                </form>
+                {% elif transfer.status == 'pending' %}
+                <form method="POST" action="{% url 'inventory:transfer_approve' transfer.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-line me-1"></i> Approve & Ship</button>
+                </form>
+                <form method="POST" action="{% url 'inventory:transfer_cancel' transfer.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger w-100" onclick="return confirm('Cancel this transfer?')"><i class="ri-close-circle-line me-1"></i> Cancel Transfer</button>
+                </form>
+                {% elif transfer.status == 'in_transit' %}
+                <form method="POST" action="{% url 'inventory:transfer_receive' transfer.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100"><i class="ri-check-double-line me-1"></i> Mark as Received</button>
+                </form>
+                {% else %}
+                <p class="text-muted mb-0">No actions available.</p>
+                {% endif %}
+
+                <a href="{% url 'inventory:transfer_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+
+        {% if transfer.notes %}
+        <div class="card">
+            <div class="card-header"><h5>Notes</h5></div>
+            <div class="card-body">{{ transfer.notes|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-8">
+        <!-- Transfer Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Transfer Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Item</th>
+                                <th>Qty Requested</th>
+                                <th>Qty Sent</th>
+                                <th>Qty Received</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ti in items %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ ti.item.code }} - {{ ti.item.name }}</td>
+                                <td>{{ ti.quantity_requested }}</td>
+                                <td>{{ ti.quantity_sent }}</td>
+                                <td>{{ ti.quantity_received }}</td>
+                                <td>{{ ti.notes|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-inbox-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No items in this transfer.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
