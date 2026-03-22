@@ -380,6 +380,129 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Inventory Management <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Warehouses -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'warehouse_list' or request.resolver_match.url_name == 'warehouse_create' or request.resolver_match.url_name == 'warehouse_detail' or request.resolver_match.url_name == 'warehouse_edit' or request.resolver_match.url_name == 'location_create' or request.resolver_match.url_name == 'location_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-building-line"></i>
+                    <span class="menu-text">Warehouses</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'warehouse_list' or request.resolver_match.url_name == 'warehouse_create' or request.resolver_match.url_name == 'warehouse_detail' or request.resolver_match.url_name == 'warehouse_edit' or request.resolver_match.url_name == 'location_create' or request.resolver_match.url_name == 'location_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'inventory:warehouse_list' %}" class="menu-link {% if request.resolver_match.url_name == 'warehouse_list' or request.resolver_match.url_name == 'warehouse_detail' or request.resolver_match.url_name == 'warehouse_edit' or request.resolver_match.url_name == 'location_create' or request.resolver_match.url_name == 'location_edit' %}active{% endif %}">
+                            <span class="menu-text">All Warehouses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'inventory:warehouse_create' %}" class="menu-link {% if request.resolver_match.url_name == 'warehouse_create' %}active{% endif %}">
+                            <span class="menu-text">Add Warehouse</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Stock Control -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'stock_list' or request.resolver_match.url_name == 'stock_detail' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-inbox-line"></i>
+                    <span class="menu-text">Stock Control</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'stock_list' or request.resolver_match.url_name == 'stock_detail' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'inventory:stock_list' %}" class="menu-link {% if request.resolver_match.url_name == 'stock_list' or request.resolver_match.url_name == 'stock_detail' %}active{% endif %}">
+                            <span class="menu-text">All Stock Items</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Warehouse Transfers -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'transfer_list' or request.resolver_match.url_name == 'transfer_create' or request.resolver_match.url_name == 'transfer_detail' or request.resolver_match.url_name == 'transfer_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-truck-line"></i>
+                    <span class="menu-text">Warehouse Transfers</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'transfer_list' or request.resolver_match.url_name == 'transfer_create' or request.resolver_match.url_name == 'transfer_detail' or request.resolver_match.url_name == 'transfer_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'inventory:transfer_list' %}" class="menu-link {% if request.resolver_match.url_name == 'transfer_list' or request.resolver_match.url_name == 'transfer_detail' or request.resolver_match.url_name == 'transfer_edit' %}active{% endif %}">
+                            <span class="menu-text">All Transfers</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'inventory:transfer_create' %}" class="menu-link {% if request.resolver_match.url_name == 'transfer_create' %}active{% endif %}">
+                            <span class="menu-text">New Transfer</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Stock Adjustments -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'adjustment_list' or request.resolver_match.url_name == 'adjustment_create' or request.resolver_match.url_name == 'adjustment_detail' or request.resolver_match.url_name == 'adjustment_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-edit-2-line"></i>
+                    <span class="menu-text">Stock Adjustments</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'adjustment_list' or request.resolver_match.url_name == 'adjustment_create' or request.resolver_match.url_name == 'adjustment_detail' or request.resolver_match.url_name == 'adjustment_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'inventory:adjustment_list' %}" class="menu-link {% if request.resolver_match.url_name == 'adjustment_list' or request.resolver_match.url_name == 'adjustment_detail' or request.resolver_match.url_name == 'adjustment_edit' %}active{% endif %}">
+                            <span class="menu-text">All Adjustments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'inventory:adjustment_create' %}" class="menu-link {% if request.resolver_match.url_name == 'adjustment_create' %}active{% endif %}">
+                            <span class="menu-text">New Adjustment</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Reorder Automation -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'reorder_rule_list' or request.resolver_match.url_name == 'reorder_rule_create' or request.resolver_match.url_name == 'reorder_rule_edit' or request.resolver_match.url_name == 'reorder_suggestion_list' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-alarm-line"></i>
+                    <span class="menu-text">Reorder Automation</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'reorder_rule_list' or request.resolver_match.url_name == 'reorder_rule_create' or request.resolver_match.url_name == 'reorder_rule_edit' or request.resolver_match.url_name == 'reorder_suggestion_list' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'inventory:reorder_rule_list' %}" class="menu-link {% if request.resolver_match.url_name == 'reorder_rule_list' or request.resolver_match.url_name == 'reorder_rule_create' or request.resolver_match.url_name == 'reorder_rule_edit' %}active{% endif %}">
+                            <span class="menu-text">Reorder Rules</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'inventory:reorder_suggestion_list' %}" class="menu-link {% if request.resolver_match.url_name == 'reorder_suggestion_list' %}active{% endif %}">
+                            <span class="menu-text">Suggestions</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Inventory Valuation -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'valuation_list' or request.resolver_match.url_name == 'valuation_create' or request.resolver_match.url_name == 'valuation_detail' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-calculator-line"></i>
+                    <span class="menu-text">Inventory Valuation</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'valuation_list' or request.resolver_match.url_name == 'valuation_create' or request.resolver_match.url_name == 'valuation_detail' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'inventory:valuation_list' %}" class="menu-link {% if request.resolver_match.url_name == 'valuation_list' or request.resolver_match.url_name == 'valuation_detail' %}active{% endif %}">
+                            <span class="menu-text">All Valuations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'inventory:valuation_create' %}" class="menu-link {% if request.resolver_match.url_name == 'valuation_create' %}active{% endif %}">
+                            <span class="menu-text">New Valuation</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Audit &amp; Security <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Audit Logs -->
