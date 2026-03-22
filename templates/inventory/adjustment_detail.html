@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Adjustment: {{ adjustment.adjustment_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ adjustment.adjustment_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'inventory:adjustment_list' %}">Adjustments</a></li>
+            <li class="breadcrumb-item active">{{ adjustment.adjustment_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Adjustment Info</h5>
+                <div>
+                    {% if adjustment.status == 'draft' %}
+                        <a href="{% url 'inventory:adjustment_edit' adjustment.pk %}" class="btn btn-sm btn-soft-warning"><i class="ri-pencil-line"></i></a>
+                        <form method="POST" action="{% url 'inventory:adjustment_delete' adjustment.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-soft-danger" onclick="return confirm('Delete this adjustment?')"><i class="ri-delete-bin-line"></i></button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Number</th><td>{{ adjustment.adjustment_number }}</td></tr>
+                        <tr><th class="ps-3">Warehouse</th><td>{{ adjustment.warehouse.name }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Type</th>
+                            <td><span class="badge bg-soft-info text-info">{{ adjustment.get_adjustment_type_display }}</span></td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if adjustment.status == 'draft' %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                                {% elif adjustment.status == 'pending' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                {% elif adjustment.status == 'approved' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Approved</span>
+                                {% elif adjustment.status == 'rejected' %}
+                                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Rejected</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ adjustment.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Date</th><td>{{ adjustment.adjustment_date|date:"M d, Y"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Adjusted By</th><td>{{ adjustment.adjusted_by.get_full_name|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Approved By</th><td>{{ adjustment.approved_by.get_full_name|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ adjustment.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Workflow Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if adjustment.status == 'draft' %}
+                <form method="POST" action="{% url 'inventory:adjustment_submit' adjustment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-send-plane-line me-1"></i> Submit for Approval</button>
+                </form>
+                {% elif adjustment.status == 'pending' %}
+                <form method="POST" action="{% url 'inventory:adjustment_approve' adjustment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-line me-1"></i> Approve</button>
+                </form>
+                <form method="POST" action="{% url 'inventory:adjustment_reject' adjustment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger w-100" onclick="return confirm('Reject this adjustment?')"><i class="ri-close-circle-line me-1"></i> Reject</button>
+                </form>
+                {% else %}
+                <p class="text-muted mb-0">No actions available.</p>
+                {% endif %}
+
+                <a href="{% url 'inventory:adjustment_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+
+        {% if adjustment.reason %}
+        <div class="card">
+            <div class="card-header"><h5>Reason</h5></div>
+            <div class="card-body">{{ adjustment.reason|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+
+        {% if adjustment.notes %}
+        <div class="card">
+            <div class="card-header"><h5>Notes</h5></div>
+            <div class="card-body">{{ adjustment.notes|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-8">
+        <!-- Adjustment Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Adjustment Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Item</th>
+                                <th>Qty Before</th>
+                                <th>Adjustment</th>
+                                <th>Qty After</th>
+                                <th>Unit Cost</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ai in items %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ ai.item.code }} - {{ ai.item.name }}</td>
+                                <td>{{ ai.quantity_before }}</td>
+                                <td>
+                                    {% if ai.quantity_adjustment > 0 %}
+                                        <span class="text-success fw-medium">+{{ ai.quantity_adjustment }}</span>
+                                    {% elif ai.quantity_adjustment < 0 %}
+                                        <span class="text-danger fw-medium">{{ ai.quantity_adjustment }}</span>
+                                    {% else %}
+                                        {{ ai.quantity_adjustment }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ ai.quantity_after }}</td>
+                                <td>{{ ai.unit_cost }}</td>
+                                <td>{{ ai.notes|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-inbox-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No items in this adjustment.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
