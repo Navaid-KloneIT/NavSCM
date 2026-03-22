@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Valuation: {{ valuation.valuation_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ valuation.valuation_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'inventory:valuation_list' %}">Valuations</a></li>
+            <li class="breadcrumb-item active">{{ valuation.valuation_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Valuation Info</h5>
+                <div>
+                    {% if valuation.status == 'draft' %}
+                    <form method="POST" action="{% url 'inventory:valuation_delete' valuation.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-soft-danger" onclick="return confirm('Delete this valuation?')"><i class="ri-delete-bin-line"></i></button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Number</th><td>{{ valuation.valuation_number }}</td></tr>
+                        <tr><th class="ps-3">Warehouse</th><td>{{ valuation.warehouse.name|default:"All Warehouses" }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Method</th>
+                            <td>
+                                {% if valuation.valuation_method == 'fifo' %}
+                                    <span class="badge bg-soft-primary text-primary">FIFO</span>
+                                {% elif valuation.valuation_method == 'lifo' %}
+                                    <span class="badge bg-soft-warning text-warning">LIFO</span>
+                                {% elif valuation.valuation_method == 'weighted_avg' %}
+                                    <span class="badge bg-soft-info text-info">Weighted Avg</span>
+                                {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ valuation.get_valuation_method_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Date</th><td>{{ valuation.valuation_date|date:"M d, Y" }}</td></tr>
+                        <tr><th class="ps-3">Total Items</th><td>{{ valuation.total_items }}</td></tr>
+                        <tr><th class="ps-3">Total Value</th><td class="fw-medium">{{ valuation.total_value|floatformat:2 }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if valuation.status == 'draft' %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                                {% elif valuation.status == 'completed' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ valuation.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Created By</th><td>{{ valuation.created_by.get_full_name|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ valuation.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if valuation.status == 'draft' %}
+                <form method="POST" action="{% url 'inventory:valuation_run' valuation.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-calculator-line me-1"></i> Run Valuation</button>
+                </form>
+                {% if valuation.total_items > 0 %}
+                <form method="POST" action="{% url 'inventory:valuation_complete' valuation.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-line me-1"></i> Mark as Completed</button>
+                </form>
+                {% endif %}
+                {% else %}
+                <p class="text-muted mb-0">Valuation is completed.</p>
+                {% endif %}
+
+                <a href="{% url 'inventory:valuation_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+
+        {% if valuation.notes %}
+        <div class="card">
+            <div class="card-header"><h5>Notes</h5></div>
+            <div class="card-body">{{ valuation.notes|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-8">
+        <!-- Valuation Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Valuation Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Item</th>
+                                <th>Warehouse</th>
+                                <th>Qty on Hand</th>
+                                <th>Unit Cost</th>
+                                <th>Total Value</th>
+                                <th>Method</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vi in items %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ vi.item.code }} - {{ vi.item.name }}</td>
+                                <td>{{ vi.warehouse.name }}</td>
+                                <td>{{ vi.quantity_on_hand }}</td>
+                                <td>{{ vi.unit_cost|floatformat:2 }}</td>
+                                <td class="fw-medium">{{ vi.total_value|floatformat:2 }}</td>
+                                <td>
+                                    {% if vi.valuation_method == 'fifo' %}
+                                        <span class="badge bg-soft-primary text-primary">FIFO</span>
+                                    {% elif vi.valuation_method == 'lifo' %}
+                                        <span class="badge bg-soft-warning text-warning">LIFO</span>
+                                    {% elif vi.valuation_method == 'weighted_avg' %}
+                                        <span class="badge bg-soft-info text-info">Weighted Avg</span>
+                                    {% else %}
+                                        {{ vi.valuation_method }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-calculator-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">
+                                            {% if valuation.status == 'draft' %}
+                                                Click "Run Valuation" to calculate inventory values.
+                                            {% else %}
+                                                No items in this valuation.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
