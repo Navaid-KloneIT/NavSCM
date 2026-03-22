@@ -13,6 +13,7 @@ urlpatterns = [
     path('core/', include('apps.core.urls', namespace='core')),
     path('procurement/', include('apps.procurement.urls', namespace='procurement')),
     path('srm/', include('apps.srm.urls', namespace='srm')),
+    path('inventory/', include('apps.inventory.urls', namespace='inventory')),
     path('', include('apps.dashboard.urls')),
 ]
 
