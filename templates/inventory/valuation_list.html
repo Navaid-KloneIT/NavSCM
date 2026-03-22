@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory Valuations{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Inventory Valuations</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Inventory</li>
+            <li class="breadcrumb-item active">Valuations</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'inventory:valuation_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by valuation number...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Method</label>
+                            <select class="form-select" name="method">
+                                <option value="">All Methods</option>
+                                {% for value, label in method_choices %}
+                                <option value="{{ value }}" {% if request.GET.method == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'inventory:valuation_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Valuation</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Valuations Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Valuations</h5>
+                <span class="text-muted">{{ valuations|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Number</th>
+                                <th>Warehouse</th>
+                                <th>Method</th>
+                                <th>Date</th>
+                                <th>Items</th>
+                                <th>Total Value</th>
+                                <th>Status</th>
+                                <th>Created By</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for v in valuations %}
+                            <tr>
+                                <td><a href="{% url 'inventory:valuation_detail' v.pk %}" class="fw-medium">{{ v.valuation_number }}</a></td>
+                                <td>{{ v.warehouse.name|default:"All Warehouses" }}</td>
+                                <td>
+                                    {% if v.valuation_method == 'fifo' %}
+                                        <span class="badge bg-soft-primary text-primary">FIFO</span>
+                                    {% elif v.valuation_method == 'lifo' %}
+                                        <span class="badge bg-soft-warning text-warning">LIFO</span>
+                                    {% elif v.valuation_method == 'weighted_avg' %}
+                                        <span class="badge bg-soft-info text-info">Weighted Avg</span>
+                                    {% else %}
+                                        <span class="badge bg-soft-secondary text-secondary">{{ v.get_valuation_method_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ v.valuation_date|date:"M d, Y" }}</td>
+                                <td>{{ v.total_items }}</td>
+                                <td class="fw-medium">{{ v.total_value|floatformat:2 }}</td>
+                                <td>
+                                    {% if v.status == 'draft' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                                    {% elif v.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ v.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ v.created_by.get_full_name|default:"-" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'inventory:valuation_detail' v.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if v.status == 'draft' %}
+                                        <form method="POST" action="{% url 'inventory:valuation_delete' v.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this valuation?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-calculator-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No valuations found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.method %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Create a valuation to calculate your inventory worth.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
