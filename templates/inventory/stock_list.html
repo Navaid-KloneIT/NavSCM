@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Stock Items{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Stock Control</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Inventory</li>
+            <li class="breadcrumb-item active">Stock Items</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'inventory:stock_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by item name, code, batch or serial...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Warehouse</label>
+                            <select class="form-select" name="warehouse">
+                                <option value="">All Warehouses</option>
+                                {% for wh in warehouses %}
+                                <option value="{{ wh.pk }}" {% if request.GET.warehouse == wh.pk|stringformat:"d" %}selected{% endif %}>{{ wh.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Stock Level</label>
+                            <select class="form-select" name="low_stock">
+                                <option value="">All</option>
+                                <option value="yes" {% if request.GET.low_stock == 'yes' %}selected{% endif %}>Low Stock Only</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stock Items Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Stock Items</h5>
+                <span class="text-muted">{{ stock_items|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Warehouse</th>
+                                <th>Location</th>
+                                <th>On Hand</th>
+                                <th>Reserved</th>
+                                <th>Available</th>
+                                <th>Reorder Point</th>
+                                <th>Unit Cost</th>
+                                <th>Batch #</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for si in stock_items %}
+                            <tr>
+                                <td><a href="{% url 'inventory:stock_detail' si.pk %}" class="fw-medium">{{ si.item.code }} - {{ si.item.name }}</a></td>
+                                <td>{{ si.warehouse.name }}</td>
+                                <td>{{ si.location.name|default:"-" }}</td>
+                                <td>{{ si.quantity_on_hand }}</td>
+                                <td>{{ si.quantity_reserved }}</td>
+                                <td>
+                                    {% if si.is_below_reorder %}
+                                        <span class="text-danger fw-medium">{{ si.quantity_available }}</span>
+                                        <i class="ri-arrow-down-line text-danger"></i>
+                                    {% elif si.is_below_safety %}
+                                        <span class="text-warning fw-medium">{{ si.quantity_available }}</span>
+                                    {% else %}
+                                        {{ si.quantity_available }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ si.reorder_point }}</td>
+                                <td>{{ si.unit_cost }}</td>
+                                <td>{{ si.batch_number|default:"-" }}</td>
+                                <td>
+                                    <a href="{% url 'inventory:stock_detail' si.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="10" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-inbox-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No stock items found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.warehouse or request.GET.low_stock %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Stock items will appear here once goods are received or transferred.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
