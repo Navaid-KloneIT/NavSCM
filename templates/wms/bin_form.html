@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'wms:bin_list' %}">Bins</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Bin Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Warehouse *</label>
+                            {{ form.warehouse }}
+                            {% if form.warehouse.errors %}<div class="text-danger small">{{ form.warehouse.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Bin Code</label>
+                            {{ form.bin_code }}
+                            {% if form.bin_code.errors %}<div class="text-danger small">{{ form.bin_code.errors.0 }}</div>{% endif %}
+                            <small class="text-muted">Auto-generated if blank.</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Zone</label>
+                            {{ form.zone }}
+                            {% if form.zone.errors %}<div class="text-danger small">{{ form.zone.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Aisle</label>
+                            {{ form.aisle }}
+                            {% if form.aisle.errors %}<div class="text-danger small">{{ form.aisle.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Rack</label>
+                            {{ form.rack }}
+                            {% if form.rack.errors %}<div class="text-danger small">{{ form.rack.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Shelf</label>
+                            {{ form.shelf }}
+                            {% if form.shelf.errors %}<div class="text-danger small">{{ form.shelf.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Bin Position</label>
+                            {{ form.bin_position }}
+                            {% if form.bin_position.errors %}<div class="text-danger small">{{ form.bin_position.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Bin Type *</label>
+                            {{ form.bin_type }}
+                            {% if form.bin_type.errors %}<div class="text-danger small">{{ form.bin_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Capacity</label>
+                            {{ form.capacity }}
+                            {% if form.capacity.errors %}<div class="text-danger small">{{ form.capacity.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Bin</button>
+                    <a href="{% url 'wms:bin_list' %}" class="btn btn-light w-100">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
