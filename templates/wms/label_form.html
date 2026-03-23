@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'wms:label_list' %}">Shipping Labels</a></li>
+            <li class="breadcrumb-item active">Generate</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="alert alert-info mb-0">
+            <i class="ri-information-line me-1"></i> Generating label for packing order <strong>{{ order.packing_number }}</strong>
+        </div>
+    </div>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Label Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Carrier *</label>
+                            {{ form.carrier }}
+                            {% if form.carrier.errors %}<div class="text-danger small">{{ form.carrier.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tracking Number</label>
+                            {{ form.tracking_number }}
+                            {% if form.tracking_number.errors %}<div class="text-danger small">{{ form.tracking_number.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Weight</label>
+                            {{ form.weight }}
+                            {% if form.weight.errors %}<div class="text-danger small">{{ form.weight.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Dimensions</label>
+                            {{ form.dimensions }}
+                            {% if form.dimensions.errors %}<div class="text-danger small">{{ form.dimensions.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Destination Address *</label>
+                            {{ form.destination_address }}
+                            {% if form.destination_address.errors %}<div class="text-danger small">{{ form.destination_address.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-price-tag-3-line me-1"></i> Generate Label</button>
+                    <a href="{% url 'wms:packing_detail' order.pk %}" class="btn btn-light w-100">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
