@@ -55,6 +55,16 @@ Manages stock levels, warehouse operations, and inventory valuation across multi
 - **Reorder Automation** - Configurable reorder rules with safety stock, lead times, and auto-generated reorder suggestions
 - **Inventory Valuation** - Stock valuation using FIFO, LIFO, or Weighted Average methods with per-item breakdown
 
+### Module 4: Warehouse Management System (WMS)
+
+Controls the physical operations within the warehouse.
+
+- **Bin/Location Management** - Granular storage bin tracking within warehouses with zone, aisle, rack, shelf positioning, bin types (bulk, pick, reserve, staging, dock), and capacity/utilization monitoring
+- **Inbound Operations** - Dock appointment scheduling (scheduled → checked in → receiving → completed), receiving order processing with line items and put-away destination, and put-away task assignment with source/destination bin tracking
+- **Outbound Operations** - Pick list management with picking strategies (wave, batch, zone, single) and priority levels (low → urgent), packing order workflow (pending → packing → packed → shipped), and shipping label generation with carrier, tracking, and destination details
+- **Cycle Counting** - Scheduled count plans with configurable frequency (daily, weekly, monthly, quarterly) and count types (ABC analysis, location-based, random sample, full count), individual cycle count sessions with item-level variance tracking
+- **Yard Management** - Yard location mapping (dock doors, parking spots, staging areas, gates) with occupancy tracking, and yard visit management for trucks/trailers with full status workflow (expected → checked in → at dock → loading/unloading → completed → departed)
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -165,6 +175,11 @@ Manages stock levels, warehouse operations, and inventory valuation across multi
    python manage.py seed_inventory
    ```
 
+7e. **Seed WMS data**
+   ```bash
+   python manage.py seed_wms
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -207,11 +222,17 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/srm/*)
 │   │   └── admin.py       # Django admin registration
-│   └── inventory/         # Inventory management module
-│       ├── models.py      # Warehouse, StockItem, Transfer, Adjustment, Reorder, Valuation
-│       ├── views.py       # All inventory CRUD & workflow views
+│   ├── inventory/         # Inventory management module
+│   │   ├── models.py      # Warehouse, StockItem, Transfer, Adjustment, Reorder, Valuation
+│   │   ├── views.py       # All inventory CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/inventory/*)
+│   │   └── admin.py       # Django admin registration
+│   └── wms/               # Warehouse management system module
+│       ├── models.py      # Bin, DockAppointment, ReceivingOrder, PutAwayTask, PickList, PackingOrder, ShippingLabel, CycleCountPlan, CycleCount, YardLocation, YardVisit
+│       ├── views.py       # All WMS CRUD & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/inventory/*)
+│       ├── urls.py        # URL routing (/wms/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -241,13 +262,25 @@ NavSCM/
 │   │   ├── contract_*.html    # Contract list, form, detail
 │   │   ├── catalog_*.html     # Supplier catalog list, form, detail
 │   │   └── risk_*.html        # Risk assessment list, form, detail
-│   └── inventory/         # Inventory templates
-│       ├── warehouse_*.html   # Warehouse list, form, detail
-│       ├── stock_*.html       # Stock item list, detail
-│       ├── transfer_*.html    # Warehouse transfer list, form, detail
-│       ├── adjustment_*.html  # Stock adjustment list, form, detail
-│       ├── reorder_*.html     # Reorder rules & suggestions list, form
-│       └── valuation_*.html   # Inventory valuation list, form, detail
+│   ├── inventory/         # Inventory templates
+│   │   ├── warehouse_*.html   # Warehouse list, form, detail
+│   │   ├── stock_*.html       # Stock item list, detail
+│   │   ├── transfer_*.html    # Warehouse transfer list, form, detail
+│   │   ├── adjustment_*.html  # Stock adjustment list, form, detail
+│   │   ├── reorder_*.html     # Reorder rules & suggestions list, form
+│   │   └── valuation_*.html   # Inventory valuation list, form, detail
+│   └── wms/               # WMS templates
+│       ├── bin_*.html         # Bin list, form, detail
+│       ├── dock_*.html        # Dock appointment list, form, detail
+│       ├── receiving_*.html   # Receiving order list, form, detail
+│       ├── putaway_*.html     # Put-away task list, detail
+│       ├── picklist_*.html    # Pick list list, form, detail
+│       ├── packing_*.html     # Packing order list, form, detail
+│       ├── label_*.html       # Shipping label list, form, detail
+│       ├── plan_*.html        # Cycle count plan list, form, detail
+│       ├── count_*.html       # Cycle count list, form, detail
+│       ├── yard_location_*.html # Yard location list, form, detail
+│       └── yard_visit_*.html  # Yard visit list, form, detail
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
@@ -275,7 +308,7 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 
 | # | Module | Description | Status |
 |---|--------|-------------|--------|
-| 1 | **Warehouse Management (WMS)** | Inbound/outbound operations, bin/location management, cycle counting, yard management | Planned |
+| 1 | **Warehouse Management (WMS)** | Inbound/outbound operations, bin/location management, cycle counting, yard management | Done |
 | 2 | **Order Management (OMS)** | Order capture, validation, allocation, backorder management, customer notifications | Planned |
 | 3 | **Transportation Management (TMS)** | Route planning, freight audit, carrier management, shipment tracking, load optimization | Planned |
 | 4 | **Demand Planning & Forecasting** | Sales forecasting, seasonality analysis, demand sensing, collaborative planning, safety stock calculation | Planned |
