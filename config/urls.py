@@ -14,6 +14,7 @@ urlpatterns = [
     path('procurement/', include('apps.procurement.urls', namespace='procurement')),
     path('srm/', include('apps.srm.urls', namespace='srm')),
     path('inventory/', include('apps.inventory.urls', namespace='inventory')),
+    path('wms/', include('apps.wms.urls', namespace='wms')),
     path('', include('apps.dashboard.urls')),
 ]
 
