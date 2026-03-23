@@ -34,6 +34,16 @@ Manages the purchasing of goods and services to ensure cost-effectiveness and ti
 - **Vendor Management** - Vendor master data with contact details, payment terms, tax ID, and activity tracking
 - **Item Catalog** - Categorized item/service catalog with unit of measure, pricing, and active/inactive status
 
+### Module 2: Supplier Relationship Management (SRM)
+
+Manages the full supplier lifecycle from onboarding and qualification through performance evaluation, contract management, and risk mitigation.
+
+- **Supplier Onboarding** - Structured vendor qualification workflow (draft → in progress → under review → approved/rejected) with qualification questionnaires and due diligence checks (financial verification, legal compliance, quality certification, insurance, reference checks, site inspection)
+- **Supplier Scorecards** - Periodic vendor performance evaluation across four dimensions (delivery, quality, price, responsiveness) with auto-calculated overall scores and ratings (excellent → poor)
+- **Contract Management** - Full contract lifecycle for master agreements, purchase agreements, service agreements, NDAs, and SLAs with milestone tracking, document management, auto-renewal alerts, and multi-currency support (USD, EUR, GBP, PKR, AED, SAR, INR, CNY)
+- **Supplier Catalog Management** - Vendor-specific product catalogs with supplier part numbers, pricing, minimum order quantities, and lead times linked to the procurement item catalog
+- **Risk Assessment** - Comprehensive supplier risk evaluation across financial, geopolitical, compliance, and operational dimensions with likelihood/impact scoring, risk factor identification, and mitigation action tracking with assignments and due dates
+
 ### Module 3: Inventory Management
 
 Manages stock levels, warehouse operations, and inventory valuation across multiple locations.
@@ -145,7 +155,12 @@ Manages stock levels, warehouse operations, and inventory valuation across multi
    python manage.py seed_procurement
    ```
 
-7c. **Seed inventory data**
+7c. **Seed SRM data**
+   ```bash
+   python manage.py seed_srm
+   ```
+
+7d. **Seed inventory data**
    ```bash
    python manage.py seed_inventory
    ```
@@ -186,6 +201,12 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/procurement/*)
 │   │   └── admin.py       # Django admin registration
+│   ├── srm/               # Supplier relationship management module
+│   │   ├── models.py      # Onboarding, Scorecard, Contract, Catalog, Risk Assessment
+│   │   ├── views.py       # All SRM CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/srm/*)
+│   │   └── admin.py       # Django admin registration
 │   └── inventory/         # Inventory management module
 │       ├── models.py      # Warehouse, StockItem, Transfer, Adjustment, Reorder, Valuation
 │       ├── views.py       # All inventory CRUD & workflow views
@@ -212,6 +233,14 @@ NavSCM/
 │   │   ├── grn_*.html         # Goods receipt list, form, detail
 │   │   ├── invoice_*.html     # Vendor invoice list, form, detail
 │   │   └── reconciliation*.html # 3-way match dashboard & form
+│   ├── srm/               # SRM templates
+│   │   ├── onboarding_*.html  # Supplier onboarding list, form, detail
+│   │   ├── question_*.html    # Qualification question list, form
+│   │   ├── period_*.html      # Scorecard period list, form
+│   │   ├── scorecard_*.html   # Supplier scorecard list, form, detail
+│   │   ├── contract_*.html    # Contract list, form, detail
+│   │   ├── catalog_*.html     # Supplier catalog list, form, detail
+│   │   └── risk_*.html        # Risk assessment list, form, detail
 │   └── inventory/         # Inventory templates
 │       ├── warehouse_*.html   # Warehouse list, form, detail
 │       ├── stock_*.html       # Stock item list, detail
