@@ -34,6 +34,17 @@ Manages the purchasing of goods and services to ensure cost-effectiveness and ti
 - **Vendor Management** - Vendor master data with contact details, payment terms, tax ID, and activity tracking
 - **Item Catalog** - Categorized item/service catalog with unit of measure, pricing, and active/inactive status
 
+### Module 3: Inventory Management
+
+Manages stock levels, warehouse operations, and inventory valuation across multiple locations.
+
+- **Warehouse Management** - Multiple warehouse types (main, branch, transit) with zone-based locations (receiving, storage, picking, shipping)
+- **Stock Control** - Real-time stock tracking per item/warehouse/batch with on-hand, reserved, and available quantities
+- **Warehouse Transfers** - Inter-warehouse stock movement with approval workflow (draft → pending → in transit → received)
+- **Stock Adjustments** - Inventory corrections for write-offs, damage, cycle counts, corrections, and returns with approval flow
+- **Reorder Automation** - Configurable reorder rules with safety stock, lead times, and auto-generated reorder suggestions
+- **Inventory Valuation** - Stock valuation using FIFO, LIFO, or Weighted Average methods with per-item breakdown
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -129,6 +140,16 @@ Manages the purchasing of goods and services to ensure cost-effectiveness and ti
    python manage.py seed_data
    ```
 
+7b. **Seed procurement data**
+   ```bash
+   python manage.py seed_procurement
+   ```
+
+7c. **Seed inventory data**
+   ```bash
+   python manage.py seed_inventory
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -159,11 +180,17 @@ NavSCM/
 │   ├── core/              # Tenant model, middleware, context processors
 │   ├── accounts/          # Auth, users, roles, profiles, invites
 │   ├── dashboard/         # Dashboard views & stats
-│   └── procurement/       # Procurement management module
-│       ├── models.py      # Vendor, Item, PR, RFQ, PO, GRN, Invoice, 3-Way Match
-│       ├── views.py       # All procurement CRUD & workflow views
+│   ├── procurement/       # Procurement management module
+│   │   ├── models.py      # Vendor, Item, PR, RFQ, PO, GRN, Invoice, 3-Way Match
+│   │   ├── views.py       # All procurement CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/procurement/*)
+│   │   └── admin.py       # Django admin registration
+│   └── inventory/         # Inventory management module
+│       ├── models.py      # Warehouse, StockItem, Transfer, Adjustment, Reorder, Valuation
+│       ├── views.py       # All inventory CRUD & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/procurement/*)
+│       ├── urls.py        # URL routing (/inventory/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -175,16 +202,23 @@ NavSCM/
 │   ├── auth/              # Login, register, forgot password
 │   ├── dashboard/         # Dashboard index
 │   ├── accounts/          # User list, invite, profile
-│   └── procurement/       # Procurement templates
-│       ├── vendor_*.html      # Vendor list, form, detail
-│       ├── item_*.html        # Item catalog list, form
-│       ├── category_*.html    # Category list, form
-│       ├── requisition_*.html # Purchase requisition list, form, detail
-│       ├── rfq_*.html         # RFQ list, form, detail
-│       ├── po_*.html          # Purchase order list, form, detail
-│       ├── grn_*.html         # Goods receipt list, form, detail
-│       ├── invoice_*.html     # Vendor invoice list, form, detail
-│       └── reconciliation*.html # 3-way match dashboard & form
+│   ├── procurement/       # Procurement templates
+│   │   ├── vendor_*.html      # Vendor list, form, detail
+│   │   ├── item_*.html        # Item catalog list, form
+│   │   ├── category_*.html    # Category list, form
+│   │   ├── requisition_*.html # Purchase requisition list, form, detail
+│   │   ├── rfq_*.html         # RFQ list, form, detail
+│   │   ├── po_*.html          # Purchase order list, form, detail
+│   │   ├── grn_*.html         # Goods receipt list, form, detail
+│   │   ├── invoice_*.html     # Vendor invoice list, form, detail
+│   │   └── reconciliation*.html # 3-way match dashboard & form
+│   └── inventory/         # Inventory templates
+│       ├── warehouse_*.html   # Warehouse list, form, detail
+│       ├── stock_*.html       # Stock item list, detail
+│       ├── transfer_*.html    # Warehouse transfer list, form, detail
+│       ├── adjustment_*.html  # Stock adjustment list, form, detail
+│       ├── reorder_*.html     # Reorder rules & suggestions list, form
+│       └── valuation_*.html   # Inventory valuation list, form, detail
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
@@ -213,7 +247,7 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 | # | Module | Description | Status |
 |---|--------|-------------|--------|
 | 2 | **Supplier Relationship Management (SRM)** | Supplier onboarding, scorecards, contract management, catalog management, risk assessment | Planned |
-| 3 | **Inventory Management** | Stock control, warehouse transfers, stock adjustments, reorder automation, inventory valuation (FIFO/LIFO/WA) | Planned |
+| 3 | **Inventory Management** | Stock control, warehouse transfers, stock adjustments, reorder automation, inventory valuation (FIFO/LIFO/WA) | Done |
 | 4 | **Warehouse Management (WMS)** | Inbound/outbound operations, bin/location management, cycle counting, yard management | Planned |
 | 5 | **Order Management (OMS)** | Order capture, validation, allocation, backorder management, customer notifications | Planned |
 | 6 | **Transportation Management (TMS)** | Route planning, freight audit, carrier management, shipment tracking, load optimization | Planned |
