@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Packing: {{ order.packing_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ order.packing_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'wms:packing_list' %}">Packing Orders</a></li>
+            <li class="breadcrumb-item active">{{ order.packing_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Packing Info</h5>
+                <div>
+                    {% if order.status == 'pending' %}
+                        <a href="{% url 'wms:packing_edit' order.pk %}" class="btn btn-sm btn-soft-warning"><i class="ri-pencil-line"></i></a>
+                        <form method="POST" action="{% url 'wms:packing_delete' order.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-soft-danger" onclick="return confirm('Delete this packing order?')"><i class="ri-delete-bin-line"></i></button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Packing #</th><td>{{ order.packing_number }}</td></tr>
+                        <tr><th class="ps-3">Warehouse</th><td>{{ order.warehouse.name }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Pick List</th>
+                            <td>
+                                {% if order.pick_list %}
+                                    <a href="{% url 'wms:picklist_detail' order.pick_list.pk %}">{{ order.pick_list.pick_number }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if order.status == 'pending' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                {% elif order.status == 'packing' %}
+                                    <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Packing</span>
+                                {% elif order.status == 'packed' %}
+                                    <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Packed</span>
+                                {% elif order.status == 'shipped' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Shipped</span>
+                                {% elif order.status == 'cancelled' %}
+                                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ order.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Packer</th><td>{{ order.packer.get_full_name|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Packed At</th><td>{{ order.packed_at|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Weight</th><td>{{ order.total_weight|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Packages</th><td>{{ order.total_packages|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Shipping Method</th><td>{{ order.shipping_method|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Tracking #</th><td>{{ order.tracking_number|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Notes</th><td>{{ order.notes|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ order.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Workflow Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if order.status == 'pending' %}
+                <form method="POST" action="{% url 'wms:packing_start' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-play-line me-1"></i> Start Packing</button>
+                </form>
+                {% elif order.status == 'packing' %}
+                <form method="POST" action="{% url 'wms:packing_complete' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Complete Packing</button>
+                </form>
+                {% elif order.status == 'packed' %}
+                <form method="POST" action="{% url 'wms:packing_ship' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-truck-line me-1"></i> Mark Shipped</button>
+                </form>
+                <a href="{% url 'wms:label_generate' packing_pk=order.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-price-tag-3-line me-1"></i> Generate Label</a>
+                {% else %}
+                <p class="text-muted mb-0">No actions available.</p>
+                {% endif %}
+
+                <a href="{% url 'wms:packing_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <!-- Shipping Labels -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Shipping Labels</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Label #</th>
+                                <th>Carrier</th>
+                                <th>Tracking #</th>
+                                <th>Weight</th>
+                                <th>Dimensions</th>
+                                <th>Generated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for l in labels %}
+                            <tr>
+                                <td><a href="{% url 'wms:label_detail' l.pk %}" class="fw-medium">{{ l.label_number }}</a></td>
+                                <td>{{ l.carrier|default:"-" }}</td>
+                                <td>{{ l.tracking_number|default:"-" }}</td>
+                                <td>{{ l.weight|default:"-" }}</td>
+                                <td>{{ l.dimensions|default:"-" }}</td>
+                                <td>{{ l.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-price-tag-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No shipping labels generated yet.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
