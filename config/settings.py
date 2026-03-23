@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'apps.procurement',
     'apps.srm',
     'apps.inventory',
+    'apps.wms',
 ]
 
 # ==============================================================================
