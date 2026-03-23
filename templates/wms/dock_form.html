@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'wms:dock_list' %}">Dock Appointments</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Appointment Details -->
+            <div class="card">
+                <div class="card-header"><h5>Appointment Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Warehouse *</label>
+                            {{ form.warehouse }}
+                            {% if form.warehouse.errors %}<div class="text-danger small">{{ form.warehouse.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Dock Number *</label>
+                            {{ form.dock_number }}
+                            {% if form.dock_number.errors %}<div class="text-danger small">{{ form.dock_number.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Date *</label>
+                            {{ form.date }}
+                            {% if form.date.errors %}<div class="text-danger small">{{ form.date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Time Slot *</label>
+                            {{ form.time_slot }}
+                            {% if form.time_slot.errors %}<div class="text-danger small">{{ form.time_slot.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Carrier Name *</label>
+                            {{ form.carrier_name }}
+                            {% if form.carrier_name.errors %}<div class="text-danger small">{{ form.carrier_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Trailer Number</label>
+                            {{ form.trailer_number }}
+                            {% if form.trailer_number.errors %}<div class="text-danger small">{{ form.trailer_number.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">PO Reference</label>
+                            {{ form.po_reference }}
+                            {% if form.po_reference.errors %}<div class="text-danger small">{{ form.po_reference.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Appointment</button>
+                    <a href="{% url 'wms:dock_list' %}" class="btn btn-light w-100">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
