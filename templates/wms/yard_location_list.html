@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Yard Locations{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Yard Locations</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item active">Yard Locations</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'wms:yard_location_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by location code...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Warehouse</label>
+                            <select class="form-select" name="warehouse">
+                                <option value="">All Warehouses</option>
+                                {% for wh in warehouses %}
+                                <option value="{{ wh.pk }}" {% if request.GET.warehouse == wh.pk|stringformat:"d" %}selected{% endif %}>{{ wh.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Location Type</label>
+                            <select class="form-select" name="location_type">
+                                <option value="">All Types</option>
+                                {% for value, label in type_choices %}
+                                <option value="{{ value }}" {% if request.GET.location_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                                <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'wms:yard_location_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> Add Location</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Yard Locations Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Yard Locations</h5>
+                <span class="text-muted">{{ locations|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Location Code</th>
+                                <th>Warehouse</th>
+                                <th>Type</th>
+                                <th>Occupied</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loc in locations %}
+                            <tr>
+                                <td><a href="{% url 'wms:yard_location_detail' loc.pk %}" class="fw-medium">{{ loc.location_code }}</a></td>
+                                <td>{{ loc.warehouse.name }}</td>
+                                <td><span class="badge bg-soft-info text-info">{{ loc.get_location_type_display }}</span></td>
+                                <td>
+                                    {% if loc.is_occupied %}
+                                        <span class="badge bg-soft-danger text-danger">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-soft-success text-success">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if loc.is_active %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'wms:yard_location_detail' loc.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        <a href="{% url 'wms:yard_location_edit' loc.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                        <form method="POST" action="{% url 'wms:yard_location_delete' loc.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this yard location?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-roadster-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No yard locations found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.warehouse or request.GET.location_type or request.GET.status %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by adding your first yard location.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
