@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'wms:yard_visit_list' %}">Yard Visits</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Yard Visit Details -->
+            <div class="card">
+                <div class="card-header"><h5>Yard Visit Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Warehouse *</label>
+                            {{ form.warehouse }}
+                            {% if form.warehouse.errors %}<div class="text-danger small">{{ form.warehouse.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Yard Location</label>
+                            {{ form.yard_location }}
+                            {% if form.yard_location.errors %}<div class="text-danger small">{{ form.yard_location.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Carrier Name *</label>
+                            {{ form.carrier_name }}
+                            {% if form.carrier_name.errors %}<div class="text-danger small">{{ form.carrier_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Driver Name</label>
+                            {{ form.driver_name }}
+                            {% if form.driver_name.errors %}<div class="text-danger small">{{ form.driver_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Trailer Number</label>
+                            {{ form.trailer_number }}
+                            {% if form.trailer_number.errors %}<div class="text-danger small">{{ form.trailer_number.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Truck Number</label>
+                            {{ form.truck_number }}
+                            {% if form.truck_number.errors %}<div class="text-danger small">{{ form.truck_number.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Visit Type *</label>
+                            {{ form.visit_type }}
+                            {% if form.visit_type.errors %}<div class="text-danger small">{{ form.visit_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Appointment</label>
+                            {{ form.appointment }}
+                            {% if form.appointment.errors %}<div class="text-danger small">{{ form.appointment.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Yard Visit</button>
+                    <a href="{% url 'wms:yard_visit_list' %}" class="btn btn-light w-100">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
