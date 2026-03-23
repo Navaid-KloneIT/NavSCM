@@ -503,6 +503,123 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Warehouse Management (WMS) <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Bin Management -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'bin_list' or request.resolver_match.url_name == 'bin_create' or request.resolver_match.url_name == 'bin_detail' or request.resolver_match.url_name == 'bin_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-layout-grid-line"></i>
+                    <span class="menu-text">Bin Management</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'bin_list' or request.resolver_match.url_name == 'bin_create' or request.resolver_match.url_name == 'bin_detail' or request.resolver_match.url_name == 'bin_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'wms:bin_list' %}" class="menu-link {% if request.resolver_match.url_name == 'bin_list' or request.resolver_match.url_name == 'bin_detail' %}active{% endif %}">
+                            <span class="menu-text">All Bins</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'wms:bin_create' %}" class="menu-link {% if request.resolver_match.url_name == 'bin_create' %}active{% endif %}">
+                            <span class="menu-text">Add Bin</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Inbound Operations -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'dock_list' or request.resolver_match.url_name == 'dock_create' or request.resolver_match.url_name == 'dock_detail' or request.resolver_match.url_name == 'dock_edit' or request.resolver_match.url_name == 'receiving_list' or request.resolver_match.url_name == 'receiving_create' or request.resolver_match.url_name == 'receiving_detail' or request.resolver_match.url_name == 'receiving_edit' or request.resolver_match.url_name == 'putaway_list' or request.resolver_match.url_name == 'putaway_detail' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-login-box-line"></i>
+                    <span class="menu-text">Inbound</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'dock_list' or request.resolver_match.url_name == 'dock_create' or request.resolver_match.url_name == 'dock_detail' or request.resolver_match.url_name == 'dock_edit' or request.resolver_match.url_name == 'receiving_list' or request.resolver_match.url_name == 'receiving_create' or request.resolver_match.url_name == 'receiving_detail' or request.resolver_match.url_name == 'receiving_edit' or request.resolver_match.url_name == 'putaway_list' or request.resolver_match.url_name == 'putaway_detail' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'wms:dock_list' %}" class="menu-link {% if request.resolver_match.url_name == 'dock_list' or request.resolver_match.url_name == 'dock_detail' or request.resolver_match.url_name == 'dock_edit' %}active{% endif %}">
+                            <span class="menu-text">Dock Appointments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'wms:receiving_list' %}" class="menu-link {% if request.resolver_match.url_name == 'receiving_list' or request.resolver_match.url_name == 'receiving_detail' or request.resolver_match.url_name == 'receiving_edit' %}active{% endif %}">
+                            <span class="menu-text">Receiving Orders</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'wms:putaway_list' %}" class="menu-link {% if request.resolver_match.url_name == 'putaway_list' or request.resolver_match.url_name == 'putaway_detail' %}active{% endif %}">
+                            <span class="menu-text">Put-Away Tasks</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Outbound Operations -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'picklist_list' or request.resolver_match.url_name == 'picklist_create' or request.resolver_match.url_name == 'picklist_detail' or request.resolver_match.url_name == 'picklist_edit' or request.resolver_match.url_name == 'packing_list' or request.resolver_match.url_name == 'packing_create' or request.resolver_match.url_name == 'packing_detail' or request.resolver_match.url_name == 'packing_edit' or request.resolver_match.url_name == 'label_list' or request.resolver_match.url_name == 'label_detail' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-logout-box-line"></i>
+                    <span class="menu-text">Outbound</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'picklist_list' or request.resolver_match.url_name == 'picklist_create' or request.resolver_match.url_name == 'picklist_detail' or request.resolver_match.url_name == 'picklist_edit' or request.resolver_match.url_name == 'packing_list' or request.resolver_match.url_name == 'packing_create' or request.resolver_match.url_name == 'packing_detail' or request.resolver_match.url_name == 'packing_edit' or request.resolver_match.url_name == 'label_list' or request.resolver_match.url_name == 'label_detail' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'wms:picklist_list' %}" class="menu-link {% if request.resolver_match.url_name == 'picklist_list' or request.resolver_match.url_name == 'picklist_detail' or request.resolver_match.url_name == 'picklist_edit' %}active{% endif %}">
+                            <span class="menu-text">Pick Lists</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'wms:packing_list' %}" class="menu-link {% if request.resolver_match.url_name == 'packing_list' or request.resolver_match.url_name == 'packing_detail' or request.resolver_match.url_name == 'packing_edit' %}active{% endif %}">
+                            <span class="menu-text">Packing Orders</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'wms:label_list' %}" class="menu-link {% if request.resolver_match.url_name == 'label_list' or request.resolver_match.url_name == 'label_detail' %}active{% endif %}">
+                            <span class="menu-text">Shipping Labels</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Cycle Counting -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'plan_list' or request.resolver_match.url_name == 'plan_create' or request.resolver_match.url_name == 'plan_detail' or request.resolver_match.url_name == 'plan_edit' or request.resolver_match.url_name == 'count_list' or request.resolver_match.url_name == 'count_create' or request.resolver_match.url_name == 'count_detail' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-survey-line"></i>
+                    <span class="menu-text">Cycle Counting</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'plan_list' or request.resolver_match.url_name == 'plan_create' or request.resolver_match.url_name == 'plan_detail' or request.resolver_match.url_name == 'plan_edit' or request.resolver_match.url_name == 'count_list' or request.resolver_match.url_name == 'count_create' or request.resolver_match.url_name == 'count_detail' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'wms:plan_list' %}" class="menu-link {% if request.resolver_match.url_name == 'plan_list' or request.resolver_match.url_name == 'plan_detail' or request.resolver_match.url_name == 'plan_edit' %}active{% endif %}">
+                            <span class="menu-text">Count Plans</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'wms:count_list' %}" class="menu-link {% if request.resolver_match.url_name == 'count_list' or request.resolver_match.url_name == 'count_detail' %}active{% endif %}">
+                            <span class="menu-text">Cycle Counts</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Yard Management -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'yard_location_list' or request.resolver_match.url_name == 'yard_location_create' or request.resolver_match.url_name == 'yard_location_detail' or request.resolver_match.url_name == 'yard_location_edit' or request.resolver_match.url_name == 'yard_visit_list' or request.resolver_match.url_name == 'yard_visit_create' or request.resolver_match.url_name == 'yard_visit_detail' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-roadster-line"></i>
+                    <span class="menu-text">Yard Management</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'yard_location_list' or request.resolver_match.url_name == 'yard_location_create' or request.resolver_match.url_name == 'yard_location_detail' or request.resolver_match.url_name == 'yard_location_edit' or request.resolver_match.url_name == 'yard_visit_list' or request.resolver_match.url_name == 'yard_visit_create' or request.resolver_match.url_name == 'yard_visit_detail' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'wms:yard_location_list' %}" class="menu-link {% if request.resolver_match.url_name == 'yard_location_list' or request.resolver_match.url_name == 'yard_location_detail' or request.resolver_match.url_name == 'yard_location_edit' %}active{% endif %}">
+                            <span class="menu-text">Yard Locations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'wms:yard_visit_list' %}" class="menu-link {% if request.resolver_match.url_name == 'yard_visit_list' or request.resolver_match.url_name == 'yard_visit_detail' %}active{% endif %}">
+                            <span class="menu-text">Yard Visits</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Audit &amp; Security <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Audit Logs -->
