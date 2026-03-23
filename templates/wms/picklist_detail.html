@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Pick List: {{ pick_list.pick_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ pick_list.pick_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'wms:picklist_list' %}">Pick Lists</a></li>
+            <li class="breadcrumb-item active">{{ pick_list.pick_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Pick List Info</h5>
+                <div>
+                    {% if pick_list.status == 'pending' %}
+                        <a href="{% url 'wms:picklist_edit' pick_list.pk %}" class="btn btn-sm btn-soft-warning"><i class="ri-pencil-line"></i></a>
+                        <form method="POST" action="{% url 'wms:picklist_delete' pick_list.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-soft-danger" onclick="return confirm('Delete this pick list?')"><i class="ri-delete-bin-line"></i></button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Pick #</th><td>{{ pick_list.pick_number }}</td></tr>
+                        <tr><th class="ps-3">Warehouse</th><td>{{ pick_list.warehouse.name }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Type</th>
+                            <td><span class="badge bg-soft-info text-info">{{ pick_list.get_pick_type_display }}</span></td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Priority</th>
+                            <td>
+                                {% if pick_list.priority == 'low' %}
+                                    <span class="badge bg-soft-secondary text-secondary">Low</span>
+                                {% elif pick_list.priority == 'medium' %}
+                                    <span class="badge bg-soft-info text-info">Medium</span>
+                                {% elif pick_list.priority == 'high' %}
+                                    <span class="badge bg-soft-warning text-warning">High</span>
+                                {% elif pick_list.priority == 'urgent' %}
+                                    <span class="badge bg-soft-danger text-danger">Urgent</span>
+                                {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ pick_list.get_priority_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if pick_list.status == 'pending' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                {% elif pick_list.status == 'in_progress' %}
+                                    <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Progress</span>
+                                {% elif pick_list.status == 'completed' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                {% elif pick_list.status == 'cancelled' %}
+                                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ pick_list.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Assigned To</th><td>{{ pick_list.assigned_to.get_full_name|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Started At</th><td>{{ pick_list.started_at|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Completed At</th><td>{{ pick_list.completed_at|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Notes</th><td>{{ pick_list.notes|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ pick_list.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Workflow Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if pick_list.status == 'pending' %}
+                <form method="POST" action="{% url 'wms:picklist_start' pick_list.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-play-line me-1"></i> Start Picking</button>
+                </form>
+                {% elif pick_list.status == 'in_progress' %}
+                <form method="POST" action="{% url 'wms:picklist_complete' pick_list.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Complete</button>
+                </form>
+                {% else %}
+                <p class="text-muted mb-0">No actions available.</p>
+                {% endif %}
+
+                <a href="{% url 'wms:picklist_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <!-- Pick Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Pick Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty Requested</th>
+                                <th>Qty Picked</th>
+                                <th>Source Bin</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in items %}
+                            <tr>
+                                <td>{{ i.item.code }} - {{ i.item.name }}</td>
+                                <td>{{ i.quantity_requested }}</td>
+                                <td>{{ i.quantity_picked }}</td>
+                                <td>{{ i.source_bin.bin_code|default:"-" }}</td>
+                                <td>
+                                    {% if i.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% elif i.status == 'picked' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Picked</span>
+                                    {% elif i.status == 'short' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Short</span>
+                                    {% elif i.status == 'skipped' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Skipped</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ i.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-shopping-basket-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No items in this pick list.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Packing Orders -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Packing Orders</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Packing #</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for po in packing_orders %}
+                            <tr>
+                                <td>{{ po.packing_number }}</td>
+                                <td>
+                                    {% if po.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% elif po.status == 'packing' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Packing</span>
+                                    {% elif po.status == 'packed' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Packed</span>
+                                    {% elif po.status == 'shipped' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Shipped</span>
+                                    {% elif po.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ po.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ po.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'wms:packing_detail' po.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-gift-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No packing orders linked to this pick list.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
