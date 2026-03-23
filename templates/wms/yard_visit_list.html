@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Yard Visits{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Yard Visits</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item active">Yard Visits</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'wms:yard_visit_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by visit #, carrier, driver...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Warehouse</label>
+                            <select class="form-select" name="warehouse">
+                                <option value="">All Warehouses</option>
+                                {% for wh in warehouses %}
+                                <option value="{{ wh.pk }}" {% if request.GET.warehouse == wh.pk|stringformat:"d" %}selected{% endif %}>{{ wh.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Visit Type</label>
+                            <select class="form-select" name="visit_type">
+                                <option value="">All Types</option>
+                                {% for value, label in type_choices %}
+                                <option value="{{ value }}" {% if request.GET.visit_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'wms:yard_visit_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Yard Visit</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Yard Visits Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Yard Visits</h5>
+                <span class="text-muted">{{ visits|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Visit #</th>
+                                <th>Warehouse</th>
+                                <th>Carrier</th>
+                                <th>Driver</th>
+                                <th>Trailer #</th>
+                                <th>Location</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Check In</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for v in visits %}
+                            <tr>
+                                <td><a href="{% url 'wms:yard_visit_detail' v.pk %}" class="fw-medium">{{ v.visit_number }}</a></td>
+                                <td>{{ v.warehouse.name }}</td>
+                                <td>{{ v.carrier_name }}</td>
+                                <td>{{ v.driver_name|default:"-" }}</td>
+                                <td>{{ v.trailer_number|default:"-" }}</td>
+                                <td>{{ v.yard_location.location_code|default:"-" }}</td>
+                                <td><span class="badge bg-soft-info text-info">{{ v.get_visit_type_display }}</span></td>
+                                <td>
+                                    {% if v.status == 'expected' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Expected</span>
+                                    {% elif v.status == 'checked_in' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Checked In</span>
+                                    {% elif v.status == 'at_dock' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> At Dock</span>
+                                    {% elif v.status == 'loading' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Loading</span>
+                                    {% elif v.status == 'unloading' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Unloading</span>
+                                    {% elif v.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% elif v.status == 'departed' %}
+                                        <span class="status-badge bg-soft-dark text-dark"><span class="status-dot bg-dark"></span> Departed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ v.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ v.check_in_time|date:"M d, Y H:i"|default:"-" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'wms:yard_visit_detail' v.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="10" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-roadster-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No yard visits found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.warehouse or request.GET.visit_type or request.GET.status %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first yard visit.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
