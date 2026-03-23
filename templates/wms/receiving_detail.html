@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Receiving Order: {{ order.receiving_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ order.receiving_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'wms:receiving_list' %}">Receiving Orders</a></li>
+            <li class="breadcrumb-item active">{{ order.receiving_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Receiving Info</h5>
+                <div>
+                    {% if order.status == 'pending' %}
+                        <a href="{% url 'wms:receiving_edit' order.pk %}" class="btn btn-sm btn-soft-warning"><i class="ri-pencil-line"></i></a>
+                        <form method="POST" action="{% url 'wms:receiving_delete' order.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-soft-danger" onclick="return confirm('Delete this receiving order?')"><i class="ri-delete-bin-line"></i></button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Receiving #</th><td>{{ order.receiving_number }}</td></tr>
+                        <tr><th class="ps-3">Warehouse</th><td>{{ order.warehouse.name }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Dock Appt</th>
+                            <td>
+                                {% if order.dock_appointment %}
+                                    <a href="{% url 'wms:dock_detail' order.dock_appointment.pk %}">{{ order.dock_appointment.appointment_number }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">PO Ref</th><td>{{ order.po_reference|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Supplier</th><td>{{ order.supplier_name }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if order.status == 'pending' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                {% elif order.status == 'in_progress' %}
+                                    <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Progress</span>
+                                {% elif order.status == 'completed' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                {% elif order.status == 'cancelled' %}
+                                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ order.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Received By</th><td>{{ order.received_by.get_full_name|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Received At</th><td>{{ order.received_at|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Notes</th><td>{{ order.notes|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ order.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Workflow Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if order.status == 'pending' %}
+                <form method="POST" action="{% url 'wms:receiving_start' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-play-line me-1"></i> Start Receiving</button>
+                </form>
+                {% elif order.status == 'in_progress' %}
+                <form method="POST" action="{% url 'wms:receiving_complete' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Complete</button>
+                </form>
+                {% else %}
+                <p class="text-muted mb-0">No actions available.</p>
+                {% endif %}
+
+                <a href="{% url 'wms:receiving_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <!-- Received Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Received Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Item</th>
+                                <th>Expected Qty</th>
+                                <th>Received Qty</th>
+                                <th>Damaged Qty</th>
+                                <th>Bin</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in items %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.item.code }} - {{ i.item.name }}</td>
+                                <td>{{ i.expected_quantity }}</td>
+                                <td>{{ i.received_quantity }}</td>
+                                <td>{{ i.damaged_quantity }}</td>
+                                <td>{{ i.bin|default:"-" }}</td>
+                                <td>{{ i.notes|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-inbox-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No items in this receiving order.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Put-Away Tasks -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Put-Away Tasks</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Task #</th>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Source Bin</th>
+                                <th>Dest Bin</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pt in putaway_tasks %}
+                            <tr>
+                                <td class="fw-medium">{{ pt.task_number }}</td>
+                                <td>{{ pt.item.code }} - {{ pt.item.name }}</td>
+                                <td>{{ pt.quantity }}</td>
+                                <td>{{ pt.source_bin|default:"-" }}</td>
+                                <td>{{ pt.destination_bin|default:"-" }}</td>
+                                <td>
+                                    {% if pt.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% elif pt.status == 'in_progress' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Progress</span>
+                                    {% elif pt.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ pt.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'wms:putaway_detail' pt.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-arrow-down-circle-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No put-away tasks for this receiving order.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
