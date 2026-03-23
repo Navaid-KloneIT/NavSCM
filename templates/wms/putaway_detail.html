@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Put-Away Task: {{ task.task_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ task.task_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'wms:putaway_list' %}">Put-Away Tasks</a></li>
+            <li class="breadcrumb-item active">{{ task.task_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Task Info</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Task #</th><td>{{ task.task_number }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Receiving Order</th>
+                            <td><a href="{% url 'wms:receiving_detail' task.receiving_order.pk %}">{{ task.receiving_order.receiving_number }}</a></td>
+                        </tr>
+                        <tr><th class="ps-3">Item</th><td>{{ task.item.code }} - {{ task.item.name }}</td></tr>
+                        <tr><th class="ps-3">Quantity</th><td>{{ task.quantity }}</td></tr>
+                        <tr><th class="ps-3">Source Bin</th><td>{{ task.source_bin|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Destination Bin</th><td>{{ task.destination_bin|default:"-" }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if task.status == 'pending' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                {% elif task.status == 'in_progress' %}
+                                    <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Progress</span>
+                                {% elif task.status == 'completed' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ task.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Assigned To</th><td>{{ task.assigned_to.get_full_name|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Completed At</th><td>{{ task.completed_at|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ task.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Workflow Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if task.status == 'pending' %}
+                <form method="POST" action="{% url 'wms:putaway_start' task.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-play-line me-1"></i> Start</button>
+                </form>
+                {% elif task.status == 'in_progress' %}
+                <form method="POST" action="{% url 'wms:putaway_complete' task.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Complete</button>
+                </form>
+                {% else %}
+                <p class="text-muted mb-0">No actions available.</p>
+                {% endif %}
+
+                <a href="{% url 'wms:putaway_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
