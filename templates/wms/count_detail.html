@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Cycle Count: {{ count.count_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ count.count_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'wms:count_list' %}">Cycle Counts</a></li>
+            <li class="breadcrumb-item active">{{ count.count_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5>Cycle Count Info</h5></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Count #</th><td>{{ count.count_number }}</td></tr>
+                        <tr><th class="ps-3">Warehouse</th><td>{{ count.warehouse.name }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Plan</th>
+                            <td>
+                                {% if count.plan %}
+                                    <a href="{% url 'wms:plan_detail' count.plan.pk %}">{{ count.plan.name }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if count.status == 'pending' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                {% elif count.status == 'in_progress' %}
+                                    <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Progress</span>
+                                {% elif count.status == 'completed' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                {% elif count.status == 'cancelled' %}
+                                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ count.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Counter</th><td>{{ count.counter.get_full_name|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Started At</th><td>{{ count.started_at|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Completed At</th><td>{{ count.completed_at|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Total Items</th><td>{{ count.total_items|default:"0" }}</td></tr>
+                        <tr><th class="ps-3">Items Counted</th><td>{{ count.items_counted|default:"0" }}</td></tr>
+                        <tr><th class="ps-3">Variance Count</th><td>{{ count.variance_count|default:"0" }}</td></tr>
+                        <tr><th class="ps-3">Notes</th><td>{{ count.notes|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ count.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Workflow Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if count.status == 'pending' %}
+                <form method="POST" action="{% url 'wms:count_start' count.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-play-line me-1"></i> Start Count</button>
+                </form>
+                {% elif count.status == 'in_progress' %}
+                <form method="POST" action="{% url 'wms:count_complete' count.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Complete</button>
+                </form>
+                {% else %}
+                <p class="text-muted mb-0">No actions available.</p>
+                {% endif %}
+
+                <a href="{% url 'wms:count_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <!-- Count Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Count Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Bin</th>
+                                <th>Item</th>
+                                <th>Expected Qty</th>
+                                <th>Counted Qty</th>
+                                <th>Variance</th>
+                                <th>Counted By</th>
+                                <th>Counted At</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in items %}
+                            <tr>
+                                <td>{{ i.bin.bin_code|default:"-" }}</td>
+                                <td>{{ i.item.code }} - {{ i.item.name }}</td>
+                                <td>{{ i.expected_quantity }}</td>
+                                <td>{{ i.counted_quantity|default:"-" }}</td>
+                                <td>
+                                    {% if i.variance and i.variance != 0 %}
+                                        <span class="text-danger fw-medium">{{ i.variance }}</span>
+                                    {% else %}
+                                        {{ i.variance|default:"0" }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ i.counted_by.get_full_name|default:"-" }}</td>
+                                <td>{{ i.counted_at|date:"M d, Y H:i"|default:"-" }}</td>
+                                <td>{{ i.notes|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-survey-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No items in this cycle count.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
