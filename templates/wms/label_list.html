@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Shipping Labels{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Shipping Labels</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item active">Shipping Labels</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'wms:label_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by label #, carrier, tracking...">
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Labels Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Shipping Labels</h5>
+                <span class="text-muted">{{ labels|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Label #</th>
+                                <th>Packing Order</th>
+                                <th>Carrier</th>
+                                <th>Tracking #</th>
+                                <th>Weight</th>
+                                <th>Generated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for l in labels %}
+                            <tr>
+                                <td><a href="{% url 'wms:label_detail' l.pk %}" class="fw-medium">{{ l.label_number }}</a></td>
+                                <td>
+                                    {% if l.packing_order %}
+                                        <a href="{% url 'wms:packing_detail' l.packing_order.pk %}">{{ l.packing_order.packing_number }}</a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{{ l.carrier|default:"-" }}</td>
+                                <td>{{ l.tracking_number|default:"-" }}</td>
+                                <td>{{ l.weight|default:"-" }}</td>
+                                <td>{{ l.created_at|date:"M d, Y H:i" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'wms:label_detail' l.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-price-tag-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No shipping labels found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q %}
+                                                Try adjusting your search criteria.
+                                            {% else %}
+                                                Labels are generated from packing orders.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
