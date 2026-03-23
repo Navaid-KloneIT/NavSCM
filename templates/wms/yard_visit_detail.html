@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Yard Visit: {{ visit.visit_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ visit.visit_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'wms:yard_visit_list' %}">Yard Visits</a></li>
+            <li class="breadcrumb-item active">{{ visit.visit_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Visit Info</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Visit #</th><td>{{ visit.visit_number }}</td></tr>
+                        <tr><th class="ps-3">Warehouse</th><td>{{ visit.warehouse.name }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Yard Location</th>
+                            <td>
+                                {% if visit.yard_location %}
+                                    <a href="{% url 'wms:yard_location_detail' visit.yard_location.pk %}">{{ visit.yard_location.location_code }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Carrier</th><td>{{ visit.carrier_name }}</td></tr>
+                        <tr><th class="ps-3">Driver</th><td>{{ visit.driver_name|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Trailer #</th><td>{{ visit.trailer_number|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Truck #</th><td>{{ visit.truck_number|default:"-" }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Visit Type</th>
+                            <td><span class="badge bg-soft-info text-info">{{ visit.get_visit_type_display }}</span></td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if visit.status == 'expected' %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Expected</span>
+                                {% elif visit.status == 'checked_in' %}
+                                    <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Checked In</span>
+                                {% elif visit.status == 'at_dock' %}
+                                    <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> At Dock</span>
+                                {% elif visit.status == 'loading' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Loading</span>
+                                {% elif visit.status == 'unloading' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Unloading</span>
+                                {% elif visit.status == 'completed' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                {% elif visit.status == 'departed' %}
+                                    <span class="status-badge bg-soft-dark text-dark"><span class="status-dot bg-dark"></span> Departed</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ visit.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Appointment</th>
+                            <td>
+                                {% if visit.appointment %}
+                                    <a href="{% url 'wms:dock_detail' visit.appointment.pk %}">{{ visit.appointment.appointment_number }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Check In Time</th><td>{{ visit.check_in_time|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Check Out Time</th><td>{{ visit.check_out_time|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Notes</th><td>{{ visit.notes|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ visit.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Workflow Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if visit.status == 'expected' %}
+                <form method="POST" action="{% url 'wms:yard_visit_check_in' visit.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-login-box-line me-1"></i> Check In</button>
+                </form>
+                {% elif visit.status == 'checked_in' %}
+                <form method="POST" action="{% url 'wms:yard_visit_dock' visit.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-arrow-right-circle-line me-1"></i> Move to Dock</button>
+                </form>
+                {% elif visit.status == 'at_dock' or visit.status == 'loading' or visit.status == 'unloading' %}
+                <form method="POST" action="{% url 'wms:yard_visit_complete' visit.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Complete</button>
+                </form>
+                {% elif visit.status == 'completed' %}
+                <form method="POST" action="{% url 'wms:yard_visit_depart' visit.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-dark w-100 mb-2"><i class="ri-truck-line me-1"></i> Depart</button>
+                </form>
+                {% else %}
+                <p class="text-muted mb-0">No actions available.</p>
+                {% endif %}
+
+                <a href="{% url 'wms:yard_visit_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
