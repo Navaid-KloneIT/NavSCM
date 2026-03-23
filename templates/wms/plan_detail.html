@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Plan: {{ plan.plan_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ plan.plan_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'wms:plan_list' %}">Cycle Count Plans</a></li>
+            <li class="breadcrumb-item active">{{ plan.plan_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Plan Info</h5>
+                <div>
+                    {% if plan.status == 'draft' %}
+                        <a href="{% url 'wms:plan_edit' plan.pk %}" class="btn btn-sm btn-soft-warning"><i class="ri-pencil-line"></i></a>
+                        <form method="POST" action="{% url 'wms:plan_delete' plan.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-soft-danger" onclick="return confirm('Delete this plan?')"><i class="ri-delete-bin-line"></i></button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Plan #</th><td>{{ plan.plan_number }}</td></tr>
+                        <tr><th class="ps-3">Name</th><td>{{ plan.name }}</td></tr>
+                        <tr><th class="ps-3">Warehouse</th><td>{{ plan.warehouse.name }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Count Type</th>
+                            <td><span class="badge bg-soft-info text-info">{{ plan.get_count_type_display }}</span></td>
+                        </tr>
+                        <tr><th class="ps-3">Frequency</th><td>{{ plan.get_frequency_display }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if plan.status == 'draft' %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                                {% elif plan.status == 'active' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                {% elif plan.status == 'paused' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Paused</span>
+                                {% elif plan.status == 'completed' %}
+                                    <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Completed</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ plan.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Start Date</th><td>{{ plan.start_date|date:"M d, Y" }}</td></tr>
+                        <tr><th class="ps-3">Next Count Date</th><td>{{ plan.next_count_date|date:"M d, Y"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Notes</th><td>{{ plan.notes|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ plan.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Workflow Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if plan.status == 'draft' or plan.status == 'paused' %}
+                <form method="POST" action="{% url 'wms:plan_activate' plan.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-play-line me-1"></i> Activate</button>
+                </form>
+                {% elif plan.status == 'active' %}
+                <form method="POST" action="{% url 'wms:plan_pause' plan.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning w-100 mb-2"><i class="ri-pause-line me-1"></i> Pause</button>
+                </form>
+                {% else %}
+                <p class="text-muted mb-0">No actions available.</p>
+                {% endif %}
+
+                <a href="{% url 'wms:plan_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <!-- Cycle Counts -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Cycle Counts</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Count #</th>
+                                <th>Status</th>
+                                <th>Counter</th>
+                                <th>Items Counted</th>
+                                <th>Variance</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in cycle_counts %}
+                            <tr>
+                                <td class="fw-medium">{{ c.count_number }}</td>
+                                <td>
+                                    {% if c.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% elif c.status == 'in_progress' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Progress</span>
+                                    {% elif c.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% elif c.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ c.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ c.counter.get_full_name|default:"-" }}</td>
+                                <td>{{ c.items_counted|default:"0" }}</td>
+                                <td>{{ c.variance_count|default:"0" }}</td>
+                                <td>{{ c.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'wms:count_detail' c.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-survey-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No cycle counts for this plan yet.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
