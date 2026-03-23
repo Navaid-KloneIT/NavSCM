@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Dock Appointments{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Dock Appointments</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item active">Dock Appointments</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'wms:dock_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by number, carrier...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Warehouse</label>
+                            <select class="form-select" name="warehouse">
+                                <option value="">All</option>
+                                {% for wh in warehouses %}
+                                <option value="{{ wh.pk }}" {% if request.GET.warehouse == wh.pk|stringformat:"d" %}selected{% endif %}>{{ wh.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'wms:dock_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> Schedule Appointment</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dock Appointments Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Dock Appointments</h5>
+                <span class="text-muted">{{ docks|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Appointment #</th>
+                                <th>Warehouse</th>
+                                <th>Dock #</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Carrier</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in docks %}
+                            <tr>
+                                <td><a href="{% url 'wms:dock_detail' d.pk %}" class="fw-medium">{{ d.appointment_number }}</a></td>
+                                <td>{{ d.warehouse.name }}</td>
+                                <td>{{ d.dock_number }}</td>
+                                <td>{{ d.date|date:"M d, Y" }}</td>
+                                <td>{{ d.time_slot }}</td>
+                                <td>{{ d.carrier_name }}</td>
+                                <td>
+                                    {% if d.status == 'scheduled' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Scheduled</span>
+                                    {% elif d.status == 'checked_in' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Checked In</span>
+                                    {% elif d.status == 'receiving' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Receiving</span>
+                                    {% elif d.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% elif d.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                    {% elif d.status == 'no_show' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> No Show</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ d.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'wms:dock_detail' d.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if d.status == 'scheduled' %}
+                                        <a href="{% url 'wms:dock_edit' d.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                        <form method="POST" action="{% url 'wms:dock_delete' d.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this appointment?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-calendar-schedule-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No dock appointments found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.warehouse %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by scheduling your first dock appointment.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
