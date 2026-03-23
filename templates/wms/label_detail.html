@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Label: {{ label.label_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ label.label_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">WMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'wms:label_list' %}">Shipping Labels</a></li>
+            <li class="breadcrumb-item active">{{ label.label_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5>Label Info</h5></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Label #</th><td>{{ label.label_number }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Packing Order</th>
+                            <td>
+                                {% if label.packing_order %}
+                                    <a href="{% url 'wms:packing_detail' label.packing_order.pk %}">{{ label.packing_order.packing_number }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Carrier</th><td>{{ label.carrier|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Tracking #</th><td>{{ label.tracking_number|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Weight</th><td>{{ label.weight|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Dimensions</th><td>{{ label.dimensions|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Generated</th><td>{{ label.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <a href="{% url 'wms:label_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header"><h5>Destination Address</h5></div>
+            <div class="card-body">
+                {% if label.destination_address %}
+                    {{ label.destination_address|linebreaksbr }}
+                {% else %}
+                    <p class="text-muted mb-0">No destination address provided.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
