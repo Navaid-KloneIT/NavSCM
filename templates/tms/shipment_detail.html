@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+
+{% block title %}Shipment: {{ shipment.shipment_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ shipment.shipment_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">TMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'tms:shipment_list' %}">Shipments</a></li>
+            <li class="breadcrumb-item active">{{ shipment.shipment_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Shipment Info</h5>
+                <div>
+                    {% if shipment.status == 'draft' or shipment.status == 'booked' %}
+                    <a href="{% url 'tms:shipment_edit' shipment.pk %}" class="btn btn-sm btn-soft-warning"><i class="ri-pencil-line"></i></a>
+                    {% endif %}
+                    {% if shipment.status == 'draft' %}
+                    <form method="POST" action="{% url 'tms:shipment_delete' shipment.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-soft-danger" onclick="return confirm('Are you sure you want to delete this shipment?')"><i class="ri-delete-bin-line"></i></button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Shipment #</th><td>{{ shipment.shipment_number }}</td></tr>
+                        <tr><th class="ps-3">Carrier</th><td>{{ shipment.carrier|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Order</th><td>{{ shipment.order|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Route</th><td>{{ shipment.route|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Transport Mode</th><td>{{ shipment.get_transport_mode_display|default:"-" }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Priority</th>
+                            <td>
+                                {% if shipment.priority == 'low' %}
+                                    <span class="badge bg-soft-secondary text-secondary">Low</span>
+                                {% elif shipment.priority == 'medium' %}
+                                    <span class="badge bg-soft-info text-info">Medium</span>
+                                {% elif shipment.priority == 'high' %}
+                                    <span class="badge bg-soft-warning text-warning">High</span>
+                                {% elif shipment.priority == 'urgent' %}
+                                    <span class="badge bg-soft-danger text-danger">Urgent</span>
+                                {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ shipment.get_priority_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if shipment.status == 'draft' %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                                {% elif shipment.status == 'booked' %}
+                                    <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Booked</span>
+                                {% elif shipment.status == 'picked_up' %}
+                                    <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Picked Up</span>
+                                {% elif shipment.status == 'in_transit' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> In Transit</span>
+                                {% elif shipment.status == 'delivered' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Delivered</span>
+                                {% elif shipment.status == 'cancelled' %}
+                                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                {% elif shipment.status == 'failed' %}
+                                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Failed</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ shipment.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Origin</th><td>{{ shipment.origin_address|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Destination</th><td>{{ shipment.destination_address|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Estimated Departure</th><td>{{ shipment.estimated_departure|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Estimated Arrival</th><td>{{ shipment.estimated_arrival|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Actual Departure</th><td>{{ shipment.actual_departure|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Actual Arrival</th><td>{{ shipment.actual_arrival|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Total Weight</th><td>{{ shipment.total_weight|default:"-" }} kg</td></tr>
+                        <tr><th class="ps-3">Total Volume</th><td>{{ shipment.total_volume|default:"-" }} cbm</td></tr>
+                        <tr><th class="ps-3">Tracking URL</th><td>{% if shipment.tracking_url %}<a href="{{ shipment.tracking_url }}" target="_blank">{{ shipment.tracking_url|truncatechars:30 }}</a>{% else %}-{% endif %}</td></tr>
+                        <tr><th class="ps-3">Special Instructions</th><td>{{ shipment.special_instructions|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Notes</th><td>{{ shipment.notes|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ shipment.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Workflow Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if shipment.status == 'draft' %}
+                <form method="POST" action="{% url 'tms:shipment_book' shipment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-bookmark-line me-1"></i> Book Shipment</button>
+                </form>
+                <form method="POST" action="{% url 'tms:shipment_cancel' shipment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Are you sure you want to cancel this shipment?')"><i class="ri-close-circle-line me-1"></i> Cancel Shipment</button>
+                </form>
+
+                {% elif shipment.status == 'booked' %}
+                <form method="POST" action="{% url 'tms:shipment_pickup' shipment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-truck-line me-1"></i> Mark Picked Up</button>
+                </form>
+                <form method="POST" action="{% url 'tms:shipment_cancel' shipment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Are you sure you want to cancel this shipment?')"><i class="ri-close-circle-line me-1"></i> Cancel Shipment</button>
+                </form>
+
+                {% elif shipment.status == 'picked_up' %}
+                <form method="POST" action="{% url 'tms:shipment_transit' shipment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning w-100 mb-2"><i class="ri-road-map-line me-1"></i> Mark In Transit</button>
+                </form>
+                <form method="POST" action="{% url 'tms:shipment_cancel' shipment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Are you sure you want to cancel this shipment?')"><i class="ri-close-circle-line me-1"></i> Cancel Shipment</button>
+                </form>
+
+                {% elif shipment.status == 'in_transit' or shipment.status == 'at_hub' or shipment.status == 'out_for_delivery' %}
+                <form method="POST" action="{% url 'tms:shipment_deliver' shipment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-checkbox-circle-line me-1"></i> Mark Delivered</button>
+                </form>
+                <form method="POST" action="{% url 'tms:shipment_cancel' shipment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Are you sure you want to cancel this shipment?')"><i class="ri-close-circle-line me-1"></i> Cancel Shipment</button>
+                </form>
+
+                {% else %}
+                <p class="text-muted mb-0">No actions available.</p>
+                {% endif %}
+
+                <a href="{% url 'tms:shipment_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <!-- Shipment Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Shipment Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Weight (kg)</th>
+                                <th>Volume (cbm)</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td class="fw-medium">{{ item.item }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.weight|default:"-" }}</td>
+                                <td>{{ item.volume|default:"-" }}</td>
+                                <td>{{ item.notes|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No items in this shipment.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tracking Events -->
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Tracking Events</h5>
+                <a href="{% url 'tms:tracking_add' shipment.pk %}" class="btn btn-sm btn-soft-success"><i class="ri-add-line me-1"></i> Add Tracking Event</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Recorded At</th>
+                                <th>Recorded By</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for te in tracking_events %}
+                            <tr>
+                                <td>{{ te.location|default:"-" }}</td>
+                                <td>
+                                    {% if te.status == 'picked_up' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Picked Up</span>
+                                    {% elif te.status == 'in_transit' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> In Transit</span>
+                                    {% elif te.status == 'at_hub' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> At Hub</span>
+                                    {% elif te.status == 'out_for_delivery' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Out for Delivery</span>
+                                    {% elif te.status == 'delivered' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Delivered</span>
+                                    {% elif te.status == 'failed' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Failed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ te.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ te.recorded_at|date:"M d, Y H:i" }}</td>
+                                <td>{{ te.recorded_by|default:"-" }}</td>
+                                <td>
+                                    <a href="{% url 'tms:tracking_detail' te.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-map-pin-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No tracking events for this shipment.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Freight Bills -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Freight Bills</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Bill #</th>
+                                <th>Carrier</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fb in freight_bills %}
+                            <tr>
+                                <td class="fw-medium">{{ fb.bill_number }}</td>
+                                <td>{{ fb.carrier|default:"-" }}</td>
+                                <td>{{ fb.total_amount|floatformat:2 }}</td>
+                                <td>
+                                    {% if fb.status == 'draft' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                                    {% elif fb.status == 'submitted' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Submitted</span>
+                                    {% elif fb.status == 'approved' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Approved</span>
+                                    {% elif fb.status == 'paid' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Paid</span>
+                                    {% elif fb.status == 'disputed' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Disputed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ fb.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ fb.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-bill-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No freight bills for this shipment.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Load Plans -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Load Plans</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Plan #</th>
+                                <th>Vehicle</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lp in load_plans %}
+                            <tr>
+                                <td class="fw-medium">{{ lp.plan_number }}</td>
+                                <td>{{ lp.vehicle|default:"-" }}</td>
+                                <td>
+                                    {% if lp.status == 'draft' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                                    {% elif lp.status == 'confirmed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Confirmed</span>
+                                    {% elif lp.status == 'in_progress' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Progress</span>
+                                    {% elif lp.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ lp.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ lp.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-truck-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No load plans for this shipment.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
