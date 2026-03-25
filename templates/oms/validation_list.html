@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Order Validations{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Order Validations</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">OMS</li>
+            <li class="breadcrumb-item active">Validations</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'oms:validation_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by validation number, order number...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" name="validation_type">
+                                <option value="">All</option>
+                                {% for value, label in type_choices %}
+                                <option value="{{ value }}" {% if request.GET.validation_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Validations Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Order Validations</h5>
+                <span class="text-muted">{{ validations|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Validation #</th>
+                                <th>Order #</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Validated By</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for v in validations %}
+                            <tr>
+                                <td><a href="{% url 'oms:validation_detail' v.pk %}" class="fw-medium">{{ v.validation_number }}</a></td>
+                                <td><a href="{% url 'oms:order_detail' v.order.pk %}">{{ v.order.order_number }}</a></td>
+                                <td>{{ v.get_validation_type_display }}</td>
+                                <td>
+                                    {% if v.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% elif v.status == 'passed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Passed</span>
+                                    {% elif v.status == 'failed' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Failed</span>
+                                    {% elif v.status == 'warning' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Warning</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ v.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ v.validated_by }}</td>
+                                <td>{{ v.validated_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'oms:validation_detail' v.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-shield-check-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No validations found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.validation_type %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Validations are created automatically through the order workflow.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
