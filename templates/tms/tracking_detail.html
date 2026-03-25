@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Tracking Event #{{ event.pk }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Tracking Event #{{ event.pk }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">TMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'tms:tracking_list' %}">Tracking</a></li>
+            <li class="breadcrumb-item active">Event #{{ event.pk }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Event Details</h5></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="ps-3">Shipment</th>
+                            <td><a href="{% url 'tms:shipment_detail' event.shipment.pk %}">{{ event.shipment.shipment_number }}</a></td>
+                        </tr>
+                        <tr><th class="ps-3">Location</th><td>{{ event.location|default:"-" }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if event.status == 'picked_up' %}
+                                    <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Picked Up</span>
+                                {% elif event.status == 'in_transit' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> In Transit</span>
+                                {% elif event.status == 'at_hub' %}
+                                    <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> At Hub</span>
+                                {% elif event.status == 'out_for_delivery' %}
+                                    <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Out for Delivery</span>
+                                {% elif event.status == 'delivered' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Delivered</span>
+                                {% elif event.status == 'failed' %}
+                                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Failed</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ event.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Notes</th><td>{{ event.notes|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Recorded At</th><td>{{ event.recorded_at|date:"M d, Y H:i" }}</td></tr>
+                        <tr><th class="ps-3">Recorded By</th><td>{{ event.recorded_by|default:"-" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                <a href="{% url 'tms:shipment_detail' event.shipment.pk %}" class="btn btn-primary w-100 mb-2"><i class="ri-ship-line me-1"></i> Back to Shipment</a>
+                <a href="{% url 'tms:tracking_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to Tracking List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
