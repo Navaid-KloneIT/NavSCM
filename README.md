@@ -77,6 +77,17 @@ Centralizes the processing of orders from various sales channels.
 - **Backorder Management** - Automated tracking of out-of-stock order items with fulfillment status (pending → partially fulfilled → fulfilled), expected dates, and cancel workflows
 - **Customer Notifications** - Notification management for order lifecycle events (confirmation, validation, shipping, delivery, backorder alerts, cancellation) via email, SMS, or both with send status tracking
 
+### Module 6: Transportation Management System (TMS)
+
+Plans, executes, and optimizes the physical movement of goods.
+
+- **Carrier Management** - 3PL partner management with carrier types (FTL, LTL, parcel, air/ocean freight, rail, courier), contact details, ratings, and rate cards with multi-currency support and configurable unit pricing
+- **Rate Cards** - Carrier-specific rate management with origin/destination lanes, transport modes, rate per unit (kg, CBM, pallet, container, flat rate), minimum charges, transit days, and validity periods
+- **Route Planning** - Delivery route optimization with origin/destination, distance tracking, estimated travel time, waypoint management, fuel and toll cost estimates, and route activation workflow (draft → active → inactive)
+- **Shipment Tracking** - Full shipment lifecycle management (draft → booked → picked up → in transit → at hub → out for delivery → delivered) with carrier assignment, route linking, GPS/location tracking events, priority levels, and real-time status updates
+- **Freight Audit & Payment** - Freight bill verification against shipments with line-item charge breakdown (base freight, fuel surcharge, handling, insurance, customs, toll, accessorial), audit workflow (draft → pending review → approved/disputed → paid), dispute management, and payment reference tracking
+- **Load Optimization** - Cargo loading plans for vehicles/containers (20ft/40ft trucks, containers, vans, flatbeds, refrigerated, bulk) with weight/volume capacity tracking, utilization percentage calculation, load sequencing, and loading workflow (draft → planned → loading → loaded → closed)
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -197,6 +208,11 @@ Centralizes the processing of orders from various sales channels.
    python manage.py seed_oms
    ```
 
+7g. **Seed TMS data**
+   ```bash
+   python manage.py seed_tms
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -251,11 +267,17 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/wms/*)
 │   │   └── admin.py       # Django admin registration
-│   └── oms/               # Order management system module
-│       ├── models.py      # Customer, SalesChannel, Order, OrderItem, OrderValidation, OrderAllocation, AllocationItem, Backorder, CustomerNotification
-│       ├── views.py       # All OMS CRUD & workflow views
+│   ├── oms/               # Order management system module
+│   │   ├── models.py      # Customer, SalesChannel, Order, OrderItem, OrderValidation, OrderAllocation, AllocationItem, Backorder, CustomerNotification
+│   │   ├── views.py       # All OMS CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/oms/*)
+│   │   └── admin.py       # Django admin registration
+│   └── tms/               # Transportation management system module
+│       ├── models.py      # Carrier, RateCard, Route, Shipment, ShipmentItem, ShipmentTracking, FreightBill, FreightBillItem, LoadPlan, LoadPlanItem
+│       ├── views.py       # All TMS CRUD & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/oms/*)
+│       ├── urls.py        # URL routing (/tms/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -304,14 +326,22 @@ NavSCM/
 │   │   ├── count_*.html       # Cycle count list, form, detail
 │   │   ├── yard_location_*.html # Yard location list, form, detail
 │   │   └── yard_visit_*.html  # Yard visit list, form, detail
-│   └── oms/               # OMS templates
-│       ├── customer_*.html    # Customer list, form, detail
-│       ├── channel_*.html     # Sales channel list, form
-│       ├── order_*.html       # Order list, form, detail
-│       ├── validation_*.html  # Order validation list, detail
-│       ├── allocation_*.html  # Order allocation list, form, detail
-│       ├── backorder_*.html   # Backorder list, detail
-│       └── notification_*.html # Customer notification list, detail
+│   ├── oms/               # OMS templates
+│   │   ├── customer_*.html    # Customer list, form, detail
+│   │   ├── channel_*.html     # Sales channel list, form
+│   │   ├── order_*.html       # Order list, form, detail
+│   │   ├── validation_*.html  # Order validation list, detail
+│   │   ├── allocation_*.html  # Order allocation list, form, detail
+│   │   ├── backorder_*.html   # Backorder list, detail
+│   │   └── notification_*.html # Customer notification list, detail
+│   └── tms/               # TMS templates
+│       ├── carrier_*.html     # Carrier list, form, detail
+│       ├── rate_*.html        # Rate card list, form, detail
+│       ├── route_*.html       # Route list, form, detail
+│       ├── shipment_*.html    # Shipment list, form, detail
+│       ├── tracking_*.html    # Tracking event list, form, detail
+│       ├── freight_*.html     # Freight bill list, form, detail
+│       └── load_*.html        # Load plan list, form, detail
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
@@ -341,7 +371,7 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 |---|--------|-------------|--------|
 | 1 | **Warehouse Management (WMS)** | Inbound/outbound operations, bin/location management, cycle counting, yard management | Done |
 | 2 | **Order Management (OMS)** | Order capture, validation, allocation, backorder management, customer notifications | Done |
-| 3 | **Transportation Management (TMS)** | Route planning, freight audit, carrier management, shipment tracking, load optimization | Planned |
+| 3 | **Transportation Management (TMS)** | Route planning, freight audit, carrier management, shipment tracking, load optimization | Done |
 | 4 | **Demand Planning & Forecasting** | Sales forecasting, seasonality analysis, demand sensing, collaborative planning, safety stock calculation | Planned |
 | 5 | **Manufacturing / Production** | Bill of materials (BOM), production scheduling, work orders, MRP, shop floor control | Planned |
 | 6 | **Quality Management (QMS)** | Quality inspection, non-conformance reports, CAPA, audit management, certificates of analysis | Planned |
