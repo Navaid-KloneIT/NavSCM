@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Carrier: {{ carrier.carrier_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ carrier.carrier_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">TMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'tms:carrier_list' %}">Carriers</a></li>
+            <li class="breadcrumb-item active">{{ carrier.carrier_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Carrier Information</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Carrier #</th><td>{{ carrier.carrier_number }}</td></tr>
+                            <tr><th class="ps-3">Name</th><td>{{ carrier.name }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Type</th>
+                                <td>
+                                    <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ carrier.get_carrier_type_display }}</span>
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Contact Person</th><td>{{ carrier.contact_person|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Email</th><td>{{ carrier.email|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Phone</th><td>{{ carrier.phone|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Address</th><td>{{ carrier.address|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Rating</th><td>{{ carrier.rating|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ carrier.notes|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if carrier.is_active %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Inactive</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Created</th><td>{{ carrier.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Shipments -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Recent Shipments</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Shipment #</th>
+                                <th>Date</th>
+                                <th>Origin</th>
+                                <th>Destination</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in shipments %}
+                            <tr>
+                                <td class="fw-medium"><a href="{% url 'tms:shipment_detail' s.pk %}">{{ s.shipment_number }}</a></td>
+                                <td>{{ s.ship_date|date:"M d, Y" }}</td>
+                                <td>{{ s.origin|default:"-" }}</td>
+                                <td>{{ s.destination|default:"-" }}</td>
+                                <td>
+                                    {% if s.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif s.status == 'in_transit' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Transit</span>
+                                    {% elif s.status == 'delivered' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Delivered</span>
+                                    {% elif s.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ s.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-truck-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No shipments for this carrier.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rate Cards -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Rate Cards</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Rate #</th>
+                                <th>Origin</th>
+                                <th>Destination</th>
+                                <th>Rate</th>
+                                <th>Effective Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rc in rate_cards %}
+                            <tr>
+                                <td class="fw-medium">{{ rc.rate_number|default:rc.pk }}</td>
+                                <td>{{ rc.origin|default:"-" }}</td>
+                                <td>{{ rc.destination|default:"-" }}</td>
+                                <td>{{ rc.rate|floatformat:2 }}</td>
+                                <td>{{ rc.effective_date|date:"M d, Y"|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-price-tag-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No rate cards for this carrier.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                <a href="{% url 'tms:carrier_edit' carrier.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit Carrier</a>
+                <form method="POST" action="{% url 'tms:carrier_delete' carrier.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Are you sure you want to delete this carrier?')"><i class="ri-delete-bin-line me-1"></i> Delete Carrier</button>
+                </form>
+                <a href="{% url 'tms:carrier_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
