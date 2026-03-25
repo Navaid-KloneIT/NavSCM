@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Rate Cards{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Rate Cards</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">TMS</li>
+            <li class="breadcrumb-item active">Rate Cards</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'tms:rate_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by number, origin, destination...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Carrier</label>
+                            <select class="form-select" name="carrier">
+                                <option value="">All</option>
+                                {% for car in carriers %}
+                                    <option value="{{ car.pk }}" {% if request.GET.carrier == car.pk|stringformat:"d" %}selected{% endif %}>{{ car.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Mode</label>
+                            <select class="form-select" name="transport_mode">
+                                <option value="">All</option>
+                                {% for value, label in transport_mode_choices %}
+                                    <option value="{{ value }}" {% if request.GET.transport_mode == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                                <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'tms:rate_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> Add Rate Card</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rate Cards Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Rate Cards</h5>
+                <span class="text-muted">{{ rates|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Rate #</th>
+                                <th>Carrier</th>
+                                <th>Origin → Destination</th>
+                                <th>Mode</th>
+                                <th>Rate/Unit</th>
+                                <th>Currency</th>
+                                <th>Transit Days</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in rates %}
+                            <tr>
+                                <td><a href="{% url 'tms:rate_detail' r.pk %}" class="fw-medium">{{ r.rate_number }}</a></td>
+                                <td>{{ r.carrier.name }}</td>
+                                <td>{{ r.origin }} → {{ r.destination }}</td>
+                                <td>
+                                    {% if r.transport_mode == 'road' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Road</span>
+                                    {% elif r.transport_mode == 'air' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Air</span>
+                                    {% elif r.transport_mode == 'ocean' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Ocean</span>
+                                    {% elif r.transport_mode == 'rail' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Rail</span>
+                                    {% elif r.transport_mode == 'multimodal' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Multimodal</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ r.get_transport_mode_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ r.rate_per_unit|floatformat:2 }}</td>
+                                <td>{{ r.currency }}</td>
+                                <td>{{ r.transit_days }}</td>
+                                <td>
+                                    {% if r.is_active %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'tms:rate_detail' r.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        <a href="{% url 'tms:rate_edit' r.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                        <form method="POST" action="{% url 'tms:rate_delete' r.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this rate card?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-price-tag-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No rate cards found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.carrier or request.GET.transport_mode %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by adding your first rate card.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
