@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Order Allocations{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Order Allocations</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">OMS</li>
+            <li class="breadcrumb-item active">Allocations</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'oms:allocation_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by allocation number, order number...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Method</label>
+                            <select class="form-select" name="method">
+                                <option value="">All</option>
+                                {% for value, label in method_choices %}
+                                <option value="{{ value }}" {% if request.GET.method == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'oms:allocation_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> Create Allocation</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Allocations Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Order Allocations</h5>
+                <span class="text-muted">{{ allocations|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Allocation #</th>
+                                <th>Order #</th>
+                                <th>Warehouse</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Allocated By</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in allocations %}
+                            <tr>
+                                <td><a href="{% url 'oms:allocation_detail' a.pk %}" class="fw-medium">{{ a.allocation_number }}</a></td>
+                                <td><a href="{% url 'oms:order_detail' a.order.pk %}">{{ a.order.order_number }}</a></td>
+                                <td>{{ a.warehouse.name }}</td>
+                                <td>{{ a.get_method_display }}</td>
+                                <td>
+                                    {% if a.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% elif a.status == 'allocated' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Allocated</span>
+                                    {% elif a.status == 'partial' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Partial</span>
+                                    {% elif a.status == 'failed' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Failed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ a.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ a.allocated_by }}</td>
+                                <td>{{ a.allocated_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'oms:allocation_detail' a.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if a.status == 'pending' %}
+                                        <form method="POST" action="{% url 'oms:allocation_delete' a.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this allocation?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-route-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No allocations found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.method %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first allocation.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
