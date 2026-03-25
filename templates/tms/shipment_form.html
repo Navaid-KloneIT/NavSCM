@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">TMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'tms:shipment_list' %}">Shipments</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Shipment Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Carrier *</label>
+                            {{ form.carrier }}
+                            {% if form.carrier.errors %}<div class="text-danger small">{{ form.carrier.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Order</label>
+                            {{ form.order }}
+                            {% if form.order.errors %}<div class="text-danger small">{{ form.order.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Route</label>
+                            {{ form.route }}
+                            {% if form.route.errors %}<div class="text-danger small">{{ form.route.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Transport Mode *</label>
+                            {{ form.transport_mode }}
+                            {% if form.transport_mode.errors %}<div class="text-danger small">{{ form.transport_mode.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Priority</label>
+                            {{ form.priority }}
+                            {% if form.priority.errors %}<div class="text-danger small">{{ form.priority.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tracking URL</label>
+                            {{ form.tracking_url }}
+                            {% if form.tracking_url.errors %}<div class="text-danger small">{{ form.tracking_url.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Origin Address *</label>
+                            {{ form.origin_address }}
+                            {% if form.origin_address.errors %}<div class="text-danger small">{{ form.origin_address.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Destination Address *</label>
+                            {{ form.destination_address }}
+                            {% if form.destination_address.errors %}<div class="text-danger small">{{ form.destination_address.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estimated Departure</label>
+                            {{ form.estimated_departure }}
+                            {% if form.estimated_departure.errors %}<div class="text-danger small">{{ form.estimated_departure.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estimated Arrival</label>
+                            {{ form.estimated_arrival }}
+                            {% if form.estimated_arrival.errors %}<div class="text-danger small">{{ form.estimated_arrival.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Total Weight (kg)</label>
+                            {{ form.total_weight }}
+                            {% if form.total_weight.errors %}<div class="text-danger small">{{ form.total_weight.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Total Volume (cbm)</label>
+                            {{ form.total_volume }}
+                            {% if form.total_volume.errors %}<div class="text-danger small">{{ form.total_volume.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Special Instructions</label>
+                            {{ form.special_instructions }}
+                            {% if form.special_instructions.errors %}<div class="text-danger small">{{ form.special_instructions.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Shipment Items</h5>
+                    <button type="button" class="btn btn-sm btn-soft-success" id="add-item-btn"><i class="ri-add-line me-1"></i> Add Line</button>
+                </div>
+                <div class="card-body p-0">
+                    {{ formset.management_form }}
+                    <div class="table-responsive">
+                        <table class="table mb-0" id="formset-table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Weight (kg)</th>
+                                    <th>Volume (cbm)</th>
+                                    <th>Notes</th>
+                                    <th>Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody id="formset-container">
+                                {% for item_form in formset %}
+                                <tr class="formset-row">
+                                    {% if item_form.instance.pk %}{{ item_form.id }}{% endif %}
+                                    <td>
+                                        {{ item_form.item }}
+                                        {% if item_form.item.errors %}<div class="text-danger small">{{ item_form.item.errors.0 }}</div>{% endif %}
+                                    </td>
+                                    <td>
+                                        {{ item_form.quantity }}
+                                        {% if item_form.quantity.errors %}<div class="text-danger small">{{ item_form.quantity.errors.0 }}</div>{% endif %}
+                                    </td>
+                                    <td>
+                                        {{ item_form.weight }}
+                                        {% if item_form.weight.errors %}<div class="text-danger small">{{ item_form.weight.errors.0 }}</div>{% endif %}
+                                    </td>
+                                    <td>
+                                        {{ item_form.volume }}
+                                        {% if item_form.volume.errors %}<div class="text-danger small">{{ item_form.volume.errors.0 }}</div>{% endif %}
+                                    </td>
+                                    <td>
+                                        {{ item_form.notes }}
+                                        {% if item_form.notes.errors %}<div class="text-danger small">{{ item_form.notes.errors.0 }}</div>{% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="form-check">
+                                            {{ item_form.DELETE }}
+                                            <label class="form-check-label text-danger">Remove</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Shipment</button>
+                    <a href="{% url 'tms:shipment_list' %}" class="btn btn-light w-100">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('formset-container');
+    const addBtn = document.getElementById('add-item-btn');
+    const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+    addBtn.addEventListener('click', function() {
+        const formCount = parseInt(totalForms.value);
+        const lastForm = container.querySelector('.formset-row:last-child');
+        if (!lastForm) return;
+        const newForm = lastForm.cloneNode(true);
+        newForm.innerHTML = newForm.innerHTML.replace(/items-\d+-/g, 'items-' + formCount + '-');
+        newForm.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(i => i.value = '');
+        newForm.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+        newForm.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+        newForm.querySelectorAll('textarea').forEach(t => t.value = '');
+        const idField = newForm.querySelector('input[name$="-id"]');
+        if (idField) idField.value = '';
+        container.appendChild(newForm);
+        totalForms.value = formCount + 1;
+    });
+});
+</script>
+{% endblock %}
