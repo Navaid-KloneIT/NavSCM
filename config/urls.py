@@ -16,6 +16,7 @@ urlpatterns = [
     path('inventory/', include('apps.inventory.urls', namespace='inventory')),
     path('wms/', include('apps.wms.urls', namespace='wms')),
     path('oms/', include('apps.oms.urls', namespace='oms')),
+    path('tms/', include('apps.tms.urls', namespace='tms')),
     path('', include('apps.dashboard.urls')),
 ]
 
