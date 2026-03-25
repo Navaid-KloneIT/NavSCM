@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">TMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'tms:rate_list' %}">Rate Cards</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Carrier *</label>
+                            {{ form.carrier }}
+                            {% if form.carrier.errors %}<div class="text-danger small">{{ form.carrier.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Transport Mode *</label>
+                            {{ form.transport_mode }}
+                            {% if form.transport_mode.errors %}<div class="text-danger small">{{ form.transport_mode.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Origin *</label>
+                            {{ form.origin }}
+                            {% if form.origin.errors %}<div class="text-danger small">{{ form.origin.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Destination *</label>
+                            {{ form.destination }}
+                            {% if form.destination.errors %}<div class="text-danger small">{{ form.destination.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Rate Per Unit *</label>
+                            {{ form.rate_per_unit }}
+                            {% if form.rate_per_unit.errors %}<div class="text-danger small">{{ form.rate_per_unit.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Currency *</label>
+                            {{ form.currency }}
+                            {% if form.currency.errors %}<div class="text-danger small">{{ form.currency.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Unit Type *</label>
+                            {{ form.unit_type }}
+                            {% if form.unit_type.errors %}<div class="text-danger small">{{ form.unit_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Min Charge</label>
+                            {{ form.min_charge }}
+                            {% if form.min_charge.errors %}<div class="text-danger small">{{ form.min_charge.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Max Weight</label>
+                            {{ form.max_weight }}
+                            {% if form.max_weight.errors %}<div class="text-danger small">{{ form.max_weight.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Transit Days</label>
+                            {{ form.transit_days }}
+                            {% if form.transit_days.errors %}<div class="text-danger small">{{ form.transit_days.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Effective From *</label>
+                            {{ form.effective_from }}
+                            {% if form.effective_from.errors %}<div class="text-danger small">{{ form.effective_from.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Effective To *</label>
+                            {{ form.effective_to }}
+                            {% if form.effective_to.errors %}<div class="text-danger small">{{ form.effective_to.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mt-4">
+                                {{ form.is_active }}
+                                <label class="form-check-label">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Rate Card</button>
+                    <a href="{% url 'tms:rate_list' %}" class="btn btn-light w-100">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
