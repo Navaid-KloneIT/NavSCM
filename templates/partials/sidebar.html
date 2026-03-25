@@ -620,6 +620,113 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Order Management (OMS) <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Orders -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'order_list' or request.resolver_match.url_name == 'order_create' or request.resolver_match.url_name == 'order_detail' or request.resolver_match.url_name == 'order_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-shopping-cart-line"></i>
+                    <span class="menu-text">Orders</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'order_list' or request.resolver_match.url_name == 'order_create' or request.resolver_match.url_name == 'order_detail' or request.resolver_match.url_name == 'order_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'oms:order_list' %}" class="menu-link {% if request.resolver_match.url_name == 'order_list' or request.resolver_match.url_name == 'order_detail' or request.resolver_match.url_name == 'order_edit' %}active{% endif %}">
+                            <span class="menu-text">All Orders</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'oms:order_create' %}" class="menu-link {% if request.resolver_match.url_name == 'order_create' %}active{% endif %}">
+                            <span class="menu-text">Create Order</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Customers -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'customer_list' or request.resolver_match.url_name == 'customer_create' or request.resolver_match.url_name == 'customer_detail' or request.resolver_match.url_name == 'customer_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-contacts-line"></i>
+                    <span class="menu-text">Customers</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'customer_list' or request.resolver_match.url_name == 'customer_create' or request.resolver_match.url_name == 'customer_detail' or request.resolver_match.url_name == 'customer_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'oms:customer_list' %}" class="menu-link {% if request.resolver_match.url_name == 'customer_list' or request.resolver_match.url_name == 'customer_detail' or request.resolver_match.url_name == 'customer_edit' %}active{% endif %}">
+                            <span class="menu-text">All Customers</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'oms:customer_create' %}" class="menu-link {% if request.resolver_match.url_name == 'customer_create' %}active{% endif %}">
+                            <span class="menu-text">Add Customer</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Sales Channels -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'channel_list' or request.resolver_match.url_name == 'channel_create' or request.resolver_match.url_name == 'channel_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-store-2-line"></i>
+                    <span class="menu-text">Sales Channels</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'channel_list' or request.resolver_match.url_name == 'channel_create' or request.resolver_match.url_name == 'channel_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'oms:channel_list' %}" class="menu-link {% if request.resolver_match.url_name == 'channel_list' or request.resolver_match.url_name == 'channel_edit' %}active{% endif %}">
+                            <span class="menu-text">All Channels</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'oms:channel_create' %}" class="menu-link {% if request.resolver_match.url_name == 'channel_create' %}active{% endif %}">
+                            <span class="menu-text">Add Channel</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Order Processing -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'validation_list' or request.resolver_match.url_name == 'validation_detail' or request.resolver_match.url_name == 'allocation_list' or request.resolver_match.url_name == 'allocation_create' or request.resolver_match.url_name == 'allocation_detail' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-shield-check-line"></i>
+                    <span class="menu-text">Order Processing</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'validation_list' or request.resolver_match.url_name == 'validation_detail' or request.resolver_match.url_name == 'allocation_list' or request.resolver_match.url_name == 'allocation_create' or request.resolver_match.url_name == 'allocation_detail' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'oms:validation_list' %}" class="menu-link {% if request.resolver_match.url_name == 'validation_list' or request.resolver_match.url_name == 'validation_detail' %}active{% endif %}">
+                            <span class="menu-text">Validations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'oms:allocation_list' %}" class="menu-link {% if request.resolver_match.url_name == 'allocation_list' or request.resolver_match.url_name == 'allocation_detail' or request.resolver_match.url_name == 'allocation_create' %}active{% endif %}">
+                            <span class="menu-text">Allocations</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Backorders & Notifications -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'backorder_list' or request.resolver_match.url_name == 'backorder_detail' or request.resolver_match.url_name == 'notification_list' or request.resolver_match.url_name == 'notification_detail' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-notification-3-line"></i>
+                    <span class="menu-text">Backorders & Alerts</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'backorder_list' or request.resolver_match.url_name == 'backorder_detail' or request.resolver_match.url_name == 'notification_list' or request.resolver_match.url_name == 'notification_detail' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'oms:backorder_list' %}" class="menu-link {% if request.resolver_match.url_name == 'backorder_list' or request.resolver_match.url_name == 'backorder_detail' %}active{% endif %}">
+                            <span class="menu-text">Backorders</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'oms:notification_list' %}" class="menu-link {% if request.resolver_match.url_name == 'notification_list' or request.resolver_match.url_name == 'notification_detail' %}active{% endif %}">
+                            <span class="menu-text">Notifications</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Audit &amp; Security <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Audit Logs -->
