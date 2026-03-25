@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">TMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'tms:route_list' %}">Routes</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Name *</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Transport Mode *</label>
+                            {{ form.transport_mode }}
+                            {% if form.transport_mode.errors %}<div class="text-danger small">{{ form.transport_mode.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Origin *</label>
+                            {{ form.origin }}
+                            {% if form.origin.errors %}<div class="text-danger small">{{ form.origin.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Destination *</label>
+                            {{ form.destination }}
+                            {% if form.destination.errors %}<div class="text-danger small">{{ form.destination.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Distance (km)</label>
+                            {{ form.distance_km }}
+                            {% if form.distance_km.errors %}<div class="text-danger small">{{ form.distance_km.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estimated Time (hours)</label>
+                            {{ form.estimated_time_hours }}
+                            {% if form.estimated_time_hours.errors %}<div class="text-danger small">{{ form.estimated_time_hours.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Carrier</label>
+                            {{ form.carrier }}
+                            {% if form.carrier.errors %}<div class="text-danger small">{{ form.carrier.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <!-- spacer -->
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Waypoints</label>
+                            {{ form.waypoints }}
+                            {% if form.waypoints.errors %}<div class="text-danger small">{{ form.waypoints.errors.0 }}</div>{% endif %}
+                            <div class="form-text">Comma-separated waypoints</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fuel Cost Estimate</label>
+                            {{ form.fuel_cost_estimate }}
+                            {% if form.fuel_cost_estimate.errors %}<div class="text-danger small">{{ form.fuel_cost_estimate.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Toll Cost Estimate</label>
+                            {{ form.toll_cost_estimate }}
+                            {% if form.toll_cost_estimate.errors %}<div class="text-danger small">{{ form.toll_cost_estimate.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Route</button>
+                    <a href="{% url 'tms:route_list' %}" class="btn btn-light w-100">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
