@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Notification: {{ notification.notification_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ notification.notification_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">OMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'oms:notification_list' %}">Notifications</a></li>
+            <li class="breadcrumb-item active">{{ notification.notification_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Notification Info</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Notification #</th><td>{{ notification.notification_number }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Order</th>
+                            <td><a href="{% url 'oms:order_detail' notification.order.pk %}">{{ notification.order.order_number }}</a></td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Customer</th>
+                            <td><a href="{% url 'oms:customer_detail' notification.customer.pk %}">{{ notification.customer.name }}</a></td>
+                        </tr>
+                        <tr><th class="ps-3">Notification Type</th><td>{{ notification.get_notification_type_display }}</td></tr>
+                        <tr><th class="ps-3">Channel</th><td>{{ notification.get_channel_display }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if notification.status == 'pending' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                {% elif notification.status == 'sent' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Sent</span>
+                                {% elif notification.status == 'failed' %}
+                                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Failed</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ notification.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Subject</th><td>{{ notification.subject|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Message</th><td>{{ notification.message|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Sent At</th><td>{{ notification.sent_at|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ notification.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Workflow Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if notification.status == 'pending' %}
+                <form method="POST" action="{% url 'oms:notification_send' notification.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-send-plane-line me-1"></i> Send Notification</button>
+                </form>
+                {% else %}
+                <p class="text-muted mb-0">No actions available.</p>
+                {% endif %}
+
+                <a href="{% url 'oms:notification_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+    </div>
+</div>
+{% endblock %}
