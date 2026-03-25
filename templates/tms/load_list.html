@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Load Plans{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Load Plans</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">TMS</li>
+            <li class="breadcrumb-item active">Load Plans</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'tms:load_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by plan number...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Vehicle Type</label>
+                            <select class="form-select" name="vehicle_type">
+                                <option value="">All</option>
+                                {% for value, label in vehicle_type_choices %}
+                                <option value="{{ value }}" {% if request.GET.vehicle_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'tms:load_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> Create Load Plan</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Load Plans Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Load Plans</h5>
+                <span class="text-muted">{{ loads|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Plan #</th>
+                                <th>Shipment</th>
+                                <th>Vehicle Type</th>
+                                <th>Max Weight</th>
+                                <th>Planned Weight</th>
+                                <th>Utilization %</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for l in loads %}
+                            <tr>
+                                <td><a href="{% url 'tms:load_detail' l.pk %}" class="fw-medium">{{ l.plan_number }}</a></td>
+                                <td>{{ l.shipment|default:"-" }}</td>
+                                <td>{{ l.get_vehicle_type_display|default:"-" }}</td>
+                                <td>{{ l.max_weight|floatformat:2|default:"-" }}</td>
+                                <td>{{ l.planned_weight|floatformat:2|default:"-" }}</td>
+                                <td>
+                                    {% if l.max_weight and l.planned_weight %}
+                                        {% widthratio l.planned_weight l.max_weight 100 as util_pct %}
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height: 8px;">
+                                                <div class="progress-bar {% if util_pct > 90 %}bg-danger{% elif util_pct > 70 %}bg-warning{% else %}bg-success{% endif %}" style="width: {{ util_pct }}%"></div>
+                                            </div>
+                                            <span class="small">{{ util_pct }}%</span>
+                                        </div>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if l.status == 'draft' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                                    {% elif l.status == 'planned' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Planned</span>
+                                    {% elif l.status == 'loading' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Loading</span>
+                                    {% elif l.status == 'loaded' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Loaded</span>
+                                    {% elif l.status == 'closed' %}
+                                        <span class="status-badge badge-soft-dark"><span class="status-dot bg-dark"></span> Closed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ l.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'tms:load_detail' l.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if l.status == 'draft' or l.status == 'planned' %}
+                                        <a href="{% url 'tms:load_edit' l.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                        {% endif %}
+                                        {% if l.status == 'draft' %}
+                                        <form method="POST" action="{% url 'tms:load_delete' l.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this load plan?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-truck-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No load plans found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.vehicle_type %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first load plan.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
