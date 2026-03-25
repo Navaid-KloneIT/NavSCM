@@ -344,7 +344,7 @@
 
 <!-- Row 5: More Charts - PO, Shipments, Freight -->
 <div class="row">
-    <!-- PO Status Pie -->
+    <!-- PO Status - Horizontal Bar -->
     <div class="col-xl-4">
         <div class="card">
             <div class="card-header align-items-center d-flex">
@@ -352,12 +352,12 @@
                 <a href="{% url 'procurement:po_list' %}" class="btn btn-sm btn-soft-primary">View All</a>
             </div>
             <div class="card-body">
-                <div id="poDonutChart" style="min-height: 280px;"></div>
+                <div id="poBarChart" style="min-height: 280px;"></div>
             </div>
         </div>
     </div>
 
-    <!-- Shipments Status Pie -->
+    <!-- Shipments Status - Polar Area -->
     <div class="col-xl-4">
         <div class="card">
             <div class="card-header align-items-center d-flex">
@@ -365,12 +365,12 @@
                 <a href="{% url 'tms:shipment_list' %}" class="btn btn-sm btn-soft-primary">View All</a>
             </div>
             <div class="card-body">
-                <div id="shipmentDonutChart" style="min-height: 280px;"></div>
+                <div id="shipmentPolarChart" style="min-height: 280px;"></div>
             </div>
         </div>
     </div>
 
-    <!-- Freight Bills Status Pie -->
+    <!-- Freight Bills Status - Radar -->
     <div class="col-xl-4">
         <div class="card">
             <div class="card-header align-items-center d-flex">
@@ -378,7 +378,7 @@
                 <a href="{% url 'tms:freight_list' %}" class="btn btn-sm btn-soft-primary">View All</a>
             </div>
             <div class="card-body">
-                <div id="freightDonutChart" style="min-height: 280px;"></div>
+                <div id="freightRadarChart" style="min-height: 280px;"></div>
             </div>
         </div>
     </div>
@@ -616,57 +616,63 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector("#orderDonutChart").innerHTML = '<div class="text-center text-muted py-5"><i class="ri-pie-chart-line" style="font-size:48px;opacity:0.3"></i><p class="mt-2">No orders yet</p></div>';
     }
 
-    // PO Status Pie Chart
+    // PO Status - Horizontal Bar Chart
     var poLabels = {{ po_chart_labels|safe }};
     var poData = {{ po_chart_data|safe }};
     if (poData.length > 0) {
-        new ApexCharts(document.querySelector("#poDonutChart"), {
-            series: poData,
-            chart: {type: 'pie', height: 280},
-            labels: poLabels,
+        new ApexCharts(document.querySelector("#poBarChart"), {
+            series: [{name: 'POs', data: poData}],
+            chart: {type: 'bar', height: 280, toolbar: {show: false}},
+            plotOptions: {bar: {borderRadius: 4, horizontal: true, barHeight: '60%', distributed: true}},
             colors: ['#6b7280', '#f59e0b', '#22c55e', '#06b6d4', '#3b82f6', '#f97316', '#10b981', '#ef4444'],
-            legend: {position: 'bottom', fontSize: '12px'},
-            dataLabels: {enabled: true, formatter: function(val) {return Math.round(val) + '%';}},
-            responsive: [{breakpoint: 480, options: {chart: {height: 250}}}]
+            dataLabels: {enabled: true, style: {fontSize: '12px', fontWeight: 600}},
+            xaxis: {categories: poLabels},
+            legend: {show: false},
+            grid: {borderColor: '#f1f1f1', xaxis: {lines: {show: true}}, yaxis: {lines: {show: false}}},
+            tooltip: {y: {formatter: function(val) {return val + ' orders';}}}
         }).render();
     } else {
-        document.querySelector("#poDonutChart").innerHTML = '<div class="text-center text-muted py-5"><i class="ri-pie-chart-line" style="font-size:48px;opacity:0.3"></i><p class="mt-2">No purchase orders</p></div>';
+        document.querySelector("#poBarChart").innerHTML = '<div class="text-center text-muted py-5"><i class="ri-bar-chart-horizontal-line" style="font-size:48px;opacity:0.3"></i><p class="mt-2">No purchase orders</p></div>';
     }
 
-    // Shipment Status Donut Chart
+    // Shipment Status - Polar Area Chart
     var shipmentLabels = {{ shipment_chart_labels|safe }};
     var shipmentData = {{ shipment_chart_data|safe }};
     if (shipmentData.length > 0) {
-        new ApexCharts(document.querySelector("#shipmentDonutChart"), {
+        new ApexCharts(document.querySelector("#shipmentPolarChart"), {
             series: shipmentData,
-            chart: {type: 'donut', height: 280},
+            chart: {type: 'polarArea', height: 280},
             labels: shipmentLabels,
             colors: ['#6b7280', '#06b6d4', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899', '#22c55e', '#ef4444', '#dc2626'],
-            legend: {position: 'bottom', fontSize: '12px'},
-            dataLabels: {enabled: true, formatter: function(val) {return Math.round(val) + '%';}},
-            plotOptions: {pie: {donut: {size: '50%'}}},
-            responsive: [{breakpoint: 480, options: {chart: {height: 250}}}]
+            stroke: {colors: ['#fff'], width: 2},
+            fill: {opacity: 0.85},
+            legend: {position: 'bottom', fontSize: '11px'},
+            plotOptions: {polarArea: {rings: {strokeWidth: 1, strokeColor: '#e5e7eb'}, spokes: {strokeWidth: 1, connectorColors: '#e5e7eb'}}},
+            responsive: [{breakpoint: 480, options: {chart: {height: 250}, legend: {position: 'bottom'}}}]
         }).render();
     } else {
-        document.querySelector("#shipmentDonutChart").innerHTML = '<div class="text-center text-muted py-5"><i class="ri-pie-chart-line" style="font-size:48px;opacity:0.3"></i><p class="mt-2">No shipments</p></div>';
+        document.querySelector("#shipmentPolarChart").innerHTML = '<div class="text-center text-muted py-5"><i class="ri-compass-3-line" style="font-size:48px;opacity:0.3"></i><p class="mt-2">No shipments</p></div>';
     }
 
-    // Freight Bill Status Donut Chart
+    // Freight Bill Status - Radar Chart
     var freightLabels = {{ freight_chart_labels|safe }};
     var freightData = {{ freight_chart_data|safe }};
     if (freightData.length > 0) {
-        new ApexCharts(document.querySelector("#freightDonutChart"), {
-            series: freightData,
-            chart: {type: 'donut', height: 280},
-            labels: freightLabels,
-            colors: ['#6b7280', '#f59e0b', '#06b6d4', '#ef4444', '#22c55e', '#374151'],
-            legend: {position: 'bottom', fontSize: '12px'},
-            dataLabels: {enabled: true, formatter: function(val) {return Math.round(val) + '%';}},
-            plotOptions: {pie: {donut: {size: '50%'}}},
+        new ApexCharts(document.querySelector("#freightRadarChart"), {
+            series: [{name: 'Bills', data: freightData}],
+            chart: {type: 'radar', height: 280, toolbar: {show: false}},
+            xaxis: {categories: freightLabels},
+            colors: ['#3b82f6'],
+            fill: {opacity: 0.25},
+            stroke: {width: 2},
+            markers: {size: 4, colors: ['#3b82f6'], strokeColors: '#fff', strokeWidth: 2},
+            yaxis: {show: false},
+            plotOptions: {radar: {polygons: {strokeColors: '#e5e7eb', connectorColors: '#e5e7eb', fill: {colors: ['#f9fafb', '#ffffff']}}}},
+            dataLabels: {enabled: true, style: {fontSize: '11px'}, background: {enabled: true, borderRadius: 2}},
             responsive: [{breakpoint: 480, options: {chart: {height: 250}}}]
         }).render();
     } else {
-        document.querySelector("#freightDonutChart").innerHTML = '<div class="text-center text-muted py-5"><i class="ri-pie-chart-line" style="font-size:48px;opacity:0.3"></i><p class="mt-2">No freight bills</p></div>';
+        document.querySelector("#freightRadarChart").innerHTML = '<div class="text-center text-muted py-5"><i class="ri-radar-line" style="font-size:48px;opacity:0.3"></i><p class="mt-2">No freight bills</p></div>';
     }
 });
 </script>
