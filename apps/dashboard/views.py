@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, F, Q
 from django.shortcuts import render
@@ -81,6 +83,14 @@ def dashboard_view(request):
             tenant=tenant
         ).select_related('customer').order_by('-created_at')[:5]
 
+        # Order status breakdown
+        order_by_status = list(
+            Order.objects.filter(tenant=tenant)
+            .values('status')
+            .annotate(count=Count('id'))
+            .order_by('status')
+        )
+
         # =================================================================
         # TMS
         # =================================================================
@@ -120,9 +130,54 @@ def dashboard_view(request):
         pending_receiving = 0
         total_orders = total_customers = 0
         recent_orders = []
+        order_by_status = []
         active_shipments = total_carriers = 0
         recent_shipments = []
         shipment_by_status = freight_by_status = []
+
+    # =================================================================
+    # CHART DATA (JSON for ApexCharts)
+    # =================================================================
+
+    # Status label mapping for display
+    po_status_labels = {
+        'draft': 'Draft', 'pending_approval': 'Pending', 'approved': 'Approved',
+        'sent': 'Sent', 'acknowledged': 'Acknowledged',
+        'partially_received': 'Partial', 'received': 'Received', 'cancelled': 'Cancelled',
+    }
+    order_status_labels = {
+        'draft': 'Draft', 'pending_validation': 'Pending', 'validated': 'Validated',
+        'allocated': 'Allocated', 'in_fulfillment': 'Fulfilling',
+        'partially_shipped': 'Partial Ship', 'shipped': 'Shipped',
+        'delivered': 'Delivered', 'cancelled': 'Cancelled', 'on_hold': 'On Hold',
+    }
+    shipment_status_labels = {
+        'draft': 'Draft', 'booked': 'Booked', 'picked_up': 'Picked Up',
+        'in_transit': 'In Transit', 'at_hub': 'At Hub',
+        'out_for_delivery': 'Out for Delivery', 'delivered': 'Delivered',
+        'failed': 'Failed', 'cancelled': 'Cancelled',
+    }
+    freight_status_labels = {
+        'draft': 'Draft', 'pending_review': 'Pending', 'approved': 'Approved',
+        'disputed': 'Disputed', 'paid': 'Paid', 'cancelled': 'Cancelled',
+    }
+
+    # Build chart JSON
+    po_chart_labels = json.dumps([po_status_labels.get(s['status'], s['status'].title()) for s in po_by_status])
+    po_chart_data = json.dumps([s['count'] for s in po_by_status])
+
+    order_chart_labels = json.dumps([order_status_labels.get(s['status'], s['status'].title()) for s in order_by_status])
+    order_chart_data = json.dumps([s['count'] for s in order_by_status])
+
+    shipment_chart_labels = json.dumps([shipment_status_labels.get(s['status'], s['status'].title()) for s in shipment_by_status])
+    shipment_chart_data = json.dumps([s['count'] for s in shipment_by_status])
+
+    freight_chart_labels = json.dumps([freight_status_labels.get(s['status'], s['status'].title()) for s in freight_by_status])
+    freight_chart_data = json.dumps([s['count'] for s in freight_by_status])
+
+    # Module overview bar chart
+    module_bar_labels = json.dumps(['Vendors', 'Suppliers', 'Warehouses', 'Orders', 'Shipments', 'Carriers'])
+    module_bar_data = json.dumps([total_vendors, approved_onboardings, total_warehouses, total_orders, active_shipments, total_carriers])
 
     context = {
         # Administration
@@ -149,12 +204,24 @@ def dashboard_view(request):
         'total_orders': total_orders,
         'total_customers': total_customers,
         'recent_orders': recent_orders,
+        'order_by_status': order_by_status,
         # TMS
         'active_shipments': active_shipments,
         'total_carriers': total_carriers,
         'recent_shipments': recent_shipments,
         'shipment_by_status': shipment_by_status,
         'freight_by_status': freight_by_status,
+        # Chart JSON
+        'po_chart_labels': po_chart_labels,
+        'po_chart_data': po_chart_data,
+        'order_chart_labels': order_chart_labels,
+        'order_chart_data': order_chart_data,
+        'shipment_chart_labels': shipment_chart_labels,
+        'shipment_chart_data': shipment_chart_data,
+        'freight_chart_labels': freight_chart_labels,
+        'freight_chart_data': freight_chart_data,
+        'module_bar_labels': module_bar_labels,
+        'module_bar_data': module_bar_data,
     }
 
     return render(request, 'dashboard/index.html', context)
