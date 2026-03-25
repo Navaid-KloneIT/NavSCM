@@ -53,7 +53,7 @@
         <div class="card table-card">
             <div class="card-header">
                 <h5>Tracking Events</h5>
-                <span class="text-muted">{{ tracking_events|length }} total</span>
+                <span class="text-muted">{{ events|length }} total</span>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -69,7 +69,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for te in tracking_events %}
+                            {% for te in events %}
                             <tr>
                                 <td><a href="{% url 'tms:shipment_detail' te.shipment.pk %}" class="fw-medium">{{ te.shipment.shipment_number }}</a></td>
                                 <td>{{ te.location|default:"-" }}</td>
