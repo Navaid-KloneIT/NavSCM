@@ -65,6 +65,18 @@ Controls the physical operations within the warehouse.
 - **Cycle Counting** - Scheduled count plans with configurable frequency (daily, weekly, monthly, quarterly) and count types (ABC analysis, location-based, random sample, full count), individual cycle count sessions with item-level variance tracking
 - **Yard Management** - Yard location mapping (dock doors, parking spots, staging areas, gates) with occupancy tracking, and yard visit management for trucks/trailers with full status workflow (expected → checked in → at dock → loading/unloading → completed → departed)
 
+### Module 5: Order Management System (OMS)
+
+Centralizes the processing of orders from various sales channels.
+
+- **Customer Management** - Customer master data with contact details, billing/shipping addresses, credit limits, and order history tracking
+- **Sales Channels** - Multi-channel order capture configuration (website, marketplace, phone, EDI, manual) with channel-specific tracking
+- **Order Processing** - Full order lifecycle management (draft → pending validation → validated → allocated → in fulfillment → shipped → delivered) with priority levels (low → urgent), hold/release/cancel workflows, and line item tracking with automatic total calculation
+- **Order Validation** - Multi-type validation checks (credit check, inventory check, fraud check, address verification) with pass/fail/warning results and audit trail
+- **Order Allocation** - Logic-based assignment of orders to fulfillment centers using configurable methods (nearest warehouse, lowest cost, highest stock, manual) with line-item allocation tracking
+- **Backorder Management** - Automated tracking of out-of-stock order items with fulfillment status (pending → partially fulfilled → fulfilled), expected dates, and cancel workflows
+- **Customer Notifications** - Notification management for order lifecycle events (confirmation, validation, shipping, delivery, backorder alerts, cancellation) via email, SMS, or both with send status tracking
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -180,6 +192,11 @@ Controls the physical operations within the warehouse.
    python manage.py seed_wms
    ```
 
+7f. **Seed OMS data**
+   ```bash
+   python manage.py seed_oms
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -228,11 +245,17 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/inventory/*)
 │   │   └── admin.py       # Django admin registration
-│   └── wms/               # Warehouse management system module
-│       ├── models.py      # Bin, DockAppointment, ReceivingOrder, PutAwayTask, PickList, PackingOrder, ShippingLabel, CycleCountPlan, CycleCount, YardLocation, YardVisit
-│       ├── views.py       # All WMS CRUD & workflow views
+│   ├── wms/               # Warehouse management system module
+│   │   ├── models.py      # Bin, DockAppointment, ReceivingOrder, PutAwayTask, PickList, PackingOrder, ShippingLabel, CycleCountPlan, CycleCount, YardLocation, YardVisit
+│   │   ├── views.py       # All WMS CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/wms/*)
+│   │   └── admin.py       # Django admin registration
+│   └── oms/               # Order management system module
+│       ├── models.py      # Customer, SalesChannel, Order, OrderItem, OrderValidation, OrderAllocation, AllocationItem, Backorder, CustomerNotification
+│       ├── views.py       # All OMS CRUD & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/wms/*)
+│       ├── urls.py        # URL routing (/oms/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -269,18 +292,26 @@ NavSCM/
 │   │   ├── adjustment_*.html  # Stock adjustment list, form, detail
 │   │   ├── reorder_*.html     # Reorder rules & suggestions list, form
 │   │   └── valuation_*.html   # Inventory valuation list, form, detail
-│   └── wms/               # WMS templates
-│       ├── bin_*.html         # Bin list, form, detail
-│       ├── dock_*.html        # Dock appointment list, form, detail
-│       ├── receiving_*.html   # Receiving order list, form, detail
-│       ├── putaway_*.html     # Put-away task list, detail
-│       ├── picklist_*.html    # Pick list list, form, detail
-│       ├── packing_*.html     # Packing order list, form, detail
-│       ├── label_*.html       # Shipping label list, form, detail
-│       ├── plan_*.html        # Cycle count plan list, form, detail
-│       ├── count_*.html       # Cycle count list, form, detail
-│       ├── yard_location_*.html # Yard location list, form, detail
-│       └── yard_visit_*.html  # Yard visit list, form, detail
+│   ├── wms/               # WMS templates
+│   │   ├── bin_*.html         # Bin list, form, detail
+│   │   ├── dock_*.html        # Dock appointment list, form, detail
+│   │   ├── receiving_*.html   # Receiving order list, form, detail
+│   │   ├── putaway_*.html     # Put-away task list, detail
+│   │   ├── picklist_*.html    # Pick list list, form, detail
+│   │   ├── packing_*.html     # Packing order list, form, detail
+│   │   ├── label_*.html       # Shipping label list, form, detail
+│   │   ├── plan_*.html        # Cycle count plan list, form, detail
+│   │   ├── count_*.html       # Cycle count list, form, detail
+│   │   ├── yard_location_*.html # Yard location list, form, detail
+│   │   └── yard_visit_*.html  # Yard visit list, form, detail
+│   └── oms/               # OMS templates
+│       ├── customer_*.html    # Customer list, form, detail
+│       ├── channel_*.html     # Sales channel list, form
+│       ├── order_*.html       # Order list, form, detail
+│       ├── validation_*.html  # Order validation list, detail
+│       ├── allocation_*.html  # Order allocation list, form, detail
+│       ├── backorder_*.html   # Backorder list, detail
+│       └── notification_*.html # Customer notification list, detail
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
@@ -309,7 +340,7 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 | # | Module | Description | Status |
 |---|--------|-------------|--------|
 | 1 | **Warehouse Management (WMS)** | Inbound/outbound operations, bin/location management, cycle counting, yard management | Done |
-| 2 | **Order Management (OMS)** | Order capture, validation, allocation, backorder management, customer notifications | Planned |
+| 2 | **Order Management (OMS)** | Order capture, validation, allocation, backorder management, customer notifications | Done |
 | 3 | **Transportation Management (TMS)** | Route planning, freight audit, carrier management, shipment tracking, load optimization | Planned |
 | 4 | **Demand Planning & Forecasting** | Sales forecasting, seasonality analysis, demand sensing, collaborative planning, safety stock calculation | Planned |
 | 5 | **Manufacturing / Production** | Bill of materials (BOM), production scheduling, work orders, MRP, shop floor control | Planned |
