@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Rate Card: {{ rate.rate_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ rate.rate_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">TMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'tms:rate_list' %}">Rate Cards</a></li>
+            <li class="breadcrumb-item active">{{ rate.rate_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Rate Card Info</h5></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Rate #</th><td>{{ rate.rate_number }}</td></tr>
+                        <tr><th class="ps-3">Carrier</th><td>{{ rate.carrier.name }}</td></tr>
+                        <tr><th class="ps-3">Origin</th><td>{{ rate.origin }}</td></tr>
+                        <tr><th class="ps-3">Destination</th><td>{{ rate.destination }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Transport Mode</th>
+                            <td>
+                                {% if rate.transport_mode == 'road' %}
+                                    <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Road</span>
+                                {% elif rate.transport_mode == 'air' %}
+                                    <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Air</span>
+                                {% elif rate.transport_mode == 'ocean' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Ocean</span>
+                                {% elif rate.transport_mode == 'rail' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Rail</span>
+                                {% elif rate.transport_mode == 'multimodal' %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Multimodal</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ rate.get_transport_mode_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Rate Per Unit</th><td>{{ rate.rate_per_unit|floatformat:2 }}</td></tr>
+                        <tr><th class="ps-3">Currency</th><td>{{ rate.currency }}</td></tr>
+                        <tr><th class="ps-3">Unit Type</th><td>{{ rate.get_unit_type_display }}</td></tr>
+                        <tr><th class="ps-3">Min Charge</th><td>{{ rate.min_charge|floatformat:2 }}</td></tr>
+                        <tr><th class="ps-3">Max Weight</th><td>{{ rate.max_weight|floatformat:2 }}</td></tr>
+                        <tr><th class="ps-3">Transit Days</th><td>{{ rate.transit_days }}</td></tr>
+                        <tr><th class="ps-3">Effective From</th><td>{{ rate.effective_from|date:"M d, Y" }}</td></tr>
+                        <tr><th class="ps-3">Effective To</th><td>{{ rate.effective_to|date:"M d, Y" }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if rate.is_active %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Inactive</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Created</th><td>{{ rate.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                <a href="{% url 'tms:rate_edit' rate.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                <form method="POST" action="{% url 'tms:rate_delete' rate.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Are you sure you want to delete this rate card?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                </form>
+                <a href="{% url 'tms:rate_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
