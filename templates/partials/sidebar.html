@@ -727,6 +727,134 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Transportation (TMS) <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Carriers -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'carrier_list' or request.resolver_match.url_name == 'carrier_create' or request.resolver_match.url_name == 'carrier_detail' or request.resolver_match.url_name == 'carrier_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-truck-line"></i>
+                    <span class="menu-text">Carriers</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'carrier_list' or request.resolver_match.url_name == 'carrier_create' or request.resolver_match.url_name == 'carrier_detail' or request.resolver_match.url_name == 'carrier_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tms:carrier_list' %}" class="menu-link {% if request.resolver_match.url_name == 'carrier_list' or request.resolver_match.url_name == 'carrier_detail' or request.resolver_match.url_name == 'carrier_edit' %}active{% endif %}">
+                            <span class="menu-text">All Carriers</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tms:carrier_create' %}" class="menu-link {% if request.resolver_match.url_name == 'carrier_create' %}active{% endif %}">
+                            <span class="menu-text">Add Carrier</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Rate Cards -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'rate_list' or request.resolver_match.url_name == 'rate_create' or request.resolver_match.url_name == 'rate_detail' or request.resolver_match.url_name == 'rate_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-price-tag-3-line"></i>
+                    <span class="menu-text">Rate Cards</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'rate_list' or request.resolver_match.url_name == 'rate_create' or request.resolver_match.url_name == 'rate_detail' or request.resolver_match.url_name == 'rate_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tms:rate_list' %}" class="menu-link {% if request.resolver_match.url_name == 'rate_list' or request.resolver_match.url_name == 'rate_detail' or request.resolver_match.url_name == 'rate_edit' %}active{% endif %}">
+                            <span class="menu-text">All Rate Cards</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tms:rate_create' %}" class="menu-link {% if request.resolver_match.url_name == 'rate_create' %}active{% endif %}">
+                            <span class="menu-text">Add Rate Card</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Routes -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'route_list' or request.resolver_match.url_name == 'route_create' or request.resolver_match.url_name == 'route_detail' or request.resolver_match.url_name == 'route_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-route-line"></i>
+                    <span class="menu-text">Routes</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'route_list' or request.resolver_match.url_name == 'route_create' or request.resolver_match.url_name == 'route_detail' or request.resolver_match.url_name == 'route_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tms:route_list' %}" class="menu-link {% if request.resolver_match.url_name == 'route_list' or request.resolver_match.url_name == 'route_detail' or request.resolver_match.url_name == 'route_edit' %}active{% endif %}">
+                            <span class="menu-text">All Routes</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tms:route_create' %}" class="menu-link {% if request.resolver_match.url_name == 'route_create' %}active{% endif %}">
+                            <span class="menu-text">Add Route</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Shipments -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'shipment_list' or request.resolver_match.url_name == 'shipment_create' or request.resolver_match.url_name == 'shipment_detail' or request.resolver_match.url_name == 'shipment_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-ship-line"></i>
+                    <span class="menu-text">Shipments</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'shipment_list' or request.resolver_match.url_name == 'shipment_create' or request.resolver_match.url_name == 'shipment_detail' or request.resolver_match.url_name == 'shipment_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tms:shipment_list' %}" class="menu-link {% if request.resolver_match.url_name == 'shipment_list' or request.resolver_match.url_name == 'shipment_detail' or request.resolver_match.url_name == 'shipment_edit' %}active{% endif %}">
+                            <span class="menu-text">All Shipments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tms:shipment_create' %}" class="menu-link {% if request.resolver_match.url_name == 'shipment_create' %}active{% endif %}">
+                            <span class="menu-text">Create Shipment</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Tracking & Freight -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'tracking_list' or request.resolver_match.url_name == 'tracking_detail' or request.resolver_match.url_name == 'freight_list' or request.resolver_match.url_name == 'freight_create' or request.resolver_match.url_name == 'freight_detail' or request.resolver_match.url_name == 'freight_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-map-pin-line"></i>
+                    <span class="menu-text">Tracking & Freight</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'tracking_list' or request.resolver_match.url_name == 'tracking_detail' or request.resolver_match.url_name == 'freight_list' or request.resolver_match.url_name == 'freight_create' or request.resolver_match.url_name == 'freight_detail' or request.resolver_match.url_name == 'freight_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tms:tracking_list' %}" class="menu-link {% if request.resolver_match.url_name == 'tracking_list' or request.resolver_match.url_name == 'tracking_detail' %}active{% endif %}">
+                            <span class="menu-text">Tracking Events</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tms:freight_list' %}" class="menu-link {% if request.resolver_match.url_name == 'freight_list' or request.resolver_match.url_name == 'freight_create' or request.resolver_match.url_name == 'freight_detail' or request.resolver_match.url_name == 'freight_edit' %}active{% endif %}">
+                            <span class="menu-text">Freight Bills</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Load Planning -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'load_list' or request.resolver_match.url_name == 'load_create' or request.resolver_match.url_name == 'load_detail' or request.resolver_match.url_name == 'load_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-stack-line"></i>
+                    <span class="menu-text">Load Planning</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'load_list' or request.resolver_match.url_name == 'load_create' or request.resolver_match.url_name == 'load_detail' or request.resolver_match.url_name == 'load_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tms:load_list' %}" class="menu-link {% if request.resolver_match.url_name == 'load_list' or request.resolver_match.url_name == 'load_detail' or request.resolver_match.url_name == 'load_edit' %}active{% endif %}">
+                            <span class="menu-text">All Load Plans</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tms:load_create' %}" class="menu-link {% if request.resolver_match.url_name == 'load_create' %}active{% endif %}">
+                            <span class="menu-text">Create Load Plan</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Audit &amp; Security <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Audit Logs -->
