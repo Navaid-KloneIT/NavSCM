@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Load Plan: {{ load.plan_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ load.plan_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">TMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'tms:load_list' %}">Load Plans</a></li>
+            <li class="breadcrumb-item active">{{ load.plan_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Load Plan Info -->
+        <div class="card">
+            <div class="card-header"><h5>Load Plan Information</h5></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Plan #</th><td>{{ load.plan_number }}</td></tr>
+                        <tr><th class="ps-3">Shipment</th><td>{{ load.shipment|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Vehicle Type</th><td>{{ load.get_vehicle_type_display|default:"-" }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if load.status == 'draft' %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Draft</span>
+                                {% elif load.status == 'planned' %}
+                                    <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Planned</span>
+                                {% elif load.status == 'loading' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Loading</span>
+                                {% elif load.status == 'loaded' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Loaded</span>
+                                {% elif load.status == 'closed' %}
+                                    <span class="status-badge badge-soft-dark"><span class="status-dot bg-dark"></span> Closed</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ load.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Max Weight (kg)</th><td>{{ load.max_weight|floatformat:2|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Max Volume (cbm)</th><td>{{ load.max_volume|floatformat:2|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Planned Weight (kg)</th><td>{{ load.planned_weight|floatformat:2|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Planned Volume (cbm)</th><td>{{ load.planned_volume|floatformat:2|default:"-" }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Weight Utilization</th>
+                            <td>
+                                {% if load.max_weight and load.planned_weight %}
+                                    {% widthratio load.planned_weight load.max_weight 100 as util_pct %}
+                                    <div class="d-flex align-items-center gap-2" style="max-width: 250px;">
+                                        <div class="progress flex-grow-1" style="height: 10px;">
+                                            <div class="progress-bar {% if util_pct > 90 %}bg-danger{% elif util_pct > 70 %}bg-warning{% else %}bg-success{% endif %}" style="width: {{ util_pct }}%"></div>
+                                        </div>
+                                        <span class="fw-medium">{{ util_pct }}%</span>
+                                    </div>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Volume Utilization</th>
+                            <td>
+                                {% if load.max_volume and load.planned_volume %}
+                                    {% widthratio load.planned_volume load.max_volume 100 as vol_pct %}
+                                    <div class="d-flex align-items-center gap-2" style="max-width: 250px;">
+                                        <div class="progress flex-grow-1" style="height: 10px;">
+                                            <div class="progress-bar {% if vol_pct > 90 %}bg-danger{% elif vol_pct > 70 %}bg-warning{% else %}bg-success{% endif %}" style="width: {{ vol_pct }}%"></div>
+                                        </div>
+                                        <span class="fw-medium">{{ vol_pct }}%</span>
+                                    </div>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Notes</th><td>{{ load.notes|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ load.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Load Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Load Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Weight (kg)</th>
+                                <th>Volume (cbm)</th>
+                                <th>Load Sequence</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td class="fw-medium">{{ item.item }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.weight|default:"-" }}</td>
+                                <td>{{ item.volume|default:"-" }}</td>
+                                <td>{{ item.load_sequence|default:"-" }}</td>
+                                <td>{{ item.notes|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No items in this load plan.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if load.status == 'draft' %}
+                <form method="POST" action="{% url 'tms:load_plan' load.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-checkbox-circle-line me-1"></i> Finalize Plan</button>
+                </form>
+
+                {% elif load.status == 'planned' %}
+                <form method="POST" action="{% url 'tms:load_start' load.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning w-100 mb-2"><i class="ri-loader-line me-1"></i> Start Loading</button>
+                </form>
+
+                {% elif load.status == 'loading' %}
+                <form method="POST" action="{% url 'tms:load_complete' load.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-checkbox-circle-line me-1"></i> Complete Loading</button>
+                </form>
+
+                {% elif load.status == 'loaded' %}
+                <form method="POST" action="{% url 'tms:load_close' load.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-dark w-100 mb-2"><i class="ri-lock-line me-1"></i> Close Plan</button>
+                </form>
+                {% endif %}
+
+                {% if load.status == 'draft' or load.status == 'planned' %}
+                <a href="{% url 'tms:load_edit' load.pk %}" class="btn btn-soft-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                {% endif %}
+
+                {% if load.status == 'draft' %}
+                <form method="POST" action="{% url 'tms:load_delete' load.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-soft-danger w-100 mb-2" onclick="return confirm('Are you sure you want to delete this load plan?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                </form>
+                {% endif %}
+
+                <a href="{% url 'tms:load_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
