@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Orders{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Orders</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">OMS</li>
+            <li class="breadcrumb-item active">Orders</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'oms:order_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by order number, customer name...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" name="priority">
+                                <option value="">All</option>
+                                {% for value, label in priority_choices %}
+                                <option value="{{ value }}" {% if request.GET.priority == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Customer</label>
+                            <select class="form-select" name="customer">
+                                <option value="">All</option>
+                                {% for cust in customers %}
+                                <option value="{{ cust.pk }}" {% if request.GET.customer == cust.pk|stringformat:"d" %}selected{% endif %}>{{ cust.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'oms:order_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> Create Order</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Orders Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Orders</h5>
+                <span class="text-muted">{{ orders|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Channel</th>
+                                <th>Date</th>
+                                <th>Priority</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for o in orders %}
+                            <tr>
+                                <td><a href="{% url 'oms:order_detail' o.pk %}" class="fw-medium">{{ o.order_number }}</a></td>
+                                <td>{{ o.customer.name }}</td>
+                                <td>{{ o.channel.name }}</td>
+                                <td>{{ o.order_date|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if o.priority == 'low' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Low</span>
+                                    {% elif o.priority == 'medium' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Medium</span>
+                                    {% elif o.priority == 'high' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> High</span>
+                                    {% elif o.priority == 'urgent' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Urgent</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ o.get_priority_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ o.total_amount }}</td>
+                                <td>
+                                    {% if o.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif o.status == 'pending_validation' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending Validation</span>
+                                    {% elif o.status == 'validated' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Validated</span>
+                                    {% elif o.status == 'allocated' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Allocated</span>
+                                    {% elif o.status == 'in_fulfillment' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Fulfillment</span>
+                                    {% elif o.status == 'partially_shipped' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Partially Shipped</span>
+                                    {% elif o.status == 'shipped' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Shipped</span>
+                                    {% elif o.status == 'delivered' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Delivered</span>
+                                    {% elif o.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                    {% elif o.status == 'on_hold' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> On Hold</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ o.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'oms:order_detail' o.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if o.status == 'draft' %}
+                                        <a href="{% url 'oms:order_edit' o.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                        <form method="POST" action="{% url 'oms:order_delete' o.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this order?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-shopping-cart-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No orders found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.priority or request.GET.customer %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first order.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
