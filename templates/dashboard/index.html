@@ -314,164 +314,77 @@
     </div>
 </div>
 
-<!-- Row 4: Status Breakdowns -->
+<!-- Row 4: Charts - Module Overview & Order Status -->
 <div class="row">
-    <!-- PO by Status -->
-    <div class="col-xl-4">
+    <!-- Module Overview Bar Chart -->
+    <div class="col-xl-8">
         <div class="card">
-            <div class="card-header align-items-center d-flex">
-                <h5 class="card-title mb-0 flex-grow-1">Purchase Orders by Status</h5>
-                <a href="{% url 'procurement:po_list' %}" class="btn btn-sm btn-soft-primary">View All</a>
+            <div class="card-header">
+                <h5 class="card-title mb-0">Module Overview</h5>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-borderless align-middle mb-0">
-                        <thead class="table-light text-muted">
-                            <tr>
-                                <th>Status</th>
-                                <th class="text-end">Count</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in po_by_status %}
-                            <tr>
-                                <td>
-                                    {% if item.status == 'draft' %}
-                                        <span class="badge bg-secondary-subtle text-secondary">Draft</span>
-                                    {% elif item.status == 'pending_approval' %}
-                                        <span class="badge bg-warning-subtle text-warning">Pending Approval</span>
-                                    {% elif item.status == 'approved' %}
-                                        <span class="badge bg-success-subtle text-success">Approved</span>
-                                    {% elif item.status == 'sent' %}
-                                        <span class="badge bg-info-subtle text-info">Sent</span>
-                                    {% elif item.status == 'acknowledged' %}
-                                        <span class="badge bg-primary-subtle text-primary">Acknowledged</span>
-                                    {% elif item.status == 'partially_received' %}
-                                        <span class="badge bg-warning-subtle text-warning">Partial</span>
-                                    {% elif item.status == 'received' %}
-                                        <span class="badge bg-success-subtle text-success">Received</span>
-                                    {% elif item.status == 'cancelled' %}
-                                        <span class="badge bg-danger-subtle text-danger">Cancelled</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary-subtle text-secondary">{{ item.status|title }}</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-end fw-medium">{{ item.count }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="2" class="text-center text-muted py-3">No purchase orders.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <div class="card-body">
+                <div id="moduleBarChart" style="min-height: 320px;"></div>
             </div>
         </div>
     </div>
 
-    <!-- Shipments by Status -->
+    <!-- Order Status Donut -->
     <div class="col-xl-4">
         <div class="card">
             <div class="card-header align-items-center d-flex">
-                <h5 class="card-title mb-0 flex-grow-1">Shipments by Status</h5>
-                <a href="{% url 'tms:shipment_list' %}" class="btn btn-sm btn-soft-primary">View All</a>
+                <h5 class="card-title mb-0 flex-grow-1">Orders by Status</h5>
+                <a href="{% url 'oms:order_list' %}" class="btn btn-sm btn-soft-primary">View All</a>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-borderless align-middle mb-0">
-                        <thead class="table-light text-muted">
-                            <tr>
-                                <th>Status</th>
-                                <th class="text-end">Count</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in shipment_by_status %}
-                            <tr>
-                                <td>
-                                    {% if item.status == 'draft' %}
-                                        <span class="badge bg-secondary-subtle text-secondary">Draft</span>
-                                    {% elif item.status == 'booked' %}
-                                        <span class="badge bg-info-subtle text-info">Booked</span>
-                                    {% elif item.status == 'picked_up' %}
-                                        <span class="badge bg-primary-subtle text-primary">Picked Up</span>
-                                    {% elif item.status == 'in_transit' %}
-                                        <span class="badge bg-warning-subtle text-warning">In Transit</span>
-                                    {% elif item.status == 'delivered' %}
-                                        <span class="badge bg-success-subtle text-success">Delivered</span>
-                                    {% elif item.status == 'cancelled' or item.status == 'failed' %}
-                                        <span class="badge bg-danger-subtle text-danger">{{ item.status|title }}</span>
-                                    {% else %}
-                                        <span class="badge bg-info-subtle text-info">{{ item.status|title }}</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-end fw-medium">{{ item.count }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="2" class="text-center text-muted py-3">No shipments.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Freight Bills by Status -->
-    <div class="col-xl-4">
-        <div class="card">
-            <div class="card-header align-items-center d-flex">
-                <h5 class="card-title mb-0 flex-grow-1">Freight Bills by Status</h5>
-                <a href="{% url 'tms:freight_list' %}" class="btn btn-sm btn-soft-primary">View All</a>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-borderless align-middle mb-0">
-                        <thead class="table-light text-muted">
-                            <tr>
-                                <th>Status</th>
-                                <th class="text-end">Count</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in freight_by_status %}
-                            <tr>
-                                <td>
-                                    {% if item.status == 'draft' %}
-                                        <span class="badge bg-secondary-subtle text-secondary">Draft</span>
-                                    {% elif item.status == 'pending_review' %}
-                                        <span class="badge bg-warning-subtle text-warning">Pending Review</span>
-                                    {% elif item.status == 'approved' %}
-                                        <span class="badge bg-info-subtle text-info">Approved</span>
-                                    {% elif item.status == 'disputed' %}
-                                        <span class="badge bg-danger-subtle text-danger">Disputed</span>
-                                    {% elif item.status == 'paid' %}
-                                        <span class="badge bg-success-subtle text-success">Paid</span>
-                                    {% elif item.status == 'cancelled' %}
-                                        <span class="badge bg-dark-subtle text-dark">Cancelled</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary-subtle text-secondary">{{ item.status|title }}</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-end fw-medium">{{ item.count }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="2" class="text-center text-muted py-3">No freight bills.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <div class="card-body">
+                <div id="orderDonutChart" style="min-height: 320px;"></div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Row 5: Quick Actions -->
+<!-- Row 5: More Charts - PO, Shipments, Freight -->
+<div class="row">
+    <!-- PO Status Pie -->
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h5 class="card-title mb-0 flex-grow-1">Purchase Orders</h5>
+                <a href="{% url 'procurement:po_list' %}" class="btn btn-sm btn-soft-primary">View All</a>
+            </div>
+            <div class="card-body">
+                <div id="poDonutChart" style="min-height: 280px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shipments Status Pie -->
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h5 class="card-title mb-0 flex-grow-1">Shipments</h5>
+                <a href="{% url 'tms:shipment_list' %}" class="btn btn-sm btn-soft-primary">View All</a>
+            </div>
+            <div class="card-body">
+                <div id="shipmentDonutChart" style="min-height: 280px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Freight Bills Status Pie -->
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h5 class="card-title mb-0 flex-grow-1">Freight Bills</h5>
+                <a href="{% url 'tms:freight_list' %}" class="btn btn-sm btn-soft-primary">View All</a>
+            </div>
+            <div class="card-body">
+                <div id="freightDonutChart" style="min-height: 280px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 6: Quick Actions -->
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -504,7 +417,7 @@
     </div>
 </div>
 
-<!-- Row 6: Additional Stats -->
+<!-- Row 7: Additional Stats -->
 <div class="row">
     <!-- Extra Module Stats -->
     <div class="col-xl-4">
@@ -656,4 +569,105 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- ApexCharts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.1/dist/apexcharts.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var chartColors = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316', '#6366f1', '#14b8a6'];
+
+    // Module Overview Bar Chart
+    var moduleBarLabels = {{ module_bar_labels|safe }};
+    var moduleBarData = {{ module_bar_data|safe }};
+    if (moduleBarLabels.length > 0) {
+        new ApexCharts(document.querySelector("#moduleBarChart"), {
+            series: [{name: 'Count', data: moduleBarData}],
+            chart: {type: 'bar', height: 320, toolbar: {show: false}},
+            plotOptions: {bar: {borderRadius: 6, columnWidth: '50%', distributed: true}},
+            colors: chartColors,
+            dataLabels: {enabled: true, style: {fontSize: '14px', fontWeight: 600}},
+            legend: {show: false},
+            xaxis: {categories: moduleBarLabels, labels: {style: {fontSize: '13px'}}},
+            yaxis: {labels: {style: {fontSize: '12px'}}},
+            grid: {borderColor: '#f1f1f1'},
+            tooltip: {y: {formatter: function(val) {return val;}}}
+        }).render();
+    } else {
+        document.querySelector("#moduleBarChart").innerHTML = '<div class="text-center text-muted py-5"><i class="ri-bar-chart-line" style="font-size:48px;opacity:0.3"></i><p class="mt-2">No data available</p></div>';
+    }
+
+    // Order Status Donut Chart
+    var orderLabels = {{ order_chart_labels|safe }};
+    var orderData = {{ order_chart_data|safe }};
+    if (orderData.length > 0) {
+        new ApexCharts(document.querySelector("#orderDonutChart"), {
+            series: orderData,
+            chart: {type: 'donut', height: 320},
+            labels: orderLabels,
+            colors: chartColors,
+            legend: {position: 'bottom', fontSize: '13px'},
+            dataLabels: {enabled: true, formatter: function(val) {return Math.round(val) + '%';}},
+            plotOptions: {pie: {donut: {size: '55%', labels: {show: true, total: {show: true, label: 'Total', fontSize: '14px', fontWeight: 600}}}}},
+            responsive: [{breakpoint: 480, options: {chart: {height: 280}, legend: {position: 'bottom'}}}]
+        }).render();
+    } else {
+        document.querySelector("#orderDonutChart").innerHTML = '<div class="text-center text-muted py-5"><i class="ri-pie-chart-line" style="font-size:48px;opacity:0.3"></i><p class="mt-2">No orders yet</p></div>';
+    }
+
+    // PO Status Pie Chart
+    var poLabels = {{ po_chart_labels|safe }};
+    var poData = {{ po_chart_data|safe }};
+    if (poData.length > 0) {
+        new ApexCharts(document.querySelector("#poDonutChart"), {
+            series: poData,
+            chart: {type: 'pie', height: 280},
+            labels: poLabels,
+            colors: ['#6b7280', '#f59e0b', '#22c55e', '#06b6d4', '#3b82f6', '#f97316', '#10b981', '#ef4444'],
+            legend: {position: 'bottom', fontSize: '12px'},
+            dataLabels: {enabled: true, formatter: function(val) {return Math.round(val) + '%';}},
+            responsive: [{breakpoint: 480, options: {chart: {height: 250}}}]
+        }).render();
+    } else {
+        document.querySelector("#poDonutChart").innerHTML = '<div class="text-center text-muted py-5"><i class="ri-pie-chart-line" style="font-size:48px;opacity:0.3"></i><p class="mt-2">No purchase orders</p></div>';
+    }
+
+    // Shipment Status Donut Chart
+    var shipmentLabels = {{ shipment_chart_labels|safe }};
+    var shipmentData = {{ shipment_chart_data|safe }};
+    if (shipmentData.length > 0) {
+        new ApexCharts(document.querySelector("#shipmentDonutChart"), {
+            series: shipmentData,
+            chart: {type: 'donut', height: 280},
+            labels: shipmentLabels,
+            colors: ['#6b7280', '#06b6d4', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899', '#22c55e', '#ef4444', '#dc2626'],
+            legend: {position: 'bottom', fontSize: '12px'},
+            dataLabels: {enabled: true, formatter: function(val) {return Math.round(val) + '%';}},
+            plotOptions: {pie: {donut: {size: '50%'}}},
+            responsive: [{breakpoint: 480, options: {chart: {height: 250}}}]
+        }).render();
+    } else {
+        document.querySelector("#shipmentDonutChart").innerHTML = '<div class="text-center text-muted py-5"><i class="ri-pie-chart-line" style="font-size:48px;opacity:0.3"></i><p class="mt-2">No shipments</p></div>';
+    }
+
+    // Freight Bill Status Donut Chart
+    var freightLabels = {{ freight_chart_labels|safe }};
+    var freightData = {{ freight_chart_data|safe }};
+    if (freightData.length > 0) {
+        new ApexCharts(document.querySelector("#freightDonutChart"), {
+            series: freightData,
+            chart: {type: 'donut', height: 280},
+            labels: freightLabels,
+            colors: ['#6b7280', '#f59e0b', '#06b6d4', '#ef4444', '#22c55e', '#374151'],
+            legend: {position: 'bottom', fontSize: '12px'},
+            dataLabels: {enabled: true, formatter: function(val) {return Math.round(val) + '%';}},
+            plotOptions: {pie: {donut: {size: '50%'}}},
+            responsive: [{breakpoint: 480, options: {chart: {height: 250}}}]
+        }).render();
+    } else {
+        document.querySelector("#freightDonutChart").innerHTML = '<div class="text-center text-muted py-5"><i class="ri-pie-chart-line" style="font-size:48px;opacity:0.3"></i><p class="mt-2">No freight bills</p></div>';
+    }
+});
+</script>
 {% endblock %}
