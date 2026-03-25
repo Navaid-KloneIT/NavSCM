@@ -80,7 +80,7 @@ class Carrier(models.Model):
         if not self.carrier_number:
             last = Carrier.objects.filter(
                 tenant=self.tenant
-            ).order_by('-created_at').first()
+            ).order_by('-id').first()
             if last and last.carrier_number:
                 try:
                     num = int(last.carrier_number.split('-')[-1]) + 1
@@ -144,7 +144,7 @@ class RateCard(models.Model):
         if not self.rate_number:
             last = RateCard.objects.filter(
                 tenant=self.tenant
-            ).order_by('-created_at').first()
+            ).order_by('-id').first()
             if last and last.rate_number:
                 try:
                     num = int(last.rate_number.split('-')[-1]) + 1
@@ -211,7 +211,7 @@ class Route(models.Model):
         if not self.route_number:
             last = Route.objects.filter(
                 tenant=self.tenant
-            ).order_by('-created_at').first()
+            ).order_by('-id').first()
             if last and last.route_number:
                 try:
                     num = int(last.route_number.split('-')[-1]) + 1
@@ -303,7 +303,7 @@ class Shipment(models.Model):
         if not self.shipment_number:
             last = Shipment.objects.filter(
                 tenant=self.tenant
-            ).order_by('-created_at').first()
+            ).order_by('-id').first()
             if last and last.shipment_number:
                 try:
                     num = int(last.shipment_number.split('-')[-1]) + 1
@@ -426,7 +426,7 @@ class FreightBill(models.Model):
         if not self.bill_number:
             last = FreightBill.objects.filter(
                 tenant=self.tenant
-            ).order_by('-created_at').first()
+            ).order_by('-id').first()
             if last and last.bill_number:
                 try:
                     num = int(last.bill_number.split('-')[-1]) + 1
@@ -549,7 +549,7 @@ class LoadPlan(models.Model):
         if not self.plan_number:
             last = LoadPlan.objects.filter(
                 tenant=self.tenant
-            ).order_by('-created_at').first()
+            ).order_by('-id').first()
             if last and last.plan_number:
                 try:
                     num = int(last.plan_number.split('-')[-1]) + 1
