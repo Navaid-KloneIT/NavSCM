@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+
+{% block title %}Order: {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ order.order_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">OMS</li>
+            <li class="breadcrumb-item"><a href="{% url 'oms:order_list' %}">Orders</a></li>
+            <li class="breadcrumb-item active">{{ order.order_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Order Info</h5>
+                <div>
+                    {% if order.status == 'draft' %}
+                    <a href="{% url 'oms:order_edit' order.pk %}" class="btn btn-sm btn-soft-warning"><i class="ri-pencil-line"></i></a>
+                    <form method="POST" action="{% url 'oms:order_delete' order.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-soft-danger" onclick="return confirm('Are you sure you want to delete this order?')"><i class="ri-delete-bin-line"></i></button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><th class="ps-3">Order #</th><td>{{ order.order_number }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Customer</th>
+                            <td><a href="{% url 'oms:customer_detail' order.customer.pk %}">{{ order.customer.name }}</a></td>
+                        </tr>
+                        <tr><th class="ps-3">Sales Channel</th><td>{{ order.sales_channel|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Order Date</th><td>{{ order.order_date|date:"M d, Y" }}</td></tr>
+                        <tr><th class="ps-3">Required Date</th><td>{{ order.required_date|date:"M d, Y"|default:"-" }}</td></tr>
+                        <tr>
+                            <th class="ps-3">Priority</th>
+                            <td>
+                                {% if order.priority == 'urgent' %}
+                                    <span class="badge bg-soft-danger text-danger">Urgent</span>
+                                {% elif order.priority == 'high' %}
+                                    <span class="badge bg-soft-warning text-warning">High</span>
+                                {% elif order.priority == 'normal' %}
+                                    <span class="badge bg-soft-info text-info">Normal</span>
+                                {% elif order.priority == 'low' %}
+                                    <span class="badge bg-soft-secondary text-secondary">Low</span>
+                                {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ order.get_priority_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Status</th>
+                            <td>
+                                {% if order.status == 'draft' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                {% elif order.status == 'pending_validation' %}
+                                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending Validation</span>
+                                {% elif order.status == 'validated' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Validated</span>
+                                {% elif order.status == 'allocated' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Allocated</span>
+                                {% elif order.status == 'in_fulfillment' %}
+                                    <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Fulfillment</span>
+                                {% elif order.status == 'partially_shipped' %}
+                                    <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Partially Shipped</span>
+                                {% elif order.status == 'shipped' %}
+                                    <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Shipped</span>
+                                {% elif order.status == 'delivered' %}
+                                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Delivered</span>
+                                {% elif order.status == 'cancelled' %}
+                                    <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                {% elif order.status == 'on_hold' %}
+                                    <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> On Hold</span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ order.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr><th class="ps-3">Shipping Address</th><td>{{ order.shipping_address|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Billing Address</th><td>{{ order.billing_address|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Subtotal</th><td>{{ order.subtotal|floatformat:2 }}</td></tr>
+                        <tr><th class="ps-3">Tax Amount</th><td>{{ order.tax_amount|floatformat:2 }}</td></tr>
+                        <tr><th class="ps-3">Discount Amount</th><td>{{ order.discount_amount|floatformat:2 }}</td></tr>
+                        <tr><th class="ps-3">Shipping Amount</th><td>{{ order.shipping_amount|floatformat:2 }}</td></tr>
+                        <tr><th class="ps-3">Total Amount</th><td class="fw-bold">{{ order.total_amount|floatformat:2 }}</td></tr>
+                        <tr><th class="ps-3">Created By</th><td>{{ order.created_by|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Validated By</th><td>{{ order.validated_by|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Validated At</th><td>{{ order.validated_at|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Notes</th><td>{{ order.notes|default:"-" }}</td></tr>
+                        <tr><th class="ps-3">Created</th><td>{{ order.created_at|date:"M d, Y H:i" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Workflow Actions -->
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if order.status == 'draft' %}
+                <form method="POST" action="{% url 'oms:order_submit_validation' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-send-plane-line me-1"></i> Submit for Validation</button>
+                </form>
+                <form method="POST" action="{% url 'oms:order_hold' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning w-100 mb-2"><i class="ri-pause-circle-line me-1"></i> Put on Hold</button>
+                </form>
+                <form method="POST" action="{% url 'oms:order_cancel' order.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Are you sure you want to cancel this order?')"><i class="ri-close-circle-line me-1"></i> Cancel Order</button>
+                </form>
+
+                {% elif order.status == 'pending_validation' %}
+                <form method="POST" action="{% url 'oms:order_validate' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Validate Order</button>
+                </form>
+                <form method="POST" action="{% url 'oms:order_cancel' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Are you sure you want to cancel this order?')"><i class="ri-close-circle-line me-1"></i> Cancel Order</button>
+                </form>
+
+                {% elif order.status == 'validated' %}
+                <form method="POST" action="{% url 'oms:order_allocate' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-stack-line me-1"></i> Allocate Order</button>
+                </form>
+                <form method="POST" action="{% url 'oms:order_cancel' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Are you sure you want to cancel this order?')"><i class="ri-close-circle-line me-1"></i> Cancel Order</button>
+                </form>
+
+                {% elif order.status == 'allocated' %}
+                <form method="POST" action="{% url 'oms:order_fulfill' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-shopping-bag-line me-1"></i> Start Fulfillment</button>
+                </form>
+                <form method="POST" action="{% url 'oms:order_cancel' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Are you sure you want to cancel this order?')"><i class="ri-close-circle-line me-1"></i> Cancel Order</button>
+                </form>
+
+                {% elif order.status == 'in_fulfillment' or order.status == 'partially_shipped' %}
+                <form method="POST" action="{% url 'oms:order_ship' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-truck-line me-1"></i> Mark Shipped</button>
+                </form>
+                <form method="POST" action="{% url 'oms:order_cancel' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Are you sure you want to cancel this order?')"><i class="ri-close-circle-line me-1"></i> Cancel Order</button>
+                </form>
+
+                {% elif order.status == 'shipped' %}
+                <form method="POST" action="{% url 'oms:order_deliver' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-checkbox-circle-line me-1"></i> Mark Delivered</button>
+                </form>
+
+                {% elif order.status == 'on_hold' %}
+                <form method="POST" action="{% url 'oms:order_release' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-play-circle-line me-1"></i> Release Hold</button>
+                </form>
+                <form method="POST" action="{% url 'oms:order_cancel' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Are you sure you want to cancel this order?')"><i class="ri-close-circle-line me-1"></i> Cancel Order</button>
+                </form>
+
+                {% else %}
+                <p class="text-muted mb-0">No actions available.</p>
+                {% endif %}
+
+                <a href="{% url 'oms:order_list' %}" class="btn btn-light w-100 mt-2"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <!-- Order Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Order Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Unit Price</th>
+                                <th>Tax</th>
+                                <th>Discount</th>
+                                <th>Total</th>
+                                <th>Warehouse</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for li in order_items %}
+                            <tr>
+                                <td class="fw-medium">{{ li.item }}</td>
+                                <td>{{ li.quantity }}</td>
+                                <td>{{ li.unit_price|floatformat:2 }}</td>
+                                <td>{{ li.tax_amount|floatformat:2 }}</td>
+                                <td>{{ li.discount_amount|floatformat:2 }}</td>
+                                <td>{{ li.total_amount|floatformat:2 }}</td>
+                                <td>{{ li.warehouse|default:"-" }}</td>
+                                <td>
+                                    {% if li.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% elif li.status == 'allocated' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Allocated</span>
+                                    {% elif li.status == 'fulfilled' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Fulfilled</span>
+                                    {% elif li.status == 'partially_fulfilled' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Partially Fulfilled</span>
+                                    {% elif li.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ li.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No items in this order.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Validations -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Validations</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Validation #</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for v in validations %}
+                            <tr>
+                                <td class="fw-medium"><a href="{% url 'oms:validation_detail' v.pk %}">{{ v.validation_number }}</a></td>
+                                <td>{{ v.get_validation_type_display }}</td>
+                                <td>
+                                    {% if v.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% elif v.status == 'passed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Passed</span>
+                                    {% elif v.status == 'failed' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Failed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ v.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ v.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-shield-check-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No validations for this order.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Allocations -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Allocations</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Allocation #</th>
+                                <th>Warehouse</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in allocations %}
+                            <tr>
+                                <td class="fw-medium"><a href="{% url 'oms:allocation_detail' a.pk %}">{{ a.allocation_number }}</a></td>
+                                <td>{{ a.warehouse }}</td>
+                                <td>{{ a.get_allocation_method_display }}</td>
+                                <td>
+                                    {% if a.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% elif a.status == 'allocated' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Allocated</span>
+                                    {% elif a.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ a.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-stack-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No allocations for this order.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backorders -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Backorders</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Backorder #</th>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in backorders %}
+                            <tr>
+                                <td class="fw-medium"><a href="{% url 'oms:backorder_detail' b.pk %}">{{ b.backorder_number }}</a></td>
+                                <td>{{ b.item }}</td>
+                                <td>{{ b.quantity }}</td>
+                                <td>
+                                    {% if b.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% elif b.status == 'fulfilled' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Fulfilled</span>
+                                    {% elif b.status == 'partially_fulfilled' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Partially Fulfilled</span>
+                                    {% elif b.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ b.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-inbox-unarchive-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No backorders for this order.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
