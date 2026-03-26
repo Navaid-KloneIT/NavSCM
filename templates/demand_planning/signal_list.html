@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Demand Signals{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>Demand Signals</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Demand Planning</li>
+            <li class="breadcrumb-item active">Demand Signals</li>
+        </ol>
+    </nav>
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'demand_planning:signal_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Signal Type</label>
+                            <select class="form-select" name="type">
+                                <option value="">All</option>
+                                {% for value, label in type_choices %}
+                                    <option value="{{ value }}" {% if request.GET.type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Impact</label>
+                            <select class="form-select" name="impact">
+                                <option value="">All</option>
+                                {% for value, label in impact_choices %}
+                                    <option value="{{ value }}" {% if request.GET.impact == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'demand_planning:signal_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Signal</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Demand Signals</h5>
+                <span class="text-muted">{{ signals|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Signal #</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Impact</th>
+                                <th>Est. Impact %</th>
+                                <th>Item</th>
+                                <th>Signal Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in signals %}
+                            <tr>
+                                <td><a href="{% url 'demand_planning:signal_detail' s.pk %}" class="fw-medium">{{ s.signal_number }}</a></td>
+                                <td>{{ s.title }}</td>
+                                <td><span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ s.get_signal_type_display }}</span></td>
+                                <td>
+                                    {% if s.impact_level == 'low' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Low</span>
+                                    {% elif s.impact_level == 'medium' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Medium</span>
+                                    {% elif s.impact_level == 'high' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> High</span>
+                                    {% elif s.impact_level == 'critical' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Critical</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if s.estimated_impact_pct > 0 %}
+                                        <span class="text-success">+{{ s.estimated_impact_pct|floatformat:1 }}%</span>
+                                    {% elif s.estimated_impact_pct < 0 %}
+                                        <span class="text-danger">{{ s.estimated_impact_pct|floatformat:1 }}%</span>
+                                    {% else %}
+                                        0%
+                                    {% endif %}
+                                </td>
+                                <td>{{ s.item.name|default:"-" }}</td>
+                                <td>{{ s.signal_date|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if s.status == 'new' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> New</span>
+                                    {% elif s.status == 'analyzed' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Analyzed</span>
+                                    {% elif s.status == 'incorporated' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Incorporated</span>
+                                    {% elif s.status == 'dismissed' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Dismissed</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'demand_planning:signal_detail' s.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if s.status == 'new' %}
+                                            <a href="{% url 'demand_planning:signal_edit' s.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                            <form method="POST" action="{% url 'demand_planning:signal_delete' s.pk %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this signal?')"><i class="ri-delete-bin-line"></i></button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-signal-tower-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No demand signals found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.type or request.GET.impact or request.GET.status %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by adding your first demand signal.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
