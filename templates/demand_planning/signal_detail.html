@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Signal: {{ signal.signal_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ signal.signal_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Demand Planning</li>
+            <li class="breadcrumb-item"><a href="{% url 'demand_planning:signal_list' %}">Signals</a></li>
+            <li class="breadcrumb-item active">{{ signal.signal_number }}</li>
+        </ol>
+    </nav>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Signal Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Signal #</th><td>{{ signal.signal_number }}</td></tr>
+                            <tr><th class="ps-3">Title</th><td>{{ signal.title }}</td></tr>
+                            <tr><th class="ps-3">Type</th><td><span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ signal.get_signal_type_display }}</span></td></tr>
+                            <tr>
+                                <th class="ps-3">Impact Level</th>
+                                <td>
+                                    {% if signal.impact_level == 'low' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Low</span>
+                                    {% elif signal.impact_level == 'medium' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Medium</span>
+                                    {% elif signal.impact_level == 'high' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> High</span>
+                                    {% elif signal.impact_level == 'critical' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Critical</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if signal.status == 'new' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> New</span>
+                                    {% elif signal.status == 'analyzed' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Analyzed</span>
+                                    {% elif signal.status == 'incorporated' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Incorporated</span>
+                                    {% elif signal.status == 'dismissed' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Dismissed</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Item</th><td>{{ signal.item.name|default:"Market-wide (no specific item)" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Est. Impact</th>
+                                <td>
+                                    {% if signal.estimated_impact_pct > 0 %}
+                                        <span class="text-success fw-medium">+{{ signal.estimated_impact_pct|floatformat:1 }}%</span>
+                                    {% elif signal.estimated_impact_pct < 0 %}
+                                        <span class="text-danger fw-medium">{{ signal.estimated_impact_pct|floatformat:1 }}%</span>
+                                    {% else %}
+                                        0%
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Signal Date</th><td>{{ signal.signal_date|date:"M d, Y" }}</td></tr>
+                            <tr><th class="ps-3">Expiry Date</th><td>{{ signal.expiry_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Source</th><td>{{ signal.source|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Description</th><td>{{ signal.description|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ signal.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ signal.created_by|default:"-" }}</td></tr>
+                            {% if signal.analyzed_by %}
+                            <tr><th class="ps-3">Analyzed By</th><td>{{ signal.analyzed_by }} on {{ signal.analyzed_at|date:"M d, Y H:i" }}</td></tr>
+                            {% endif %}
+                            <tr><th class="ps-3">Created</th><td>{{ signal.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if signal.status == 'new' %}
+                    <a href="{% url 'demand_planning:signal_edit' signal.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'demand_planning:signal_analyze' signal.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-search-eye-line me-1"></i> Mark as Analyzed</button>
+                    </form>
+                    <form method="POST" action="{% url 'demand_planning:signal_dismiss' signal.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2"><i class="ri-close-line me-1"></i> Dismiss</button>
+                    </form>
+                    <form method="POST" action="{% url 'demand_planning:signal_delete' signal.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this signal?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif signal.status == 'analyzed' %}
+                    <form method="POST" action="{% url 'demand_planning:signal_incorporate' signal.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Incorporate</button>
+                    </form>
+                    <form method="POST" action="{% url 'demand_planning:signal_dismiss' signal.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2"><i class="ri-close-line me-1"></i> Dismiss</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'demand_planning:signal_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
