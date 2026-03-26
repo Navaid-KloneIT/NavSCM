@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Demand Planning</li>
+            <li class="breadcrumb-item"><a href="{% url 'demand_planning:signal_list' %}">Signals</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Signal Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Signal Type *</label>
+                            {{ form.signal_type }}
+                            {% if form.signal_type.errors %}<div class="text-danger small">{{ form.signal_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Impact Level *</label>
+                            {{ form.impact_level }}
+                            {% if form.impact_level.errors %}<div class="text-danger small">{{ form.impact_level.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Item</label>
+                            {{ form.item }}
+                            {% if form.item.errors %}<div class="text-danger small">{{ form.item.errors.0 }}</div>{% endif %}
+                            <small class="text-muted">Leave blank for market-wide signals</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estimated Impact %</label>
+                            {{ form.estimated_impact_pct }}
+                            {% if form.estimated_impact_pct.errors %}<div class="text-danger small">{{ form.estimated_impact_pct.errors.0 }}</div>{% endif %}
+                            <small class="text-muted">Positive = increase, negative = decrease</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Signal Date *</label>
+                            {{ form.signal_date }}
+                            {% if form.signal_date.errors %}<div class="text-danger small">{{ form.signal_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Expiry Date</label>
+                            {{ form.expiry_date }}
+                            {% if form.expiry_date.errors %}<div class="text-danger small">{{ form.expiry_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Source</label>
+                            {{ form.source }}
+                            {% if form.source.errors %}<div class="text-danger small">{{ form.source.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Signal</button>
+                    {% if signal %}
+                        <a href="{% url 'demand_planning:signal_detail' signal.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'demand_planning:signal_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
