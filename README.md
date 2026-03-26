@@ -88,6 +88,16 @@ Plans, executes, and optimizes the physical movement of goods.
 - **Freight Audit & Payment** - Freight bill verification against shipments with line-item charge breakdown (base freight, fuel surcharge, handling, insurance, customs, toll, accessorial), audit workflow (draft → pending review → approved/disputed → paid), dispute management, and payment reference tracking
 - **Load Optimization** - Cargo loading plans for vehicles/containers (20ft/40ft trucks, containers, vans, flatbeds, refrigerated, bulk) with weight/volume capacity tracking, utilization percentage calculation, load sequencing, and loading workflow (draft → planned → loading → loaded → closed)
 
+### Module 7: Demand Planning & Forecasting
+
+Uses data to predict future demand and align supply accordingly.
+
+- **Sales Forecasting** - Statistical forecasting based on historical sales data with multiple methods (moving average, exponential smoothing, linear regression, manual entry), approval workflow (draft → submitted → approved → active → archived), line-item forecasts with actual vs. forecasted variance tracking and confidence levels
+- **Seasonality Analysis** - Per-item seasonal demand profiles with 12 monthly adjustment factors, linked promotional events (holiday, promotion, clearance, product launch, seasonal) with configurable demand impact multipliers and date ranges
+- **Demand Sensing** - Short-term demand signal tracking from multiple sources (market trends, competitor actions, weather, economic indicators, social media, customer feedback, POS data), impact level assessment (low → critical), and signal lifecycle management (new → analyzed → incorporated/dismissed)
+- **Collaborative Planning** - Cross-functional planning interface for sales, marketing, finance, and operations teams with plan types (sales/marketing/finance/operations/consensus), approval workflow (draft → submitted → review → approved → finalized), optional forecast linking, line-item planning, and threaded discussion comments
+- **Safety Stock Calculation** - Dynamic buffer stock calculation using multiple methods (fixed quantity, percentage of demand, statistical Z-score, demand-based) with per-item/warehouse inputs (average demand, demand std deviation, lead time, lead time variability, service level), automated safety stock and reorder point computation, and one-click application to inventory reorder rules
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -213,6 +223,11 @@ Plans, executes, and optimizes the physical movement of goods.
    python manage.py seed_tms
    ```
 
+7h. **Seed Demand Planning data**
+   ```bash
+   python manage.py seed_demand_planning
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -273,11 +288,17 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/oms/*)
 │   │   └── admin.py       # Django admin registration
-│   └── tms/               # Transportation management system module
-│       ├── models.py      # Carrier, RateCard, Route, Shipment, ShipmentItem, ShipmentTracking, FreightBill, FreightBillItem, LoadPlan, LoadPlanItem
-│       ├── views.py       # All TMS CRUD & workflow views
+│   ├── tms/               # Transportation management system module
+│   │   ├── models.py      # Carrier, RateCard, Route, Shipment, ShipmentItem, ShipmentTracking, FreightBill, FreightBillItem, LoadPlan, LoadPlanItem
+│   │   ├── views.py       # All TMS CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/tms/*)
+│   │   └── admin.py       # Django admin registration
+│   └── demand_planning/   # Demand planning & forecasting module
+│       ├── models.py      # SalesForecast, ForecastLineItem, SeasonalityProfile, PromotionalEvent, DemandSignal, CollaborativePlan, PlanLineItem, PlanComment, SafetyStockCalculation, SafetyStockItem
+│       ├── views.py       # All demand planning CRUD & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/tms/*)
+│       ├── urls.py        # URL routing (/demand-planning/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -334,14 +355,21 @@ NavSCM/
 │   │   ├── allocation_*.html  # Order allocation list, form, detail
 │   │   ├── backorder_*.html   # Backorder list, detail
 │   │   └── notification_*.html # Customer notification list, detail
-│   └── tms/               # TMS templates
-│       ├── carrier_*.html     # Carrier list, form, detail
-│       ├── rate_*.html        # Rate card list, form, detail
-│       ├── route_*.html       # Route list, form, detail
-│       ├── shipment_*.html    # Shipment list, form, detail
-│       ├── tracking_*.html    # Tracking event list, form, detail
-│       ├── freight_*.html     # Freight bill list, form, detail
-│       └── load_*.html        # Load plan list, form, detail
+│   ├── tms/               # TMS templates
+│   │   ├── carrier_*.html     # Carrier list, form, detail
+│   │   ├── rate_*.html        # Rate card list, form, detail
+│   │   ├── route_*.html       # Route list, form, detail
+│   │   ├── shipment_*.html    # Shipment list, form, detail
+│   │   ├── tracking_*.html    # Tracking event list, form, detail
+│   │   ├── freight_*.html     # Freight bill list, form, detail
+│   │   └── load_*.html        # Load plan list, form, detail
+│   └── demand_planning/   # Demand planning templates
+│       ├── forecast_*.html    # Sales forecast list, form, detail
+│       ├── seasonality_*.html # Seasonality profile list, form, detail
+│       ├── event_*.html       # Promotional event list, form
+│       ├── signal_*.html      # Demand signal list, form, detail
+│       ├── plan_*.html        # Collaborative plan list, form, detail
+│       └── safety_stock_*.html # Safety stock calculation list, form, detail
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
@@ -372,7 +400,7 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 | 1 | **Warehouse Management (WMS)** | Inbound/outbound operations, bin/location management, cycle counting, yard management | Done |
 | 2 | **Order Management (OMS)** | Order capture, validation, allocation, backorder management, customer notifications | Done |
 | 3 | **Transportation Management (TMS)** | Route planning, freight audit, carrier management, shipment tracking, load optimization | Done |
-| 4 | **Demand Planning & Forecasting** | Sales forecasting, seasonality analysis, demand sensing, collaborative planning, safety stock calculation | Planned |
+| 4 | **Demand Planning & Forecasting** | Sales forecasting, seasonality analysis, demand sensing, collaborative planning, safety stock calculation | Done |
 | 5 | **Manufacturing / Production** | Bill of materials (BOM), production scheduling, work orders, MRP, shop floor control | Planned |
 | 6 | **Quality Management (QMS)** | Quality inspection, non-conformance reports, CAPA, audit management, certificates of analysis | Planned |
 | 7 | **Returns Management** | RMA workflows, refund processing, disposition management, return portal, warranty claims | Planned |
