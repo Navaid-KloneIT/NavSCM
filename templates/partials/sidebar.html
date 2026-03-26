@@ -855,6 +855,123 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Demand Planning <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Sales Forecasts -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'forecast_list' or request.resolver_match.url_name == 'forecast_create' or request.resolver_match.url_name == 'forecast_detail' or request.resolver_match.url_name == 'forecast_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-line-chart-line"></i>
+                    <span class="menu-text">Sales Forecasts</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'forecast_list' or request.resolver_match.url_name == 'forecast_create' or request.resolver_match.url_name == 'forecast_detail' or request.resolver_match.url_name == 'forecast_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'demand_planning:forecast_list' %}" class="menu-link {% if request.resolver_match.url_name == 'forecast_list' or request.resolver_match.url_name == 'forecast_detail' or request.resolver_match.url_name == 'forecast_edit' %}active{% endif %}">
+                            <span class="menu-text">All Forecasts</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'demand_planning:forecast_create' %}" class="menu-link {% if request.resolver_match.url_name == 'forecast_create' %}active{% endif %}">
+                            <span class="menu-text">New Forecast</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Seasonality -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'seasonality_list' or request.resolver_match.url_name == 'seasonality_create' or request.resolver_match.url_name == 'seasonality_detail' or request.resolver_match.url_name == 'seasonality_edit' or request.resolver_match.url_name == 'event_list' or request.resolver_match.url_name == 'event_create' or request.resolver_match.url_name == 'event_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-calendar-event-line"></i>
+                    <span class="menu-text">Seasonality</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'seasonality_list' or request.resolver_match.url_name == 'seasonality_create' or request.resolver_match.url_name == 'seasonality_detail' or request.resolver_match.url_name == 'seasonality_edit' or request.resolver_match.url_name == 'event_list' or request.resolver_match.url_name == 'event_create' or request.resolver_match.url_name == 'event_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'demand_planning:seasonality_list' %}" class="menu-link {% if request.resolver_match.url_name == 'seasonality_list' or request.resolver_match.url_name == 'seasonality_detail' or request.resolver_match.url_name == 'seasonality_edit' %}active{% endif %}">
+                            <span class="menu-text">Profiles</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'demand_planning:seasonality_create' %}" class="menu-link {% if request.resolver_match.url_name == 'seasonality_create' %}active{% endif %}">
+                            <span class="menu-text">New Profile</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'demand_planning:event_list' %}" class="menu-link {% if request.resolver_match.url_name == 'event_list' or request.resolver_match.url_name == 'event_edit' %}active{% endif %}">
+                            <span class="menu-text">Events</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'demand_planning:event_create' %}" class="menu-link {% if request.resolver_match.url_name == 'event_create' %}active{% endif %}">
+                            <span class="menu-text">New Event</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Demand Signals -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'signal_list' or request.resolver_match.url_name == 'signal_create' or request.resolver_match.url_name == 'signal_detail' or request.resolver_match.url_name == 'signal_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-signal-tower-line"></i>
+                    <span class="menu-text">Demand Signals</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'signal_list' or request.resolver_match.url_name == 'signal_create' or request.resolver_match.url_name == 'signal_detail' or request.resolver_match.url_name == 'signal_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'demand_planning:signal_list' %}" class="menu-link {% if request.resolver_match.url_name == 'signal_list' or request.resolver_match.url_name == 'signal_detail' or request.resolver_match.url_name == 'signal_edit' %}active{% endif %}">
+                            <span class="menu-text">All Signals</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'demand_planning:signal_create' %}" class="menu-link {% if request.resolver_match.url_name == 'signal_create' %}active{% endif %}">
+                            <span class="menu-text">New Signal</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Collaborative Plans -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'plan_list' or request.resolver_match.url_name == 'plan_create' or request.resolver_match.url_name == 'plan_detail' or request.resolver_match.url_name == 'plan_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-team-line"></i>
+                    <span class="menu-text">Collaborative Plans</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'plan_list' or request.resolver_match.url_name == 'plan_create' or request.resolver_match.url_name == 'plan_detail' or request.resolver_match.url_name == 'plan_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'demand_planning:plan_list' %}" class="menu-link {% if request.resolver_match.url_name == 'plan_list' or request.resolver_match.url_name == 'plan_detail' or request.resolver_match.url_name == 'plan_edit' %}active{% endif %}">
+                            <span class="menu-text">All Plans</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'demand_planning:plan_create' %}" class="menu-link {% if request.resolver_match.url_name == 'plan_create' %}active{% endif %}">
+                            <span class="menu-text">New Plan</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Safety Stock -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name == 'safety_stock_list' or request.resolver_match.url_name == 'safety_stock_create' or request.resolver_match.url_name == 'safety_stock_detail' or request.resolver_match.url_name == 'safety_stock_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-shield-check-line"></i>
+                    <span class="menu-text">Safety Stock</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name == 'safety_stock_list' or request.resolver_match.url_name == 'safety_stock_create' or request.resolver_match.url_name == 'safety_stock_detail' or request.resolver_match.url_name == 'safety_stock_edit' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'demand_planning:safety_stock_list' %}" class="menu-link {% if request.resolver_match.url_name == 'safety_stock_list' or request.resolver_match.url_name == 'safety_stock_detail' or request.resolver_match.url_name == 'safety_stock_edit' %}active{% endif %}">
+                            <span class="menu-text">Calculations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'demand_planning:safety_stock_create' %}" class="menu-link {% if request.resolver_match.url_name == 'safety_stock_create' %}active{% endif %}">
+                            <span class="menu-text">New Calculation</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Audit &amp; Security <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Audit Logs -->
