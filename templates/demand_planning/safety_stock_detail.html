@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Safety Stock: {{ calc.calculation_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ calc.calculation_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Demand Planning</li>
+            <li class="breadcrumb-item"><a href="{% url 'demand_planning:safety_stock_list' %}">Safety Stock</a></li>
+            <li class="breadcrumb-item active">{{ calc.calculation_number }}</li>
+        </ol>
+    </nav>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Calculation Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Calc #</th><td>{{ calc.calculation_number }}</td></tr>
+                            <tr><th class="ps-3">Title</th><td>{{ calc.title }}</td></tr>
+                            <tr><th class="ps-3">Method</th><td><span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ calc.get_calculation_method_display }}</span></td></tr>
+                            <tr><th class="ps-3">Service Level</th><td>{{ calc.default_service_level|floatformat:1 }}%</td></tr>
+                            <tr><th class="ps-3">Calculation Date</th><td>{{ calc.calculation_date|date:"M d, Y" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if calc.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif calc.status == 'calculated' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Calculated</span>
+                                    {% elif calc.status == 'approved' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Approved</span>
+                                    {% elif calc.status == 'applied' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Applied</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Description</th><td>{{ calc.description|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ calc.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ calc.created_by|default:"-" }}</td></tr>
+                            {% if calc.approved_by %}
+                            <tr><th class="ps-3">Approved By</th><td>{{ calc.approved_by }} on {{ calc.approved_at|date:"M d, Y H:i" }}</td></tr>
+                            {% endif %}
+                            <tr><th class="ps-3">Created</th><td>{{ calc.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Safety Stock Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Warehouse</th>
+                                <th>Avg Demand</th>
+                                <th>Demand Std Dev</th>
+                                <th>Lead Time</th>
+                                <th>Service %</th>
+                                <th>Safety Stock</th>
+                                <th>Current Stock</th>
+                                <th>Reorder Point</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in items %}
+                            <tr>
+                                <td>{{ i.item.name }}</td>
+                                <td>{{ i.warehouse.name }}</td>
+                                <td>{{ i.avg_demand|floatformat:2 }}</td>
+                                <td>{{ i.demand_std_dev|floatformat:2 }}</td>
+                                <td>{{ i.lead_time_days }} days</td>
+                                <td>{{ i.service_level_pct|floatformat:1 }}%</td>
+                                <td class="fw-medium">{{ i.calculated_safety_stock|floatformat:2 }}</td>
+                                <td>
+                                    {% if i.current_stock < i.calculated_safety_stock %}
+                                        <span class="text-danger fw-medium">{{ i.current_stock|floatformat:2 }}</span>
+                                    {% else %}
+                                        {{ i.current_stock|floatformat:2 }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ i.recommended_reorder_point|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No items.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if calc.status == 'draft' %}
+                    <a href="{% url 'demand_planning:safety_stock_edit' calc.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'demand_planning:safety_stock_calculate' calc.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-calculator-line me-1"></i> Run Calculation</button>
+                    </form>
+                    <form method="POST" action="{% url 'demand_planning:safety_stock_delete' calc.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this calculation?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif calc.status == 'calculated' %}
+                    <form method="POST" action="{% url 'demand_planning:safety_stock_approve' calc.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-line me-1"></i> Approve</button>
+                    </form>
+                {% elif calc.status == 'approved' %}
+                    <form method="POST" action="{% url 'demand_planning:safety_stock_apply' calc.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2" onclick="return confirm('Apply safety stock to inventory reorder rules?')"><i class="ri-check-double-line me-1"></i> Apply to Inventory</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'demand_planning:safety_stock_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
