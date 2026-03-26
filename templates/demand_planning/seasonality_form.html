@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Demand Planning</li>
+            <li class="breadcrumb-item"><a href="{% url 'demand_planning:seasonality_list' %}">Seasonality</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Profile Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Name *</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Item *</label>
+                            {{ form.item }}
+                            {% if form.item.errors %}<div class="text-danger small">{{ form.item.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h5>Monthly Adjustment Factors</h5></div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Set demand multiplier for each month (1.00 = normal, 1.50 = 50% increase, 0.50 = 50% decrease)</p>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">January</label>
+                            {{ form.jan_factor }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">February</label>
+                            {{ form.feb_factor }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">March</label>
+                            {{ form.mar_factor }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">April</label>
+                            {{ form.apr_factor }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">May</label>
+                            {{ form.may_factor }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">June</label>
+                            {{ form.jun_factor }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">July</label>
+                            {{ form.jul_factor }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">August</label>
+                            {{ form.aug_factor }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">September</label>
+                            {{ form.sep_factor }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">October</label>
+                            {{ form.oct_factor }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">November</label>
+                            {{ form.nov_factor }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">December</label>
+                            {{ form.dec_factor }}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mt-2">
+                                {{ form.is_active }}
+                                <label class="form-check-label">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Profile</button>
+                    {% if profile %}
+                        <a href="{% url 'demand_planning:seasonality_detail' profile.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'demand_planning:seasonality_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
