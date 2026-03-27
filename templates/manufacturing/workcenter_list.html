@@ -62,7 +62,7 @@
         <div class="card table-card">
             <div class="card-header">
                 <h5>Work Centers</h5>
-                <span class="text-muted">{{ workcenters|length }} total</span>
+                <span class="text-muted">{{ work_centers|length }} total</span>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -79,7 +79,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for wc in workcenters %}
+                            {% for wc in work_centers %}
                             <tr>
                                 <td><a href="{% url 'manufacturing:workcenter_detail' wc.pk %}" class="fw-medium">{{ wc.code }}</a></td>
                                 <td>{{ wc.name }}</td>
