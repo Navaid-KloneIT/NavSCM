@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}NCR: {{ ncr.ncr_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ ncr.ncr_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Quality Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'qms:ncr_list' %}">NCRs</a></li>
+            <li class="breadcrumb-item active">{{ ncr.ncr_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>NCR Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">NCR #</th><td>{{ ncr.ncr_number }}</td></tr>
+                            <tr><th class="ps-3">Title</th><td>{{ ncr.title }}</td></tr>
+                            <tr><th class="ps-3">Item</th><td>{{ ncr.item.name|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Work Order</th><td>{{ ncr.work_order|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Inspection</th><td>{% if ncr.inspection %}<a href="{% url 'qms:inspection_detail' ncr.inspection.pk %}">{{ ncr.inspection.inspection_number }}</a>{% else %}-{% endif %}</td></tr>
+                            <tr>
+                                <th class="ps-3">Source</th>
+                                <td>{{ ncr.get_source_display }}</td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3">Severity</th>
+                                <td>
+                                    {% if ncr.severity == 'minor' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Minor</span>
+                                    {% elif ncr.severity == 'major' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Major</span>
+                                    {% elif ncr.severity == 'critical' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Critical</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ ncr.get_severity_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if ncr.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif ncr.status == 'open' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Open</span>
+                                    {% elif ncr.status == 'under_investigation' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Under Investigation</span>
+                                    {% elif ncr.status == 'resolved' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Resolved</span>
+                                    {% elif ncr.status == 'closed' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Closed</span>
+                                    {% elif ncr.status == 'rejected' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Rejected</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ ncr.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Description</th><td>{{ ncr.description|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Root Cause</th><td>{{ ncr.root_cause|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Disposition</th><td>{{ ncr.get_disposition_display|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Disposition Notes</th><td>{{ ncr.disposition_notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Qty Affected</th><td>{{ ncr.quantity_affected|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Reported By</th><td>{{ ncr.reported_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Assigned To</th><td>{{ ncr.assigned_to|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Reported Date</th><td>{{ ncr.reported_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Closed Date</th><td>{{ ncr.closed_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Days Open</th><td>{{ ncr.days_open|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ ncr.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ ncr.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ ncr.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Linked CAPAs -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Linked CAPAs</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>CAPA #</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for capa in capas %}
+                            <tr>
+                                <td><a href="{% url 'qms:capa_detail' capa.pk %}" class="fw-medium">{{ capa.capa_number }}</a></td>
+                                <td>{{ capa.title }}</td>
+                                <td>{{ capa.get_capa_type_display }}</td>
+                                <td>{{ capa.get_status_display }}</td>
+                                <td>{{ capa.get_priority_display }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-shield-check-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No linked CAPAs.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if ncr.status == 'draft' %}
+                    <a href="{% url 'qms:ncr_edit' ncr.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'qms:ncr_open' ncr.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-folder-open-line me-1"></i> Open</button>
+                    </form>
+                    <form method="POST" action="{% url 'qms:ncr_delete' ncr.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this NCR?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif ncr.status == 'open' %}
+                    <form method="POST" action="{% url 'qms:ncr_investigate' ncr.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-search-eye-line me-1"></i> Investigate</button>
+                    </form>
+                {% elif ncr.status == 'under_investigation' %}
+                    <form method="POST" action="{% url 'qms:ncr_resolve' ncr.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-line me-1"></i> Resolve</button>
+                    </form>
+                {% elif ncr.status == 'resolved' %}
+                    <form method="POST" action="{% url 'qms:ncr_close' ncr.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2"><i class="ri-lock-line me-1"></i> Close</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'qms:ncr_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
