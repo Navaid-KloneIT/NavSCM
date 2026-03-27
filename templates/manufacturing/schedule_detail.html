@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}Schedule: {{ schedule.schedule_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ schedule.schedule_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Manufacturing</li>
+            <li class="breadcrumb-item"><a href="{% url 'manufacturing:schedule_list' %}">Schedules</a></li>
+            <li class="breadcrumb-item active">{{ schedule.schedule_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Schedule Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Schedule #</th><td>{{ schedule.schedule_number }}</td></tr>
+                            <tr><th class="ps-3">Title</th><td>{{ schedule.title }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if schedule.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif schedule.status == 'planned' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Planned</span>
+                                    {% elif schedule.status == 'in_progress' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Progress</span>
+                                    {% elif schedule.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% elif schedule.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ schedule.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Start Date</th><td>{{ schedule.start_date|date:"M d, Y" }}</td></tr>
+                            <tr><th class="ps-3">End Date</th><td>{{ schedule.end_date|date:"M d, Y" }}</td></tr>
+                            <tr><th class="ps-3">Total Planned Qty</th><td>{{ schedule.total_planned_quantity|floatformat:2|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ schedule.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ schedule.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ schedule.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Schedule Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>BOM</th>
+                                <th>Qty</th>
+                                <th>Work Center</th>
+                                <th>Planned Start</th>
+                                <th>Planned End</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for li in line_items %}
+                            <tr>
+                                <td>{{ li.product.name|default:"N/A" }}</td>
+                                <td>{{ li.bom|default:"-" }}</td>
+                                <td>{{ li.quantity|floatformat:2 }}</td>
+                                <td>{{ li.work_center|default:"-" }}</td>
+                                <td>{{ li.planned_start_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>{{ li.planned_end_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    {% if li.priority == 'low' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Low</span>
+                                    {% elif li.priority == 'medium' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Medium</span>
+                                    {% elif li.priority == 'high' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> High</span>
+                                    {% elif li.priority == 'urgent' %}
+                                        <span class="status-badge badge-soft-dark"><span class="status-dot bg-dark"></span> Urgent</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ li.get_priority_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No schedule items.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Work Orders -->
+        {% if work_orders %}
+        <div class="card table-card">
+            <div class="card-header"><h5>Related Work Orders</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>WO #</th>
+                                <th>Product</th>
+                                <th>Status</th>
+                                <th>Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for wo in work_orders %}
+                            <tr>
+                                <td><a href="{% url 'manufacturing:workorder_detail' wo.pk %}" class="fw-medium">{{ wo.work_order_number }}</a></td>
+                                <td>{{ wo.product.name|default:"N/A" }}</td>
+                                <td>
+                                    {% if wo.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif wo.status == 'released' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Released</span>
+                                    {% elif wo.status == 'in_progress' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Progress</span>
+                                    {% elif wo.status == 'on_hold' %}
+                                        <span class="status-badge badge-soft-dark"><span class="status-dot bg-dark"></span> On Hold</span>
+                                    {% elif wo.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% elif wo.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ wo.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ wo.planned_quantity|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if schedule.status == 'draft' %}
+                    <a href="{% url 'manufacturing:schedule_edit' schedule.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'manufacturing:schedule_plan' schedule.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-calendar-check-line me-1"></i> Plan</button>
+                    </form>
+                    <form method="POST" action="{% url 'manufacturing:schedule_delete' schedule.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this schedule?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif schedule.status == 'planned' %}
+                    <form method="POST" action="{% url 'manufacturing:schedule_start' schedule.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-play-line me-1"></i> Start</button>
+                    </form>
+                {% elif schedule.status == 'in_progress' %}
+                    <form method="POST" action="{% url 'manufacturing:schedule_complete' schedule.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Complete</button>
+                    </form>
+                {% endif %}
+                {% if schedule.status != 'completed' and schedule.status != 'cancelled' %}
+                    <form method="POST" action="{% url 'manufacturing:schedule_cancel' schedule.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2" onclick="return confirm('Cancel this schedule?')"><i class="ri-close-circle-line me-1"></i> Cancel Schedule</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'manufacturing:schedule_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
