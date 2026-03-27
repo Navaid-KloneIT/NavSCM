@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Inspection: {{ inspection.inspection_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ inspection.inspection_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Quality Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'qms:inspection_list' %}">Inspections</a></li>
+            <li class="breadcrumb-item active">{{ inspection.inspection_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Inspection Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Inspection #</th><td>{{ inspection.inspection_number }}</td></tr>
+                            <tr><th class="ps-3">Template</th><td>{% if inspection.template %}<a href="{% url 'qms:template_detail' inspection.template.pk %}">{{ inspection.template.name }}</a>{% else %}-{% endif %}</td></tr>
+                            <tr><th class="ps-3">Item</th><td>{{ inspection.item.name|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Work Order</th><td>{{ inspection.work_order|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Type</th>
+                                <td><span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ inspection.get_inspection_type_display }}</span></td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if inspection.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif inspection.status == 'in_progress' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Progress</span>
+                                    {% elif inspection.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% elif inspection.status == 'failed' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Failed</span>
+                                    {% elif inspection.status == 'on_hold' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> On Hold</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ inspection.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Inspector</th><td>{{ inspection.inspector|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Inspection Date</th><td>{{ inspection.inspection_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Lot Number</th><td>{{ inspection.lot_number|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Sample Size</th><td>{{ inspection.sample_size|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Accepted Qty</th><td>{{ inspection.accepted_quantity|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Rejected Qty</th><td>{{ inspection.rejected_quantity|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Pass Rate</th><td>{{ inspection.pass_rate|floatformat:1 }}%</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ inspection.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ inspection.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ inspection.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Inspection Results</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Criteria</th>
+                                <th>Result</th>
+                                <th>Measured Value</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in results %}
+                            <tr>
+                                <td>{{ r.criteria.name|default:"-" }}</td>
+                                <td>
+                                    {% if r.result == 'pass' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Pass</span>
+                                    {% elif r.result == 'fail' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Fail</span>
+                                    {% elif r.result == 'warning' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Warning</span>
+                                    {% elif r.result == 'na' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> N/A</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ r.get_result_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ r.measured_value|default:"-" }}</td>
+                                <td>{{ r.notes|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-list-check-2" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No results recorded.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if inspection.status == 'draft' %}
+                    <a href="{% url 'qms:inspection_edit' inspection.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'qms:inspection_start' inspection.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-play-line me-1"></i> Start</button>
+                    </form>
+                    <form method="POST" action="{% url 'qms:inspection_delete' inspection.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this inspection?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif inspection.status == 'in_progress' %}
+                    <form method="POST" action="{% url 'qms:inspection_complete' inspection.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Complete</button>
+                    </form>
+                    <form method="POST" action="{% url 'qms:inspection_hold' inspection.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2"><i class="ri-pause-line me-1"></i> Hold</button>
+                    </form>
+                {% elif inspection.status == 'on_hold' %}
+                    <form method="POST" action="{% url 'qms:inspection_start' inspection.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-play-line me-1"></i> Resume</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'qms:inspection_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
