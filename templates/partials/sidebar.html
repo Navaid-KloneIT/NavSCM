@@ -972,6 +972,134 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Manufacturing <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Work Centers -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'workcenter_list,workcenter_create,workcenter_detail,workcenter_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-settings-3-line"></i>
+                    <span class="menu-text">Work Centers</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'manufacturing:workcenter_list' %}" class="menu-link {% if request.resolver_match.url_name == 'workcenter_list' or request.resolver_match.url_name == 'workcenter_detail' or request.resolver_match.url_name == 'workcenter_edit' %}active{% endif %}">
+                            <span class="menu-text">All Work Centers</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'manufacturing:workcenter_create' %}" class="menu-link {% if request.resolver_match.url_name == 'workcenter_create' %}active{% endif %}">
+                            <span class="menu-text">Add Work Center</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Bill of Materials -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'bom_list,bom_create,bom_detail,bom_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-list-2-line"></i>
+                    <span class="menu-text">Bill of Materials</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'manufacturing:bom_list' %}" class="menu-link {% if request.resolver_match.url_name == 'bom_list' or request.resolver_match.url_name == 'bom_detail' or request.resolver_match.url_name == 'bom_edit' %}active{% endif %}">
+                            <span class="menu-text">All BOMs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'manufacturing:bom_create' %}" class="menu-link {% if request.resolver_match.url_name == 'bom_create' %}active{% endif %}">
+                            <span class="menu-text">New BOM</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Production Schedules -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'schedule_list,schedule_create,schedule_detail,schedule_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-calendar-schedule-line"></i>
+                    <span class="menu-text">Production Schedules</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'manufacturing:schedule_list' %}" class="menu-link {% if request.resolver_match.url_name == 'schedule_list' or request.resolver_match.url_name == 'schedule_detail' or request.resolver_match.url_name == 'schedule_edit' %}active{% endif %}">
+                            <span class="menu-text">All Schedules</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'manufacturing:schedule_create' %}" class="menu-link {% if request.resolver_match.url_name == 'schedule_create' %}active{% endif %}">
+                            <span class="menu-text">New Schedule</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Work Orders -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'workorder_list,workorder_create,workorder_detail,workorder_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-tools-line"></i>
+                    <span class="menu-text">Work Orders</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'manufacturing:workorder_list' %}" class="menu-link {% if request.resolver_match.url_name == 'workorder_list' or request.resolver_match.url_name == 'workorder_detail' or request.resolver_match.url_name == 'workorder_edit' %}active{% endif %}">
+                            <span class="menu-text">All Work Orders</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'manufacturing:workorder_create' %}" class="menu-link {% if request.resolver_match.url_name == 'workorder_create' %}active{% endif %}">
+                            <span class="menu-text">New Work Order</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- MRP -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'mrp_list,mrp_create,mrp_detail' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-calculator-line"></i>
+                    <span class="menu-text">MRP</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'manufacturing:mrp_list' %}" class="menu-link {% if request.resolver_match.url_name == 'mrp_list' or request.resolver_match.url_name == 'mrp_detail' %}active{% endif %}">
+                            <span class="menu-text">All MRP Runs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'manufacturing:mrp_create' %}" class="menu-link {% if request.resolver_match.url_name == 'mrp_create' %}active{% endif %}">
+                            <span class="menu-text">New MRP Run</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Shop Floor -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'log_list,log_create,log_detail,log_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-building-2-line"></i>
+                    <span class="menu-text">Shop Floor</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'manufacturing:log_list' %}" class="menu-link {% if request.resolver_match.url_name == 'log_list' or request.resolver_match.url_name == 'log_detail' or request.resolver_match.url_name == 'log_edit' %}active{% endif %}">
+                            <span class="menu-text">Production Logs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'manufacturing:log_create' %}" class="menu-link {% if request.resolver_match.url_name == 'log_create' %}active{% endif %}">
+                            <span class="menu-text">New Log Entry</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Audit &amp; Security <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Audit Logs -->
