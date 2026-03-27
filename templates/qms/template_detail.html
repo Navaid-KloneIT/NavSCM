@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Template: {{ template.name }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ template.name }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Quality Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'qms:template_list' %}">Inspection Templates</a></li>
+            <li class="breadcrumb-item active">{{ template.name }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Template Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Name</th><td>{{ template.name }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Type</th>
+                                <td><span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ template.get_inspection_type_display }}</span></td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3">Active</th>
+                                <td>
+                                    {% if template.is_active %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Inactive</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Description</th><td>{{ template.description|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ template.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ template.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Criteria -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Inspection Criteria</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Sequence</th>
+                                <th>Name</th>
+                                <th>Measurement Type</th>
+                                <th>Acceptance Criteria</th>
+                                <th>Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in criteria %}
+                            <tr>
+                                <td>{{ c.sequence }}</td>
+                                <td>{{ c.name }}</td>
+                                <td>{{ c.get_measurement_type_display|default:"-" }}</td>
+                                <td>{{ c.acceptance_criteria|default:"-" }}</td>
+                                <td>
+                                    {% if c.is_required %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Yes</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-list-check-2" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No criteria defined.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                <a href="{% url 'qms:template_edit' template.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                <form method="POST" action="{% url 'qms:template_delete' template.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this template?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                </form>
+                <a href="{% url 'qms:template_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
