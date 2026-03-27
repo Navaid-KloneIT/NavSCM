@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}MRP Run: {{ mrp.mrp_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ mrp.mrp_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Manufacturing</li>
+            <li class="breadcrumb-item"><a href="{% url 'manufacturing:mrp_list' %}">MRP Runs</a></li>
+            <li class="breadcrumb-item active">{{ mrp.mrp_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>MRP Run Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">MRP #</th><td>{{ mrp.mrp_number }}</td></tr>
+                            <tr><th class="ps-3">Title</th><td>{{ mrp.title }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if mrp.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif mrp.status == 'running' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Running</span>
+                                    {% elif mrp.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% elif mrp.status == 'failed' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Failed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ mrp.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Run Date</th><td>{{ mrp.run_date|date:"M d, Y" }}</td></tr>
+                            <tr><th class="ps-3">Planning Horizon</th><td>{{ mrp.planning_horizon_days }} days</td></tr>
+                            <tr><th class="ps-3">Total Requirements</th><td>{{ requirements|length }}</td></tr>
+                            <tr><th class="ps-3">Total Net Value</th><td>{{ total_net|floatformat:2 }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ mrp.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ mrp.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ mrp.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Requirements Table -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Material Requirements</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Warehouse</th>
+                                <th>Required Qty</th>
+                                <th>On Hand</th>
+                                <th>On Order</th>
+                                <th>Net Requirement</th>
+                                <th>Planned Order Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in requirements %}
+                            <tr{% if req.net_requirement > 0 %} class="table-warning"{% endif %}>
+                                <td>{{ req.item.name|default:"N/A" }}</td>
+                                <td>{{ req.warehouse.name|default:"-" }}</td>
+                                <td>{{ req.required_quantity|floatformat:2 }}</td>
+                                <td>{{ req.on_hand_quantity|floatformat:2 }}</td>
+                                <td>{{ req.on_order_quantity|floatformat:2 }}</td>
+                                <td>
+                                    {% if req.net_requirement > 0 %}
+                                        <span class="text-danger fw-medium">{{ req.net_requirement|floatformat:2 }}</span>
+                                    {% else %}
+                                        <span class="text-success">{{ req.net_requirement|floatformat:2 }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ req.planned_order_date|date:"M d, Y"|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No requirements calculated yet.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if mrp.status == 'draft' %}
+                    <a href="{% url 'manufacturing:mrp_edit' mrp.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'manufacturing:mrp_run' mrp.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-play-line me-1"></i> Run MRP</button>
+                    </form>
+                    <form method="POST" action="{% url 'manufacturing:mrp_delete' mrp.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this MRP run?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif mrp.status == 'running' %}
+                    <div class="alert alert-info mb-2">
+                        <i class="ri-loader-4-line me-1"></i> MRP is currently running. Please wait...
+                    </div>
+                {% elif mrp.status == 'completed' %}
+                    <div class="alert alert-success mb-2">
+                        <i class="ri-check-double-line me-1"></i> MRP run completed successfully.
+                        <div class="mt-2 small">
+                            <strong>{{ requirements|length }}</strong> requirements generated.
+                        </div>
+                    </div>
+                {% elif mrp.status == 'failed' %}
+                    <div class="alert alert-danger mb-2">
+                        <i class="ri-error-warning-line me-1"></i> MRP run failed.
+                        {% if mrp.notes %}
+                            <div class="mt-2 small">{{ mrp.notes }}</div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                <a href="{% url 'manufacturing:mrp_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
