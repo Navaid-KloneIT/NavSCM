@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'apps.oms',
     'apps.tms',
     'apps.demand_planning',
+    'apps.manufacturing',
 ]
 
 # ==============================================================================
