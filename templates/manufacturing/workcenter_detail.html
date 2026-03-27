@@ -122,7 +122,7 @@
                         <tbody>
                             {% for log in logs %}
                             <tr>
-                                <td><a href="{% url 'manufacturing:productionlog_detail' log.pk %}" class="fw-medium">{{ log.log_number }}</a></td>
+                                <td><a href="{% url 'manufacturing:log_detail' log.pk %}" class="fw-medium">{{ log.log_number }}</a></td>
                                 <td><span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ log.get_log_type_display }}</span></td>
                                 <td>{{ log.operator|default:"-" }}</td>
                                 <td>{{ log.quantity_produced|floatformat:2 }}</td>
