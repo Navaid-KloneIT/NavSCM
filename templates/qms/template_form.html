@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Quality Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'qms:template_list' %}">Inspection Templates</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Template Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Name *</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Inspection Type *</label>
+                            {{ form.inspection_type }}
+                            {% if form.inspection_type.errors %}<div class="text-danger small">{{ form.inspection_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label">Active</label>
+                            </div>
+                            {% if form.is_active.errors %}<div class="text-danger small">{{ form.is_active.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            <!-- Criteria Formset -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Inspection Criteria</h5>
+                    <button type="button" class="btn btn-sm btn-soft-success" id="add-item-btn"><i class="ri-add-line me-1"></i> Add Criteria</button>
+                </div>
+                <div class="card-body p-0">
+                    {{ formset.management_form }}
+                    <div class="table-responsive">
+                        <table class="table mb-0" id="formset-table">
+                            <thead>
+                                <tr>
+                                    <th>Sequence</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Acceptance Criteria</th>
+                                    <th>Measurement Type</th>
+                                    <th>Required</th>
+                                    <th>Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody id="formset-container">
+                                {% for criteria_form in formset %}
+                                <tr class="formset-row">
+                                    {% if criteria_form.instance.pk %}{{ criteria_form.id }}{% endif %}
+                                    <td>{{ criteria_form.sequence }}{% if criteria_form.sequence.errors %}<div class="text-danger small">{{ criteria_form.sequence.errors.0 }}</div>{% endif %}</td>
+                                    <td>{{ criteria_form.name }}{% if criteria_form.name.errors %}<div class="text-danger small">{{ criteria_form.name.errors.0 }}</div>{% endif %}</td>
+                                    <td>{{ criteria_form.description }}{% if criteria_form.description.errors %}<div class="text-danger small">{{ criteria_form.description.errors.0 }}</div>{% endif %}</td>
+                                    <td>{{ criteria_form.acceptance_criteria }}{% if criteria_form.acceptance_criteria.errors %}<div class="text-danger small">{{ criteria_form.acceptance_criteria.errors.0 }}</div>{% endif %}</td>
+                                    <td>{{ criteria_form.measurement_type }}{% if criteria_form.measurement_type.errors %}<div class="text-danger small">{{ criteria_form.measurement_type.errors.0 }}</div>{% endif %}</td>
+                                    <td>{{ criteria_form.is_required }}{% if criteria_form.is_required.errors %}<div class="text-danger small">{{ criteria_form.is_required.errors.0 }}</div>{% endif %}</td>
+                                    <td><div class="form-check">{{ criteria_form.DELETE }}<label class="form-check-label text-danger">Remove</label></div></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Template</button>
+                    {% if template %}
+                        <a href="{% url 'qms:template_detail' template.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'qms:template_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('formset-container');
+    const addBtn = document.getElementById('add-item-btn');
+    const totalForms = document.getElementById('id_criteria-TOTAL_FORMS');
+    addBtn.addEventListener('click', function() {
+        const formCount = parseInt(totalForms.value);
+        const lastForm = container.querySelector('.formset-row:last-child');
+        if (!lastForm) return;
+        const newForm = lastForm.cloneNode(true);
+        newForm.innerHTML = newForm.innerHTML.replace(/criteria-\d+-/g, 'criteria-' + formCount + '-');
+        newForm.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(i => i.value = '');
+        newForm.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+        newForm.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+        newForm.querySelectorAll('textarea').forEach(t => t.value = '');
+        const idField = newForm.querySelector('input[name$="-id"]');
+        if (idField) idField.value = '';
+        container.appendChild(newForm);
+        totalForms.value = formCount + 1;
+    });
+});
+</script>
+{% endblock %}
