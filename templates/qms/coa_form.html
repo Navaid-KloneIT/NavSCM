@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'qms:coa_list' %}">Quality Management</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'qms:coa_list' %}">CoAs</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>CoA Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Item *</label>
+                            {{ form.item }}
+                            {% if form.item.errors %}<div class="text-danger small">{{ form.item.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Batch Number</label>
+                            {{ form.batch_number }}
+                            {% if form.batch_number.errors %}<div class="text-danger small">{{ form.batch_number.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Production Date</label>
+                            {{ form.production_date }}
+                            {% if form.production_date.errors %}<div class="text-danger small">{{ form.production_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Expiry Date</label>
+                            {{ form.expiry_date }}
+                            {% if form.expiry_date.errors %}<div class="text-danger small">{{ form.expiry_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Quantity</label>
+                            {{ form.quantity }}
+                            {% if form.quantity.errors %}<div class="text-danger small">{{ form.quantity.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Unit of Measure</label>
+                            {{ form.unit_of_measure }}
+                            {% if form.unit_of_measure.errors %}<div class="text-danger small">{{ form.unit_of_measure.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Results Formset -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Test Results</h5>
+                    <button type="button" class="btn btn-sm btn-soft-success" id="add-item-btn">
+                        <i class="ri-add-line me-1"></i> Add Test
+                    </button>
+                </div>
+                <div class="card-body">
+                    {{ formset.management_form }}
+                    <div id="formset-container">
+                        {% for test_form in formset %}
+                        <div class="formset-row border rounded p-3 mb-3">
+                            <div class="row g-3">
+                                {% if test_form.instance.pk %}{{ test_form.id }}{% endif %}
+                                <div class="col-md-1">
+                                    <label class="form-label">Seq</label>
+                                    {{ test_form.sequence }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Test Name</label>
+                                    {{ test_form.test_name }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Test Method</label>
+                                    {{ test_form.test_method }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Specification</label>
+                                    {{ test_form.specification }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Result</label>
+                                    {{ test_form.result }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Unit</label>
+                                    {{ test_form.unit }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Status</label>
+                                    {{ test_form.status }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Notes</label>
+                                    {{ test_form.notes }}
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <div class="form-check">
+                                        {{ test_form.DELETE }}
+                                        <label class="form-check-label text-danger">Remove</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save CoA</button>
+                    {% if coa %}
+                        <a href="{% url 'qms:coa_detail' coa.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'qms:coa_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('formset-container');
+    const addBtn = document.getElementById('add-item-btn');
+    const totalForms = document.getElementById('id_tests-TOTAL_FORMS');
+
+    addBtn.addEventListener('click', function() {
+        const formCount = parseInt(totalForms.value);
+        const lastForm = container.querySelector('.formset-row:last-child');
+        if (!lastForm) return;
+
+        const newForm = lastForm.cloneNode(true);
+        newForm.innerHTML = newForm.innerHTML.replace(/tests-\d+-/g, 'tests-' + formCount + '-');
+        newForm.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(i => i.value = '');
+        newForm.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+        newForm.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+        newForm.querySelectorAll('textarea').forEach(t => t.value = '');
+        const idField = newForm.querySelector('input[name$="-id"]');
+        if (idField) idField.value = '';
+        container.appendChild(newForm);
+        totalForms.value = formCount + 1;
+    });
+});
+</script>
+{% endblock %}
