@@ -98,7 +98,7 @@ class BillOfMaterials(models.Model):
         if not self.bom_number:
             last = BillOfMaterials.objects.filter(
                 tenant=self.tenant
-            ).order_by('-created_at').first()
+            ).order_by('-id').first()
             if last and last.bom_number:
                 try:
                     num = int(last.bom_number.split('-')[-1]) + 1
@@ -206,7 +206,7 @@ class ProductionSchedule(models.Model):
         if not self.schedule_number:
             last = ProductionSchedule.objects.filter(
                 tenant=self.tenant
-            ).order_by('-created_at').first()
+            ).order_by('-id').first()
             if last and last.schedule_number:
                 try:
                     num = int(last.schedule_number.split('-')[-1]) + 1
@@ -358,7 +358,7 @@ class WorkOrder(models.Model):
         if not self.work_order_number:
             last = WorkOrder.objects.filter(
                 tenant=self.tenant
-            ).order_by('-created_at').first()
+            ).order_by('-id').first()
             if last and last.work_order_number:
                 try:
                     num = int(last.work_order_number.split('-')[-1]) + 1
@@ -473,7 +473,7 @@ class MRPRun(models.Model):
         if not self.mrp_number:
             last = MRPRun.objects.filter(
                 tenant=self.tenant
-            ).order_by('-created_at').first()
+            ).order_by('-id').first()
             if last and last.mrp_number:
                 try:
                     num = int(last.mrp_number.split('-')[-1]) + 1
@@ -592,7 +592,7 @@ class ProductionLog(models.Model):
         if not self.log_number:
             last = ProductionLog.objects.filter(
                 tenant=self.tenant
-            ).order_by('-created_at').first()
+            ).order_by('-id').first()
             if last and last.log_number:
                 try:
                     num = int(last.log_number.split('-')[-1]) + 1
