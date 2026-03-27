@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Quality Audits{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Quality Audits</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'qms:audit_list' %}">Quality Management</a></li>
+            <li class="breadcrumb-item active">Audits</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'qms:audit_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by audit # or title...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" name="type">
+                                <option value="">All</option>
+                                {% for value, label in type_choices %}
+                                <option value="{{ value }}" {% if request.GET.type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'qms:audit_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Audit</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Audits Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Audits</h5>
+                <span class="text-muted">{{ audits|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Audit #</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Lead Auditor</th>
+                                <th>Audit Date</th>
+                                <th>Findings</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for audit in audits %}
+                            <tr>
+                                <td><a href="{% url 'qms:audit_detail' audit.pk %}" class="fw-medium">{{ audit.audit_number }}</a></td>
+                                <td>{{ audit.title|truncatewords:6 }}</td>
+                                <td>
+                                    <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ audit.get_audit_type_display }}</span>
+                                </td>
+                                <td>
+                                    {% if audit.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> {{ audit.get_status_display }}</span>
+                                    {% elif audit.status == 'scheduled' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ audit.get_status_display }}</span>
+                                    {% elif audit.status == 'in_progress' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> {{ audit.get_status_display }}</span>
+                                    {% elif audit.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> {{ audit.get_status_display }}</span>
+                                    {% elif audit.status == 'closed' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ audit.get_status_display }}</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ audit.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ audit.lead_auditor.get_full_name|default:"-" }}</td>
+                                <td>{{ audit.audit_date|date:"M d, Y"|default:"-" }}</td>
+                                <td><span class="badge bg-soft-primary text-primary">{{ audit.total_findings|default:0 }}</span></td>
+                                <td>{{ audit.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'qms:audit_detail' audit.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if audit.status == 'draft' %}
+                                        <a href="{% url 'qms:audit_edit' audit.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                        <form method="POST" action="{% url 'qms:audit_delete' audit.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this audit?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-search-eye-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No audits found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.type %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first audit.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
