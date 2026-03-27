@@ -19,6 +19,7 @@ urlpatterns = [
     path('tms/', include('apps.tms.urls', namespace='tms')),
     path('demand-planning/', include('apps.demand_planning.urls', namespace='demand_planning')),
     path('manufacturing/', include('apps.manufacturing.urls', namespace='manufacturing')),
+    path('qms/', include('apps.qms.urls', namespace='qms')),
     path('', include('apps.dashboard.urls')),
 ]
 
