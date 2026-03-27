@@ -98,6 +98,17 @@ Uses data to predict future demand and align supply accordingly.
 - **Collaborative Planning** - Cross-functional planning interface for sales, marketing, finance, and operations teams with plan types (sales/marketing/finance/operations/consensus), approval workflow (draft → submitted → review → approved → finalized), optional forecast linking, line-item planning, and threaded discussion comments
 - **Safety Stock Calculation** - Dynamic buffer stock calculation using multiple methods (fixed quantity, percentage of demand, statistical Z-score, demand-based) with per-item/warehouse inputs (average demand, demand std deviation, lead time, lead time variability, service level), automated safety stock and reorder point computation, and one-click application to inventory reorder rules
 
+### Module 8: Manufacturing / Production
+
+Manages the transformation of raw materials into finished goods for manufacturing tenants.
+
+- **Work Centers** - Machine and workstation registry with types (machine, assembly line, manual station, testing station, packaging), hourly capacity and cost tracking, and active/inactive status management
+- **Bill of Materials (BOM)** - Product component definitions with version control, status workflow (draft → active → obsolete), line items specifying raw materials with quantities, units of measure, and scrap percentage allowances, plus automated component cost and unit cost calculation
+- **Production Scheduling** - Planning of production runs with status workflow (draft → planned → in progress → completed/cancelled), schedule line items linking products to BOMs and work centers with planned start/end times and priority levels (low → urgent)
+- **Work Order Management** - Shop floor work order lifecycle (draft → released → in progress ↔ on hold → completed/cancelled), BOM and schedule linking, planned vs. actual quantity tracking with completion percentage, scrap rate calculation, operation sequencing with per-operation status and efficiency tracking
+- **Material Resource Planning (MRP)** - Automated material requirement calculation that explodes BOMs from active work orders, checks on-hand inventory and open purchase orders, computes net requirements, and generates planned order dates within a configurable planning horizon
+- **Shop Floor Control** - Production activity logging with log types (production, downtime, setup, maintenance, quality check), operator assignment, start/end time tracking, quantity produced vs. rejected, duration calculation, and yield rate monitoring
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -228,6 +239,11 @@ Uses data to predict future demand and align supply accordingly.
    python manage.py seed_demand_planning
    ```
 
+7i. **Seed Manufacturing data**
+   ```bash
+   python manage.py seed_manufacturing
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -294,11 +310,17 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/tms/*)
 │   │   └── admin.py       # Django admin registration
-│   └── demand_planning/   # Demand planning & forecasting module
-│       ├── models.py      # SalesForecast, ForecastLineItem, SeasonalityProfile, PromotionalEvent, DemandSignal, CollaborativePlan, PlanLineItem, PlanComment, SafetyStockCalculation, SafetyStockItem
-│       ├── views.py       # All demand planning CRUD & workflow views
+│   ├── demand_planning/   # Demand planning & forecasting module
+│   │   ├── models.py      # SalesForecast, ForecastLineItem, SeasonalityProfile, PromotionalEvent, DemandSignal, CollaborativePlan, PlanLineItem, PlanComment, SafetyStockCalculation, SafetyStockItem
+│   │   ├── views.py       # All demand planning CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/demand-planning/*)
+│   │   └── admin.py       # Django admin registration
+│   └── manufacturing/     # Manufacturing / production module
+│       ├── models.py      # WorkCenter, BillOfMaterials, BOMLineItem, ProductionSchedule, ProductionScheduleItem, WorkOrder, WorkOrderOperation, MRPRun, MRPRequirement, ProductionLog
+│       ├── views.py       # All manufacturing CRUD & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/demand-planning/*)
+│       ├── urls.py        # URL routing (/manufacturing/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -363,13 +385,20 @@ NavSCM/
 │   │   ├── tracking_*.html    # Tracking event list, form, detail
 │   │   ├── freight_*.html     # Freight bill list, form, detail
 │   │   └── load_*.html        # Load plan list, form, detail
-│   └── demand_planning/   # Demand planning templates
-│       ├── forecast_*.html    # Sales forecast list, form, detail
-│       ├── seasonality_*.html # Seasonality profile list, form, detail
-│       ├── event_*.html       # Promotional event list, form
-│       ├── signal_*.html      # Demand signal list, form, detail
-│       ├── plan_*.html        # Collaborative plan list, form, detail
-│       └── safety_stock_*.html # Safety stock calculation list, form, detail
+│   ├── demand_planning/   # Demand planning templates
+│   │   ├── forecast_*.html    # Sales forecast list, form, detail
+│   │   ├── seasonality_*.html # Seasonality profile list, form, detail
+│   │   ├── event_*.html       # Promotional event list, form
+│   │   ├── signal_*.html      # Demand signal list, form, detail
+│   │   ├── plan_*.html        # Collaborative plan list, form, detail
+│   │   └── safety_stock_*.html # Safety stock calculation list, form, detail
+│   └── manufacturing/     # Manufacturing templates
+│       ├── workcenter_*.html  # Work center list, form, detail
+│       ├── bom_*.html         # Bill of materials list, form, detail
+│       ├── schedule_*.html    # Production schedule list, form, detail
+│       ├── workorder_*.html   # Work order list, form, detail
+│       ├── mrp_*.html         # MRP run list, form, detail
+│       └── log_*.html         # Production log list, form, detail
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
@@ -401,7 +430,7 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 | 2 | **Order Management (OMS)** | Order capture, validation, allocation, backorder management, customer notifications | Done |
 | 3 | **Transportation Management (TMS)** | Route planning, freight audit, carrier management, shipment tracking, load optimization | Done |
 | 4 | **Demand Planning & Forecasting** | Sales forecasting, seasonality analysis, demand sensing, collaborative planning, safety stock calculation | Done |
-| 5 | **Manufacturing / Production** | Bill of materials (BOM), production scheduling, work orders, MRP, shop floor control | Planned |
+| 5 | **Manufacturing / Production** | Bill of materials (BOM), production scheduling, work orders, MRP, shop floor control | Done |
 | 6 | **Quality Management (QMS)** | Quality inspection, non-conformance reports, CAPA, audit management, certificates of analysis | Planned |
 | 7 | **Returns Management** | RMA workflows, refund processing, disposition management, return portal, warranty claims | Planned |
 | 8 | **Supply Chain Analytics** | Inventory dashboards, procurement analytics, logistics KPIs, financial reporting, predictive analytics | Planned |
