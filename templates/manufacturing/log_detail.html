@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Production Log: {{ log.log_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ log.log_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Manufacturing</li>
+            <li class="breadcrumb-item"><a href="{% url 'manufacturing:log_list' %}">Production Logs</a></li>
+            <li class="breadcrumb-item active">{{ log.log_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Production Log Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Log #</th><td>{{ log.log_number }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Work Order</th>
+                                <td>
+                                    {% if log.work_order %}
+                                        <a href="{% url 'manufacturing:workorder_detail' log.work_order.pk %}">{{ log.work_order }}</a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Operation</th><td>{{ log.operation|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Work Center</th><td>{{ log.work_center|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Operator</th><td>{{ log.operator|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Type</th>
+                                <td>
+                                    {% if log.log_type == 'production' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Production</span>
+                                    {% elif log.log_type == 'downtime' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Downtime</span>
+                                    {% elif log.log_type == 'setup' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Setup</span>
+                                    {% elif log.log_type == 'maintenance' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Maintenance</span>
+                                    {% elif log.log_type == 'quality_check' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Quality Check</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ log.get_log_type_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Start Time</th><td>{{ log.start_time|date:"M d, Y H:i" }}</td></tr>
+                            <tr><th class="ps-3">End Time</th><td>{{ log.end_time|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Duration (hours)</th>
+                                <td>
+                                    {% if log.duration_hours != None %}
+                                        {{ log.duration_hours|floatformat:2 }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Qty Produced</th><td>{{ log.quantity_produced|floatformat:2 }}</td></tr>
+                            <tr><th class="ps-3">Qty Rejected</th><td>{{ log.quantity_rejected|floatformat:2 }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Yield Rate %</th>
+                                <td>
+                                    {% if log.yield_rate != None %}
+                                        {% if log.yield_rate >= 95 %}
+                                            <span class="text-success fw-medium">{{ log.yield_rate|floatformat:1 }}%</span>
+                                        {% elif log.yield_rate >= 80 %}
+                                            <span class="text-warning fw-medium">{{ log.yield_rate|floatformat:1 }}%</span>
+                                        {% else %}
+                                            <span class="text-danger fw-medium">{{ log.yield_rate|floatformat:1 }}%</span>
+                                        {% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ log.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ log.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                <a href="{% url 'manufacturing:log_edit' log.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                <form method="POST" action="{% url 'manufacturing:log_delete' log.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this production log?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                </form>
+                <a href="{% url 'manufacturing:log_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
