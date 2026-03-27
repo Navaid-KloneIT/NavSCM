@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Production Logs{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>Production Logs</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Manufacturing</li>
+            <li class="breadcrumb-item active">Production Logs</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'manufacturing:log_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by log # or work order #...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" name="log_type">
+                                <option value="">All</option>
+                                {% for value, label in type_choices %}
+                                    <option value="{{ value }}" {% if request.GET.log_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'manufacturing:log_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Log Entry</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Production Logs</h5>
+                <span class="text-muted">{{ logs|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Log #</th>
+                                <th>Work Order</th>
+                                <th>Type</th>
+                                <th>Work Center</th>
+                                <th>Operator</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Qty Produced</th>
+                                <th>Qty Rejected</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td><a href="{% url 'manufacturing:log_detail' log.pk %}" class="fw-medium">{{ log.log_number }}</a></td>
+                                <td>{{ log.work_order|default:"-" }}</td>
+                                <td>
+                                    {% if log.log_type == 'production' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Production</span>
+                                    {% elif log.log_type == 'downtime' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Downtime</span>
+                                    {% elif log.log_type == 'setup' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Setup</span>
+                                    {% elif log.log_type == 'maintenance' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Maintenance</span>
+                                    {% elif log.log_type == 'quality_check' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Quality Check</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ log.get_log_type_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ log.work_center|default:"-" }}</td>
+                                <td>{{ log.operator|default:"-" }}</td>
+                                <td>{{ log.start_time|date:"M d, Y H:i" }}</td>
+                                <td>{{ log.end_time|date:"M d, Y H:i"|default:"-" }}</td>
+                                <td>{{ log.quantity_produced|floatformat:2 }}</td>
+                                <td>{{ log.quantity_rejected|floatformat:2 }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'manufacturing:log_detail' log.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        <a href="{% url 'manufacturing:log_edit' log.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                        <form method="POST" action="{% url 'manufacturing:log_delete' log.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this production log?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="10" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-building-2-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No production logs found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.log_type %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first production log entry.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
