@@ -99,7 +99,6 @@
                                     <div class="d-flex gap-1">
                                         <a href="{% url 'manufacturing:mrp_detail' m.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
                                         {% if m.status == 'draft' %}
-                                            <a href="{% url 'manufacturing:mrp_edit' m.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
                                             <form method="POST" action="{% url 'manufacturing:mrp_delete' m.pk %}" class="d-inline">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this MRP run?')"><i class="ri-delete-bin-line"></i></button>
