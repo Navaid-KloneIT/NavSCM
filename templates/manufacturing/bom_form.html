@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Manufacturing</li>
+            <li class="breadcrumb-item"><a href="{% url 'manufacturing:bom_list' %}">Bills of Materials</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>BOM Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Product *</label>
+                            {{ form.product }}
+                            {% if form.product.errors %}<div class="text-danger small">{{ form.product.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Version *</label>
+                            {{ form.version }}
+                            {% if form.version.errors %}<div class="text-danger small">{{ form.version.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Yield Quantity *</label>
+                            {{ form.yield_quantity }}
+                            {% if form.yield_quantity.errors %}<div class="text-danger small">{{ form.yield_quantity.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            <!-- Line Items -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>BOM Line Items</h5>
+                    <button type="button" class="btn btn-sm btn-soft-success" id="add-item-btn"><i class="ri-add-line me-1"></i> Add Line</button>
+                </div>
+                <div class="card-body p-0">
+                    {{ formset.management_form }}
+                    <div class="table-responsive">
+                        <table class="table mb-0" id="formset-table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>UOM</th>
+                                    <th>Scrap %</th>
+                                    <th>Notes</th>
+                                    <th>Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody id="formset-container">
+                                {% for item_form in formset %}
+                                <tr class="formset-row">
+                                    {% if item_form.instance.pk %}{{ item_form.id }}{% endif %}
+                                    <td>{{ item_form.item }}{% if item_form.item.errors %}<div class="text-danger small">{{ item_form.item.errors.0 }}</div>{% endif %}</td>
+                                    <td>{{ item_form.quantity }}{% if item_form.quantity.errors %}<div class="text-danger small">{{ item_form.quantity.errors.0 }}</div>{% endif %}</td>
+                                    <td>{{ item_form.unit_of_measure }}{% if item_form.unit_of_measure.errors %}<div class="text-danger small">{{ item_form.unit_of_measure.errors.0 }}</div>{% endif %}</td>
+                                    <td>{{ item_form.scrap_percentage }}{% if item_form.scrap_percentage.errors %}<div class="text-danger small">{{ item_form.scrap_percentage.errors.0 }}</div>{% endif %}</td>
+                                    <td>{{ item_form.notes }}{% if item_form.notes.errors %}<div class="text-danger small">{{ item_form.notes.errors.0 }}</div>{% endif %}</td>
+                                    <td><div class="form-check">{{ item_form.DELETE }}<label class="form-check-label text-danger">Remove</label></div></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save BOM</button>
+                    {% if bom %}
+                        <a href="{% url 'manufacturing:bom_detail' bom.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'manufacturing:bom_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('formset-container');
+    const addBtn = document.getElementById('add-item-btn');
+    const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+    addBtn.addEventListener('click', function() {
+        const formCount = parseInt(totalForms.value);
+        const lastForm = container.querySelector('.formset-row:last-child');
+        if (!lastForm) return;
+        const newForm = lastForm.cloneNode(true);
+        newForm.innerHTML = newForm.innerHTML.replace(/items-\d+-/g, 'items-' + formCount + '-');
+        newForm.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(i => i.value = '');
+        newForm.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+        newForm.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+        newForm.querySelectorAll('textarea').forEach(t => t.value = '');
+        const idField = newForm.querySelector('input[name$="-id"]');
+        if (idField) idField.value = '';
+        container.appendChild(newForm);
+        totalForms.value = formCount + 1;
+    });
+});
+</script>
+{% endblock %}
