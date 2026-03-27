@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+{% block title %}Work Order: {{ wo.work_order_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ wo.work_order_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Manufacturing</li>
+            <li class="breadcrumb-item"><a href="{% url 'manufacturing:workorder_list' %}">Work Orders</a></li>
+            <li class="breadcrumb-item active">{{ wo.work_order_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Work Order Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">WO #</th><td>{{ wo.work_order_number }}</td></tr>
+                            <tr><th class="ps-3">Product</th><td>{{ wo.product.name|default:"N/A" }}</td></tr>
+                            <tr><th class="ps-3">BOM</th><td>{{ wo.bom|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Schedule</th><td>{% if wo.schedule %}<a href="{% url 'manufacturing:schedule_detail' wo.schedule.pk %}">{{ wo.schedule }}</a>{% else %}-{% endif %}</td></tr>
+                            <tr><th class="ps-3">Work Center</th><td>{{ wo.work_center|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if wo.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif wo.status == 'released' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Released</span>
+                                    {% elif wo.status == 'in_progress' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Progress</span>
+                                    {% elif wo.status == 'on_hold' %}
+                                        <span class="status-badge badge-soft-dark"><span class="status-dot bg-dark"></span> On Hold</span>
+                                    {% elif wo.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% elif wo.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ wo.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3">Priority</th>
+                                <td>
+                                    {% if wo.priority == 'low' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Low</span>
+                                    {% elif wo.priority == 'medium' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Medium</span>
+                                    {% elif wo.priority == 'high' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> High</span>
+                                    {% elif wo.priority == 'urgent' %}
+                                        <span class="status-badge badge-soft-dark"><span class="status-dot bg-dark"></span> Urgent</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ wo.get_priority_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Planned Qty</th><td>{{ wo.planned_quantity|floatformat:2 }}</td></tr>
+                            <tr><th class="ps-3">Completed Qty</th><td>{{ wo.completed_quantity|floatformat:2 }}</td></tr>
+                            <tr><th class="ps-3">Scrap Qty</th><td>{{ wo.scrap_quantity|floatformat:2 }}</td></tr>
+                            <tr><th class="ps-3">Remaining Qty</th><td>{{ wo.remaining_quantity|floatformat:2 }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Completion %</th>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                            <div class="progress-bar {% if wo.completion_percentage >= 100 %}bg-success{% elif wo.completion_percentage >= 50 %}bg-primary{% else %}bg-warning{% endif %}" role="progressbar" style="width: {{ wo.completion_percentage }}%" aria-valuenow="{{ wo.completion_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <span class="fw-medium">{{ wo.completion_percentage|floatformat:1 }}%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Scrap Rate %</th><td>{{ wo.scrap_rate|floatformat:1 }}%</td></tr>
+                            <tr><th class="ps-3">Planned Start</th><td>{{ wo.planned_start_date|date:"M d, Y" }}</td></tr>
+                            <tr><th class="ps-3">Planned End</th><td>{{ wo.planned_end_date|date:"M d, Y" }}</td></tr>
+                            <tr><th class="ps-3">Actual Start</th><td>{{ wo.actual_start_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Actual End</th><td>{{ wo.actual_end_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ wo.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ wo.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ wo.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Operations -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Operations</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Seq</th>
+                                <th>Name</th>
+                                <th>Work Center</th>
+                                <th>Planned Hours</th>
+                                <th>Actual Hours</th>
+                                <th>Efficiency %</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for op in operations %}
+                            <tr>
+                                <td>{{ op.sequence }}</td>
+                                <td>{{ op.name }}</td>
+                                <td>{{ op.work_center|default:"-" }}</td>
+                                <td>{{ op.planned_hours|floatformat:2 }}</td>
+                                <td>{{ op.actual_hours|floatformat:2|default:"-" }}</td>
+                                <td>
+                                    {% if op.efficiency_percentage != None %}
+                                        {{ op.efficiency_percentage|floatformat:1 }}%
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if op.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% elif op.status == 'in_progress' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Progress</span>
+                                    {% elif op.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% elif op.status == 'skipped' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Skipped</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ op.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-settings-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No operations defined.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Production Logs -->
+        {% if logs %}
+        <div class="card table-card">
+            <div class="card-header"><h5>Recent Production Logs</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Log #</th>
+                                <th>Type</th>
+                                <th>Operator</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Qty Produced</th>
+                                <th>Qty Rejected</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td>{{ log.log_number|default:log.pk }}</td>
+                                <td>{{ log.get_log_type_display|default:log.log_type }}</td>
+                                <td>{{ log.operator|default:"-" }}</td>
+                                <td>{{ log.start_time|date:"M d, Y H:i"|default:"-" }}</td>
+                                <td>{{ log.end_time|date:"M d, Y H:i"|default:"-" }}</td>
+                                <td>{{ log.quantity_produced|floatformat:2 }}</td>
+                                <td>{{ log.quantity_rejected|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if wo.status == 'draft' %}
+                    <a href="{% url 'manufacturing:workorder_edit' wo.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'manufacturing:workorder_release' wo.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-send-plane-line me-1"></i> Release</button>
+                    </form>
+                    <form method="POST" action="{% url 'manufacturing:workorder_delete' wo.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this work order?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif wo.status == 'released' %}
+                    <form method="POST" action="{% url 'manufacturing:workorder_start' wo.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-play-line me-1"></i> Start</button>
+                    </form>
+                {% elif wo.status == 'in_progress' %}
+                    <form method="POST" action="{% url 'manufacturing:workorder_hold' wo.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-dark w-100 mb-2"><i class="ri-pause-line me-1"></i> Hold</button>
+                    </form>
+                    <form method="POST" action="{% url 'manufacturing:workorder_complete' wo.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Complete</button>
+                    </form>
+                    <form method="POST" action="{% url 'manufacturing:workorder_cancel' wo.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2" onclick="return confirm('Cancel this work order?')"><i class="ri-close-circle-line me-1"></i> Cancel</button>
+                    </form>
+                {% elif wo.status == 'on_hold' %}
+                    <form method="POST" action="{% url 'manufacturing:workorder_resume' wo.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-play-line me-1"></i> Resume</button>
+                    </form>
+                    <form method="POST" action="{% url 'manufacturing:workorder_cancel' wo.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2" onclick="return confirm('Cancel this work order?')"><i class="ri-close-circle-line me-1"></i> Cancel</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'manufacturing:workorder_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
