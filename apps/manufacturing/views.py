@@ -735,7 +735,7 @@ def log_list_view(request):
             | Q(work_order__work_order_number__icontains=search_query)
         )
 
-    type_filter = request.GET.get('type', '').strip()
+    type_filter = request.GET.get('log_type', '').strip()
     if type_filter:
         logs = logs.filter(log_type=type_filter)
 
