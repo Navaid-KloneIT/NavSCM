@@ -109,6 +109,16 @@ Manages the transformation of raw materials into finished goods for manufacturin
 - **Material Resource Planning (MRP)** - Automated material requirement calculation that explodes BOMs from active work orders, checks on-hand inventory and open purchase orders, computes net requirements, and generates planned order dates within a configurable planning horizon
 - **Shop Floor Control** - Production activity logging with log types (production, downtime, setup, maintenance, quality check), operator assignment, start/end time tracking, quantity produced vs. rejected, duration calculation, and yield rate monitoring
 
+### Module 9: Quality Management System (QMS)
+
+Ensures products meet quality standards and regulatory requirements.
+
+- **Quality Inspection** - Reusable inspection templates with configurable criteria (visual, dimensional, functional, chemical, electrical, mechanical), actual inspection records with status workflow (draft → in progress → completed/failed/on hold), per-criteria pass/fail/warning results with measured values, pass rate calculation, and lot number tracking
+- **Non-Conformance Reports (NCR)** - Defect documentation with source tracking (incoming inspection, in-process, final inspection, customer complaint, supplier issue, internal audit), severity levels (minor/major/critical), status workflow (draft → open → under investigation → resolved → closed), disposition management (use as-is, rework, scrap, return to supplier, sort and segregate), and days-open tracking
+- **Corrective and Preventive Action (CAPA)** - Root cause analysis workflows linked to NCRs with type classification (corrective/preventive), priority levels (low → critical), action item management with individual assignments and due dates, verification step, overdue tracking, and completion percentage
+- **Audit Management** - Internal and external audit scheduling with types (internal, external, supplier, process, product, system), status workflow (draft → scheduled → in progress → completed → closed), finding classification (observation, minor/major non-conformance, opportunity for improvement, positive), severity tracking, and corrective action assignment
+- **Certificate of Analysis (CoA)** - Batch compliance certificates with test results (test name, method, specification, measured result, pass/fail), approval workflow (draft → pending review → approved → issued/revoked), production and expiry date tracking, and all-tests-passed validation
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -244,6 +254,11 @@ Manages the transformation of raw materials into finished goods for manufacturin
    python manage.py seed_manufacturing
    ```
 
+7j. **Seed QMS data**
+   ```bash
+   python manage.py seed_qms
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -316,11 +331,17 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/demand-planning/*)
 │   │   └── admin.py       # Django admin registration
-│   └── manufacturing/     # Manufacturing / production module
-│       ├── models.py      # WorkCenter, BillOfMaterials, BOMLineItem, ProductionSchedule, ProductionScheduleItem, WorkOrder, WorkOrderOperation, MRPRun, MRPRequirement, ProductionLog
-│       ├── views.py       # All manufacturing CRUD & workflow views
+│   ├── manufacturing/     # Manufacturing / production module
+│   │   ├── models.py      # WorkCenter, BillOfMaterials, BOMLineItem, ProductionSchedule, ProductionScheduleItem, WorkOrder, WorkOrderOperation, MRPRun, MRPRequirement, ProductionLog
+│   │   ├── views.py       # All manufacturing CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/manufacturing/*)
+│   │   └── admin.py       # Django admin registration
+│   └── qms/               # Quality management system module
+│       ├── models.py      # InspectionTemplate, InspectionCriteria, QualityInspection, InspectionResult, NonConformanceReport, CAPA, CAPAAction, QualityAudit, AuditFinding, CertificateOfAnalysis, CoATestResult
+│       ├── views.py       # All QMS CRUD & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/manufacturing/*)
+│       ├── urls.py        # URL routing (/qms/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -392,13 +413,20 @@ NavSCM/
 │   │   ├── signal_*.html      # Demand signal list, form, detail
 │   │   ├── plan_*.html        # Collaborative plan list, form, detail
 │   │   └── safety_stock_*.html # Safety stock calculation list, form, detail
-│   └── manufacturing/     # Manufacturing templates
-│       ├── workcenter_*.html  # Work center list, form, detail
-│       ├── bom_*.html         # Bill of materials list, form, detail
-│       ├── schedule_*.html    # Production schedule list, form, detail
-│       ├── workorder_*.html   # Work order list, form, detail
-│       ├── mrp_*.html         # MRP run list, form, detail
-│       └── log_*.html         # Production log list, form, detail
+│   ├── manufacturing/     # Manufacturing templates
+│   │   ├── workcenter_*.html  # Work center list, form, detail
+│   │   ├── bom_*.html         # Bill of materials list, form, detail
+│   │   ├── schedule_*.html    # Production schedule list, form, detail
+│   │   ├── workorder_*.html   # Work order list, form, detail
+│   │   ├── mrp_*.html         # MRP run list, form, detail
+│   │   └── log_*.html         # Production log list, form, detail
+│   └── qms/               # QMS templates
+│       ├── template_*.html    # Inspection template list, form, detail
+│       ├── inspection_*.html  # Quality inspection list, form, detail
+│       ├── ncr_*.html         # Non-conformance report list, form, detail
+│       ├── capa_*.html        # CAPA list, form, detail
+│       ├── audit_*.html       # Quality audit list, form, detail
+│       └── coa_*.html         # Certificate of analysis list, form, detail
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
@@ -431,7 +459,7 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 | 3 | **Transportation Management (TMS)** | Route planning, freight audit, carrier management, shipment tracking, load optimization | Done |
 | 4 | **Demand Planning & Forecasting** | Sales forecasting, seasonality analysis, demand sensing, collaborative planning, safety stock calculation | Done |
 | 5 | **Manufacturing / Production** | Bill of materials (BOM), production scheduling, work orders, MRP, shop floor control | Done |
-| 6 | **Quality Management (QMS)** | Quality inspection, non-conformance reports, CAPA, audit management, certificates of analysis | Planned |
+| 6 | **Quality Management (QMS)** | Quality inspection, non-conformance reports, CAPA, audit management, certificates of analysis | Done |
 | 7 | **Returns Management** | RMA workflows, refund processing, disposition management, return portal, warranty claims | Planned |
 | 8 | **Supply Chain Analytics** | Inventory dashboards, procurement analytics, logistics KPIs, financial reporting, predictive analytics | Planned |
 | 9 | **Contract & Compliance** | Contract repository, compliance tracking, trade documentation, license management, sustainability tracking | Planned |
