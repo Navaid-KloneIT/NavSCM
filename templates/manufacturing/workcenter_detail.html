@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Work Center: {{ wc.code }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ wc.code }} - {{ wc.name }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Manufacturing</li>
+            <li class="breadcrumb-item"><a href="{% url 'manufacturing:workcenter_list' %}">Work Centers</a></li>
+            <li class="breadcrumb-item active">{{ wc.code }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Work Center Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Code</th><td>{{ wc.code }}</td></tr>
+                            <tr><th class="ps-3">Name</th><td>{{ wc.name }}</td></tr>
+                            <tr><th class="ps-3">Type</th><td><span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ wc.get_work_center_type_display }}</span></td></tr>
+                            <tr><th class="ps-3">Capacity/hr</th><td>{{ wc.hourly_capacity|floatformat:2 }}</td></tr>
+                            <tr><th class="ps-3">Cost/hr</th><td>${{ wc.cost_per_hour|floatformat:2 }}</td></tr>
+                            <tr><th class="ps-3">Location</th><td>{{ wc.location|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Description</th><td>{{ wc.description|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if wc.is_active %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Inactive</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Created</th><td>{{ wc.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Work Orders -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Recent Work Orders</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>WO #</th>
+                                <th>Product</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for wo in work_orders %}
+                            <tr>
+                                <td><a href="{% url 'manufacturing:workorder_detail' wo.pk %}" class="fw-medium">{{ wo.work_order_number }}</a></td>
+                                <td>{{ wo.product.name|default:"-" }}</td>
+                                <td>
+                                    {% if wo.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif wo.status == 'planned' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Planned</span>
+                                    {% elif wo.status == 'in_progress' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Progress</span>
+                                    {% elif wo.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% elif wo.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ wo.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if wo.priority == 'high' or wo.priority == 'urgent' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> {{ wo.get_priority_display }}</span>
+                                    {% elif wo.priority == 'medium' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> {{ wo.get_priority_display }}</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ wo.get_priority_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-task-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No work orders assigned to this work center.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Production Logs -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Recent Production Logs</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Log #</th>
+                                <th>Type</th>
+                                <th>Operator</th>
+                                <th>Qty Produced</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td><a href="{% url 'manufacturing:productionlog_detail' log.pk %}" class="fw-medium">{{ log.log_number }}</a></td>
+                                <td><span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ log.get_log_type_display }}</span></td>
+                                <td>{{ log.operator|default:"-" }}</td>
+                                <td>{{ log.quantity_produced|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No production logs for this work center.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                <a href="{% url 'manufacturing:workcenter_edit' wc.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                <form method="POST" action="{% url 'manufacturing:workcenter_delete' wc.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this work center?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                </form>
+                <a href="{% url 'manufacturing:workcenter_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
