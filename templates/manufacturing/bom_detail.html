@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}BOM: {{ bom.bom_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ bom.bom_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Manufacturing</li>
+            <li class="breadcrumb-item"><a href="{% url 'manufacturing:bom_list' %}">Bills of Materials</a></li>
+            <li class="breadcrumb-item active">{{ bom.bom_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>BOM Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">BOM #</th><td>{{ bom.bom_number }}</td></tr>
+                            <tr><th class="ps-3">Product</th><td>{{ bom.product.name|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Title</th><td>{{ bom.title }}</td></tr>
+                            <tr><th class="ps-3">Version</th><td>{{ bom.version }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if bom.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif bom.status == 'active' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                    {% elif bom.status == 'obsolete' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Obsolete</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ bom.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Yield Qty</th><td>{{ bom.yield_quantity|floatformat:2 }}</td></tr>
+                            <tr><th class="ps-3">Total Component Cost</th><td>${{ bom.total_component_cost|floatformat:2 }}</td></tr>
+                            <tr><th class="ps-3">Unit Cost</th><td>${{ bom.unit_cost|floatformat:2 }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ bom.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ bom.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ bom.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Line Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>BOM Line Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>UOM</th>
+                                <th>Scrap %</th>
+                                <th>Effective Qty</th>
+                                <th>Est. Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in line_items %}
+                            <tr>
+                                <td>{{ line.item.name|default:"N/A" }}</td>
+                                <td>{{ line.quantity|floatformat:2 }}</td>
+                                <td>{{ line.unit_of_measure|default:"-" }}</td>
+                                <td>{{ line.scrap_percentage|floatformat:1 }}%</td>
+                                <td>{{ line.effective_quantity|floatformat:2 }}</td>
+                                <td>${{ line.estimated_cost|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No line items.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if bom.status == 'draft' %}
+                    <a href="{% url 'manufacturing:bom_edit' bom.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'manufacturing:bom_activate' bom.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-line me-1"></i> Activate</button>
+                    </form>
+                    <form method="POST" action="{% url 'manufacturing:bom_delete' bom.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this BOM?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif bom.status == 'active' %}
+                    <form method="POST" action="{% url 'manufacturing:bom_mark_obsolete' bom.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2"><i class="ri-archive-line me-1"></i> Mark Obsolete</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'manufacturing:bom_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
