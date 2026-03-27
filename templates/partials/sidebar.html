@@ -1100,6 +1100,118 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Quality Management <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Quality Inspections -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'inspection_list,inspection_create,inspection_detail,inspection_edit,template_list,template_create,template_detail,template_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-clipboard-line"></i>
+                    <span class="menu-text">Quality Inspections</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'qms:inspection_list' %}" class="menu-link {% if request.resolver_match.url_name == 'inspection_list' or request.resolver_match.url_name == 'inspection_detail' or request.resolver_match.url_name == 'inspection_edit' %}active{% endif %}">
+                            <span class="menu-text">All Inspections</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'qms:inspection_create' %}" class="menu-link {% if request.resolver_match.url_name == 'inspection_create' %}active{% endif %}">
+                            <span class="menu-text">New Inspection</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'qms:template_list' %}" class="menu-link {% if request.resolver_match.url_name == 'template_list' or request.resolver_match.url_name == 'template_detail' or request.resolver_match.url_name == 'template_edit' or request.resolver_match.url_name == 'template_create' %}active{% endif %}">
+                            <span class="menu-text">Inspection Templates</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Non-Conformance -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'ncr_list,ncr_create,ncr_detail,ncr_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-error-warning-line"></i>
+                    <span class="menu-text">Non-Conformance</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'qms:ncr_list' %}" class="menu-link {% if request.resolver_match.url_name == 'ncr_list' or request.resolver_match.url_name == 'ncr_detail' or request.resolver_match.url_name == 'ncr_edit' %}active{% endif %}">
+                            <span class="menu-text">All NCRs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'qms:ncr_create' %}" class="menu-link {% if request.resolver_match.url_name == 'ncr_create' %}active{% endif %}">
+                            <span class="menu-text">New NCR</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- CAPA -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'capa_list,capa_create,capa_detail,capa_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-first-aid-kit-line"></i>
+                    <span class="menu-text">CAPA</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'qms:capa_list' %}" class="menu-link {% if request.resolver_match.url_name == 'capa_list' or request.resolver_match.url_name == 'capa_detail' or request.resolver_match.url_name == 'capa_edit' %}active{% endif %}">
+                            <span class="menu-text">All CAPAs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'qms:capa_create' %}" class="menu-link {% if request.resolver_match.url_name == 'capa_create' %}active{% endif %}">
+                            <span class="menu-text">New CAPA</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Audits -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'audit_list,audit_create,audit_detail,audit_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-search-eye-line"></i>
+                    <span class="menu-text">Audits</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'qms:audit_list' %}" class="menu-link {% if request.resolver_match.url_name == 'audit_list' or request.resolver_match.url_name == 'audit_detail' or request.resolver_match.url_name == 'audit_edit' %}active{% endif %}">
+                            <span class="menu-text">All Audits</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'qms:audit_create' %}" class="menu-link {% if request.resolver_match.url_name == 'audit_create' %}active{% endif %}">
+                            <span class="menu-text">New Audit</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Certificates -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'coa_list,coa_create,coa_detail,coa_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-shield-2-line"></i>
+                    <span class="menu-text">Certificates</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'qms:coa_list' %}" class="menu-link {% if request.resolver_match.url_name == 'coa_list' or request.resolver_match.url_name == 'coa_detail' or request.resolver_match.url_name == 'coa_edit' %}active{% endif %}">
+                            <span class="menu-text">All CoAs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'qms:coa_create' %}" class="menu-link {% if request.resolver_match.url_name == 'coa_create' %}active{% endif %}">
+                            <span class="menu-text">New CoA</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Audit &amp; Security <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Audit Logs -->
