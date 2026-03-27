@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'qms:audit_list' %}">Quality Management</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'qms:audit_list' %}">Audits</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Audit Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Audit Type *</label>
+                            {{ form.audit_type }}
+                            {% if form.audit_type.errors %}<div class="text-danger small">{{ form.audit_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Lead Auditor</label>
+                            {{ form.lead_auditor }}
+                            {% if form.lead_auditor.errors %}<div class="text-danger small">{{ form.lead_auditor.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Audit Date</label>
+                            {{ form.audit_date }}
+                            {% if form.audit_date.errors %}<div class="text-danger small">{{ form.audit_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Scope</label>
+                            {{ form.scope }}
+                            {% if form.scope.errors %}<div class="text-danger small">{{ form.scope.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Findings Formset -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Audit Findings</h5>
+                    <button type="button" class="btn btn-sm btn-soft-success" id="add-item-btn">
+                        <i class="ri-add-line me-1"></i> Add Finding
+                    </button>
+                </div>
+                <div class="card-body">
+                    {{ formset.management_form }}
+                    <div id="formset-container">
+                        {% for finding_form in formset %}
+                        <div class="formset-row border rounded p-3 mb-3">
+                            <div class="row g-3">
+                                {% if finding_form.instance.pk %}{{ finding_form.id }}{% endif %}
+                                <div class="col-md-2">
+                                    <label class="form-label">Finding #</label>
+                                    {{ finding_form.finding_number }}
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label">Title</label>
+                                    {{ finding_form.title }}
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label">Description</label>
+                                    {{ finding_form.description }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Finding Type</label>
+                                    {{ finding_form.finding_type }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Severity</label>
+                                    {{ finding_form.severity }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Assigned To</label>
+                                    {{ finding_form.assigned_to }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Due Date</label>
+                                    {{ finding_form.due_date }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Corrective Action</label>
+                                    {{ finding_form.corrective_action }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Notes</label>
+                                    {{ finding_form.notes }}
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <div class="form-check">
+                                        {{ finding_form.DELETE }}
+                                        <label class="form-check-label text-danger">Remove</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Audit</button>
+                    {% if audit %}
+                        <a href="{% url 'qms:audit_detail' audit.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'qms:audit_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('formset-container');
+    const addBtn = document.getElementById('add-item-btn');
+    const totalForms = document.getElementById('id_findings-TOTAL_FORMS');
+
+    addBtn.addEventListener('click', function() {
+        const formCount = parseInt(totalForms.value);
+        const lastForm = container.querySelector('.formset-row:last-child');
+        if (!lastForm) return;
+
+        const newForm = lastForm.cloneNode(true);
+        newForm.innerHTML = newForm.innerHTML.replace(/findings-\d+-/g, 'findings-' + formCount + '-');
+        newForm.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(i => i.value = '');
+        newForm.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+        newForm.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+        newForm.querySelectorAll('textarea').forEach(t => t.value = '');
+        const idField = newForm.querySelector('input[name$="-id"]');
+        if (idField) idField.value = '';
+        container.appendChild(newForm);
+        totalForms.value = formCount + 1;
+    });
+});
+</script>
+{% endblock %}
