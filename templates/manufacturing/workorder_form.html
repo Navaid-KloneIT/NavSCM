@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Manufacturing</li>
+            <li class="breadcrumb-item"><a href="{% url 'manufacturing:workorder_list' %}">Work Orders</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Work Order Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Product *</label>
+                            {{ form.product }}
+                            {% if form.product.errors %}<div class="text-danger small">{{ form.product.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">BOM</label>
+                            {{ form.bom }}
+                            {% if form.bom.errors %}<div class="text-danger small">{{ form.bom.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Schedule</label>
+                            {{ form.schedule }}
+                            {% if form.schedule.errors %}<div class="text-danger small">{{ form.schedule.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Work Center</label>
+                            {{ form.work_center }}
+                            {% if form.work_center.errors %}<div class="text-danger small">{{ form.work_center.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Planned Quantity *</label>
+                            {{ form.planned_quantity }}
+                            {% if form.planned_quantity.errors %}<div class="text-danger small">{{ form.planned_quantity.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Planned Start Date *</label>
+                            {{ form.planned_start_date }}
+                            {% if form.planned_start_date.errors %}<div class="text-danger small">{{ form.planned_start_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Planned End Date *</label>
+                            {{ form.planned_end_date }}
+                            {% if form.planned_end_date.errors %}<div class="text-danger small">{{ form.planned_end_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Priority</label>
+                            {{ form.priority }}
+                            {% if form.priority.errors %}<div class="text-danger small">{{ form.priority.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            <!-- Operations -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Operations</h5>
+                    <button type="button" class="btn btn-sm btn-soft-success" id="add-item-btn"><i class="ri-add-line me-1"></i> Add Operation</button>
+                </div>
+                <div class="card-body p-0">
+                    {{ formset.management_form }}
+                    <div class="table-responsive">
+                        <table class="table mb-0" id="formset-table">
+                            <thead>
+                                <tr>
+                                    <th>Sequence</th>
+                                    <th>Operation Name</th>
+                                    <th>Work Center</th>
+                                    <th>Planned Hours</th>
+                                    <th>Notes</th>
+                                    <th>Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody id="formset-container">
+                                {% for op_form in formset %}
+                                <tr class="formset-row">
+                                    {% if op_form.instance.pk %}{{ op_form.id }}{% endif %}
+                                    <td>{{ op_form.sequence }}{% if op_form.sequence.errors %}<div class="text-danger small">{{ op_form.sequence.errors.0 }}</div>{% endif %}</td>
+                                    <td>{{ op_form.name }}{% if op_form.name.errors %}<div class="text-danger small">{{ op_form.name.errors.0 }}</div>{% endif %}</td>
+                                    <td>{{ op_form.work_center }}{% if op_form.work_center.errors %}<div class="text-danger small">{{ op_form.work_center.errors.0 }}</div>{% endif %}</td>
+                                    <td>{{ op_form.planned_hours }}{% if op_form.planned_hours.errors %}<div class="text-danger small">{{ op_form.planned_hours.errors.0 }}</div>{% endif %}</td>
+                                    <td>{{ op_form.notes }}{% if op_form.notes.errors %}<div class="text-danger small">{{ op_form.notes.errors.0 }}</div>{% endif %}</td>
+                                    <td><div class="form-check">{{ op_form.DELETE }}<label class="form-check-label text-danger">Remove</label></div></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Work Order</button>
+                    {% if wo %}
+                        <a href="{% url 'manufacturing:workorder_detail' wo.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'manufacturing:workorder_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('formset-container');
+    const addBtn = document.getElementById('add-item-btn');
+    const totalForms = document.getElementById('id_ops-TOTAL_FORMS');
+    addBtn.addEventListener('click', function() {
+        const formCount = parseInt(totalForms.value);
+        const lastForm = container.querySelector('.formset-row:last-child');
+        if (!lastForm) return;
+        const newForm = lastForm.cloneNode(true);
+        newForm.innerHTML = newForm.innerHTML.replace(/ops-\d+-/g, 'ops-' + formCount + '-');
+        newForm.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(i => i.value = '');
+        newForm.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+        newForm.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+        newForm.querySelectorAll('textarea').forEach(t => t.value = '');
+        const idField = newForm.querySelector('input[name$="-id"]');
+        if (idField) idField.value = '';
+        container.appendChild(newForm);
+        totalForms.value = formCount + 1;
+    });
+});
+</script>
+{% endblock %}
