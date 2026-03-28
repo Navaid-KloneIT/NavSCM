@@ -20,6 +20,7 @@ urlpatterns = [
     path('demand-planning/', include('apps.demand_planning.urls', namespace='demand_planning')),
     path('manufacturing/', include('apps.manufacturing.urls', namespace='manufacturing')),
     path('qms/', include('apps.qms.urls', namespace='qms')),
+    path('returns/', include('apps.returns.urls', namespace='returns')),
     path('', include('apps.dashboard.urls')),
 ]
 
