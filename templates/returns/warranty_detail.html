@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Warranty Claim: {{ claim.claim_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ claim.claim_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Returns Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'returns:warranty_list' %}">Warranty Claims</a></li>
+            <li class="breadcrumb-item active">{{ claim.claim_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Claim Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Claim #</th><td>{{ claim.claim_number }}</td></tr>
+                            <tr><th class="ps-3">Vendor</th><td>{{ claim.vendor }}</td></tr>
+                            <tr><th class="ps-3">Item</th><td>{{ claim.item.name }}</td></tr>
+                            <tr><th class="ps-3">RMA</th><td>{% if claim.rma %}<a href="{% url 'returns:rma_detail' claim.rma.pk %}">{{ claim.rma.rma_number }}</a>{% else %}-{% endif %}</td></tr>
+                            <tr><th class="ps-3">Claim Type</th><td>{{ claim.get_claim_type_display }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if claim.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif claim.status == 'submitted' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Submitted</span>
+                                    {% elif claim.status == 'under_review' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Under Review</span>
+                                    {% elif claim.status == 'approved' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Approved</span>
+                                    {% elif claim.status == 'settled' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Settled</span>
+                                    {% elif claim.status == 'denied' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Denied</span>
+                                    {% elif claim.status == 'closed' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Closed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ claim.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Warranty Start</th><td>{{ claim.warranty_start_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Warranty End</th><td>{{ claim.warranty_end_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Warranty Active</th>
+                                <td>
+                                    {% if claim.is_warranty_active %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Expired</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Claim Amount</th><td>{{ claim.currency }} {{ claim.claim_amount }}</td></tr>
+                            <tr><th class="ps-3">Settlement Amount</th><td>{{ claim.currency }} {{ claim.settlement_amount }}</td></tr>
+                            <tr><th class="ps-3">Description</th><td>{{ claim.description|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Resolution Notes</th><td>{{ claim.resolution_notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ claim.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ claim.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Claim Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Claim Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th>Unit Cost</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ci in claim_items %}
+                            <tr>
+                                <td>{{ ci.description }}</td>
+                                <td>{{ ci.quantity }}</td>
+                                <td>{{ ci.unit_cost }}</td>
+                                <td>{{ ci.total }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No claim items added.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if claim.status == 'draft' %}
+                    <a href="{% url 'returns:warranty_edit' claim.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'returns:warranty_submit' claim.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-send-plane-line me-1"></i> Submit</button>
+                    </form>
+                    <form method="POST" action="{% url 'returns:warranty_delete' claim.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this claim?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif claim.status == 'submitted' %}
+                    <form method="POST" action="{% url 'returns:warranty_review' claim.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-search-eye-line me-1"></i> Start Review</button>
+                    </form>
+                {% elif claim.status == 'under_review' %}
+                    <form method="POST" action="{% url 'returns:warranty_approve' claim.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-line me-1"></i> Approve</button>
+                    </form>
+                    <form method="POST" action="{% url 'returns:warranty_deny' claim.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Deny this claim?')"><i class="ri-close-line me-1"></i> Deny</button>
+                    </form>
+                {% elif claim.status == 'approved' %}
+                    <form method="POST" action="{% url 'returns:warranty_settle' claim.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-money-dollar-circle-line me-1"></i> Settle</button>
+                    </form>
+                {% elif claim.status == 'settled' or claim.status == 'denied' %}
+                    <form method="POST" action="{% url 'returns:warranty_close' claim.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2"><i class="ri-lock-line me-1"></i> Close</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'returns:warranty_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
