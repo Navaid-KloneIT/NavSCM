@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block title %}RMA: {{ rma.rma_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ rma.rma_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Returns Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'returns:rma_list' %}">RMAs</a></li>
+            <li class="breadcrumb-item active">{{ rma.rma_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>RMA Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">RMA #</th><td>{{ rma.rma_number }}</td></tr>
+                            <tr><th class="ps-3">Customer</th><td>{{ rma.customer }}</td></tr>
+                            <tr><th class="ps-3">Order</th><td>{{ rma.order|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Return Type</th><td>{{ rma.get_return_type_display }}</td></tr>
+                            <tr><th class="ps-3">Reason</th><td>{{ rma.get_reason_category_display }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Priority</th>
+                                <td>
+                                    {% if rma.priority == 'urgent' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Urgent</span>
+                                    {% elif rma.priority == 'high' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> High</span>
+                                    {% elif rma.priority == 'medium' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Medium</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Low</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if rma.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif rma.status == 'submitted' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Submitted</span>
+                                    {% elif rma.status == 'approved' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Approved</span>
+                                    {% elif rma.status == 'receiving' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Receiving</span>
+                                    {% elif rma.status == 'received' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Received</span>
+                                    {% elif rma.status == 'closed' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Closed</span>
+                                    {% elif rma.status == 'rejected' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Rejected</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ rma.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Requested Date</th><td>{{ rma.requested_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Approved By</th><td>{{ rma.approved_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Approved Date</th><td>{{ rma.approved_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Days Since Request</th><td>{{ rma.days_since_request }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ rma.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ rma.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ rma.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Line Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Return Items ({{ line_items|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Condition</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for li in line_items %}
+                            <tr>
+                                <td>{{ li.item.name }}</td>
+                                <td>{{ li.quantity }}</td>
+                                <td>{{ li.get_condition_display }}</td>
+                                <td>{{ li.reason|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-inbox-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No return items added.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Linked Refunds -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Linked Refunds</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Refund #</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for refund in refunds %}
+                            <tr>
+                                <td><a href="{% url 'returns:refund_detail' refund.pk %}" class="fw-medium">{{ refund.refund_number }}</a></td>
+                                <td>{{ refund.get_refund_type_display }}</td>
+                                <td>{{ refund.currency }} {{ refund.amount }}</td>
+                                <td>{{ refund.get_status_display }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-refund-2-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No linked refunds.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Linked Dispositions -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Linked Dispositions</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Disposition #</th>
+                                <th>Item</th>
+                                <th>Decision</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dsp in dispositions %}
+                            <tr>
+                                <td><a href="{% url 'returns:disposition_detail' dsp.pk %}" class="fw-medium">{{ dsp.disposition_number }}</a></td>
+                                <td>{{ dsp.item.name }}</td>
+                                <td>{{ dsp.get_disposition_decision_display|default:"-" }}</td>
+                                <td>{{ dsp.get_status_display }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-survey-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No linked dispositions.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if rma.status == 'draft' %}
+                    <a href="{% url 'returns:rma_edit' rma.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'returns:rma_submit' rma.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-send-plane-line me-1"></i> Submit</button>
+                    </form>
+                    <form method="POST" action="{% url 'returns:rma_delete' rma.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this RMA?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif rma.status == 'submitted' %}
+                    <form method="POST" action="{% url 'returns:rma_approve' rma.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-line me-1"></i> Approve</button>
+                    </form>
+                    <form method="POST" action="{% url 'returns:rma_reject' rma.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Reject this RMA?')"><i class="ri-close-line me-1"></i> Reject</button>
+                    </form>
+                {% elif rma.status == 'approved' %}
+                    <form method="POST" action="{% url 'returns:rma_receive' rma.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-inbox-archive-line me-1"></i> Start Receiving</button>
+                    </form>
+                {% elif rma.status == 'receiving' %}
+                    <form method="POST" action="{% url 'returns:rma_received' rma.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-checkbox-circle-line me-1"></i> Mark Received</button>
+                    </form>
+                {% elif rma.status == 'received' %}
+                    <form method="POST" action="{% url 'returns:rma_close' rma.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2"><i class="ri-lock-line me-1"></i> Close</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'returns:rma_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
