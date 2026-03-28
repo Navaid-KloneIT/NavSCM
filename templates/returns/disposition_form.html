@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Returns Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'returns:disposition_list' %}">Dispositions</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Disposition Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">RMA *</label>
+                            {{ form.rma }}
+                            {% if form.rma.errors %}<div class="text-danger small">{{ form.rma.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">RMA Line Item</label>
+                            {{ form.rma_item }}
+                            {% if form.rma_item.errors %}<div class="text-danger small">{{ form.rma_item.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Item *</label>
+                            {{ form.item }}
+                            {% if form.item.errors %}<div class="text-danger small">{{ form.item.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Quantity *</label>
+                            {{ form.quantity }}
+                            {% if form.quantity.errors %}<div class="text-danger small">{{ form.quantity.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Condition Received *</label>
+                            {{ form.condition_received }}
+                            {% if form.condition_received.errors %}<div class="text-danger small">{{ form.condition_received.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Disposition Decision</label>
+                            {{ form.disposition_decision }}
+                            {% if form.disposition_decision.errors %}<div class="text-danger small">{{ form.disposition_decision.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Assigned To</label>
+                            {{ form.assigned_to }}
+                            {% if form.assigned_to.errors %}<div class="text-danger small">{{ form.assigned_to.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Inspection Notes</label>
+                            {{ form.inspection_notes }}
+                            {% if form.inspection_notes.errors %}<div class="text-danger small">{{ form.inspection_notes.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Decision Notes</label>
+                            {{ form.decision_notes }}
+                            {% if form.decision_notes.errors %}<div class="text-danger small">{{ form.decision_notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Disposition</button>
+                    {% if disposition %}
+                        <a href="{% url 'returns:disposition_detail' disposition.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'returns:disposition_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
