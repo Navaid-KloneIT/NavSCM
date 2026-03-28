@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block title %}Supply Chain Analytics{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>Supply Chain Analytics</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item active">Supply Chain Analytics</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Summary Stats -->
+<div class="row mb-4">
+    <div class="col-md">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="ri-bar-chart-2-line text-primary" style="font-size: 32px;"></i>
+                <h3 class="mt-2 mb-1">{{ inventory_count }}</h3>
+                <p class="text-muted mb-0">Inventory Reports</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="ri-pie-chart-2-line text-success" style="font-size: 32px;"></i>
+                <h3 class="mt-2 mb-1">{{ procurement_count }}</h3>
+                <p class="text-muted mb-0">Procurement Reports</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="ri-truck-line text-info" style="font-size: 32px;"></i>
+                <h3 class="mt-2 mb-1">{{ logistics_count }}</h3>
+                <p class="text-muted mb-0">Logistics Reports</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="ri-money-dollar-circle-line text-warning" style="font-size: 32px;"></i>
+                <h3 class="mt-2 mb-1">{{ financial_count }}</h3>
+                <p class="text-muted mb-0">Financial Reports</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="ri-lightbulb-flash-line text-danger" style="font-size: 32px;"></i>
+                <h3 class="mt-2 mb-1">{{ alert_count }}</h3>
+                <p class="text-muted mb-0">Active Alerts</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Alerts -->
+    <div class="col-lg-6">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Active Predictive Alerts</h5>
+                <a href="{% url 'analytics:alert_list' %}" class="text-muted" style="font-size: 13px;">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Alert #</th>
+                                <th>Title</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alert in recent_alerts %}
+                            <tr>
+                                <td><a href="{% url 'analytics:alert_detail' alert.pk %}" class="fw-medium">{{ alert.alert_number }}</a></td>
+                                <td>{{ alert.title|truncatechars:30 }}</td>
+                                <td>
+                                    {% if alert.severity == 'critical' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Critical</span>
+                                    {% elif alert.severity == 'high' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> High</span>
+                                    {% elif alert.severity == 'medium' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Medium</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ alert.get_status_display }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-4 text-muted">No active alerts.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Inventory Reports -->
+    <div class="col-lg-6">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Recent Inventory Reports</h5>
+                <a href="{% url 'analytics:inventory_list' %}" class="text-muted" style="font-size: 13px;">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Report #</th>
+                                <th>Type</th>
+                                <th>Period</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in recent_inventory %}
+                            <tr>
+                                <td><a href="{% url 'analytics:inventory_detail' r.pk %}" class="fw-medium">{{ r.report_number }}</a></td>
+                                <td>{{ r.get_report_type_display }}</td>
+                                <td>{{ r.start_date|date:"M d" }} - {{ r.end_date|date:"M d, Y" }}</td>
+                                <td>{{ r.get_status_display }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-4 text-muted">No inventory reports yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Procurement Reports -->
+    <div class="col-lg-6">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Recent Procurement Reports</h5>
+                <a href="{% url 'analytics:procurement_list' %}" class="text-muted" style="font-size: 13px;">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Report #</th>
+                                <th>Type</th>
+                                <th>Total Spend</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in recent_procurement %}
+                            <tr>
+                                <td><a href="{% url 'analytics:procurement_detail' r.pk %}" class="fw-medium">{{ r.report_number }}</a></td>
+                                <td>{{ r.get_report_type_display }}</td>
+                                <td>{{ r.total_spend }}</td>
+                                <td>{{ r.get_status_display }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-4 text-muted">No procurement reports yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Logistics Reports -->
+    <div class="col-lg-6">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Recent Logistics KPI Reports</h5>
+                <a href="{% url 'analytics:logistics_list' %}" class="text-muted" style="font-size: 13px;">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Report #</th>
+                                <th>Type</th>
+                                <th>On-Time Rate</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in recent_logistics %}
+                            <tr>
+                                <td><a href="{% url 'analytics:logistics_detail' r.pk %}" class="fw-medium">{{ r.report_number }}</a></td>
+                                <td>{{ r.get_report_type_display }}</td>
+                                <td>{{ r.on_time_rate }}%</td>
+                                <td>{{ r.get_status_display }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-4 text-muted">No logistics reports yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
