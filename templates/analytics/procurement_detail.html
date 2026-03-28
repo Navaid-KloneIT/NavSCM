@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Procurement Report: {{ report.report_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Procurement Report: {{ report.report_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'analytics:procurement_list' %}">Supply Chain Analytics</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'analytics:procurement_list' %}">Procurement Analytics</a></li>
+            <li class="breadcrumb-item active">{{ report.report_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Report Info -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Report Information</h5>
+                {% if report.status == 'draft' %}
+                    <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> {{ report.get_status_display }}</span>
+                {% elif report.status == 'generated' %}
+                    <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ report.get_status_display }}</span>
+                {% elif report.status == 'reviewed' %}
+                    <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> {{ report.get_status_display }}</span>
+                {% elif report.status == 'archived' %}
+                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ report.get_status_display }}</span>
+                {% else %}
+                    <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ report.get_status_display }}</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Report #:</strong></div>
+                    <div class="col-md-3">{{ report.report_number }}</div>
+                    <div class="col-md-3"><strong>Type:</strong></div>
+                    <div class="col-md-3">{{ report.get_report_type_display }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Status:</strong></div>
+                    <div class="col-md-3">
+                        {% if report.status == 'draft' %}
+                            <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> {{ report.get_status_display }}</span>
+                        {% elif report.status == 'generated' %}
+                            <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ report.get_status_display }}</span>
+                        {% elif report.status == 'reviewed' %}
+                            <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> {{ report.get_status_display }}</span>
+                        {% elif report.status == 'archived' %}
+                            <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ report.get_status_display }}</span>
+                        {% else %}
+                            <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ report.get_status_display }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3"><strong>Period:</strong></div>
+                    <div class="col-md-3">{{ report.start_date|date:"M d, Y" }} - {{ report.end_date|date:"M d, Y" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Total Spend:</strong></div>
+                    <div class="col-md-3">{{ report.total_spend|default:"-" }}</div>
+                    <div class="col-md-3"><strong>Total Orders:</strong></div>
+                    <div class="col-md-3">{{ report.total_orders|default:"-" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Avg Order Value:</strong></div>
+                    <div class="col-md-3">{{ report.avg_order_value|default:"-" }}</div>
+                    <div class="col-md-3"><strong>On-Time Delivery Rate:</strong></div>
+                    <div class="col-md-3">{{ report.on_time_delivery_rate|default:"-" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Rejection Rate:</strong></div>
+                    <div class="col-md-3">{{ report.rejection_rate|default:"-" }}</div>
+                    <div class="col-md-3"><strong>Top Vendor Spend:</strong></div>
+                    <div class="col-md-3">{{ report.top_vendor_spend|default:"-" }}</div>
+                </div>
+                {% if report.notes %}
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Notes:</strong></div>
+                    <div class="col-md-9">{{ report.notes }}</div>
+                </div>
+                {% endif %}
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Created By:</strong></div>
+                    <div class="col-md-3">{{ report.created_by.get_full_name|default:"-" }}</div>
+                    <div class="col-md-3"><strong>Created:</strong></div>
+                    <div class="col-md-3">{{ report.created_at|date:"M d, Y H:i" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vendor Breakdown -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Vendor Breakdown</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Vendor</th>
+                                <th>Total Spend</th>
+                                <th>Orders</th>
+                                <th>Avg Lead Time</th>
+                                <th>On-Time Rate</th>
+                                <th>Rejection Rate</th>
+                                <th>Cost Variance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.vendor|default:"-" }}</td>
+                                <td>{{ item.total_spend|default:"-" }}</td>
+                                <td>{{ item.order_count|default:"-" }}</td>
+                                <td>{{ item.avg_lead_time_days|default:"-" }}</td>
+                                <td>{{ item.on_time_rate|default:"-" }}</td>
+                                <td>{{ item.rejection_rate|default:"-" }}</td>
+                                <td>{{ item.cost_variance|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-pie-chart-2-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No vendor breakdown data recorded</p>
+                                        <p class="mb-0" style="font-size: 13px;">Vendor performance data will appear here once added.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Sidebar -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if report.status == 'draft' %}
+                    <a href="{% url 'analytics:procurement_edit' report.pk %}" class="btn btn-soft-warning w-100 mb-2">
+                        <i class="ri-pencil-line me-1"></i> Edit
+                    </a>
+                    <form method="POST" action="{% url 'analytics:procurement_generate' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2">
+                            <i class="ri-bar-chart-2-line me-1"></i> Generate
+                        </button>
+                    </form>
+                    <form method="POST" action="{% url 'analytics:procurement_delete' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-soft-danger w-100 mb-2" onclick="return confirm('Are you sure you want to delete this report?')">
+                            <i class="ri-delete-bin-line me-1"></i> Delete
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if report.status == 'generated' %}
+                    <form method="POST" action="{% url 'analytics:procurement_review' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2">
+                            <i class="ri-check-line me-1"></i> Review
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if report.status == 'reviewed' %}
+                    <form method="POST" action="{% url 'analytics:procurement_archive' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2">
+                            <i class="ri-archive-line me-1"></i> Archive
+                        </button>
+                    </form>
+                {% endif %}
+
+                <a href="{% url 'analytics:procurement_list' %}" class="btn btn-light w-100">
+                    <i class="ri-arrow-left-line me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
