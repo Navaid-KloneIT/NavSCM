@@ -129,6 +129,16 @@ Handles the return of products from customers back to the warehouse.
 - **Warranty Claims** - Claims against suppliers or manufacturers (draft → submitted → under review → approved → settled / denied → closed) with claim types (manufacturer warranty, supplier warranty, extended warranty), warranty period tracking, claim and settlement amounts, multi-currency support, claim line items with quantity and cost breakdown, and vendor linkage
 - **Return Portal Settings** - Per-tenant configuration for return portal (enable/disable portal, return window days, approval requirements, auto-generate labels, restocking fee percentage, return policy text)
 
+### Module 12: Supply Chain Analytics
+
+Provides insights into supply chain performance and efficiency.
+
+- **Inventory Dashboards** - Periodic inventory performance reports with types (turnover analysis, dead stock, aging inventory, stock summary), status workflow (draft → generated → reviewed → archived), aggregate metrics (total items, total value, turnover rate, dead stock count/value, aging 30/60/90/90+ day counts), and per-item/warehouse line item breakdown with movement tracking and dead stock flagging
+- **Procurement Analytics** - Spend analysis and vendor performance reports with types (spend analysis, vendor performance, cost savings, purchase summary), aggregate metrics (total spend, total orders, average order value, on-time delivery rate, rejection rate), and per-vendor line item breakdown with lead time, on-time rate, rejection rate, and cost variance tracking
+- **Logistics KPIs** - Transportation performance scorecards with types (delivery performance, freight cost, vehicle utilization, carrier performance), aggregate metrics (total shipments, on-time/late counts, on-time rate, total freight cost, average cost per shipment, average transit days, vehicle utilization rate), and per-carrier line item breakdown
+- **Financial Reporting** - Gross margin analysis and supply chain cost breakdowns with types (gross margin, cost breakdown, revenue analysis, profitability), aggregate metrics (total revenue, total COGS, gross margin, gross margin percentage, procurement/logistics/manufacturing/warehousing costs), and cost category line items with percentage of total
+- **Predictive Analytics** - AI-driven prediction alerts with types (demand spike, supply disruption, stockout risk, price fluctuation, delivery delay), severity levels (low → critical), status workflow (new → analyzing → confirmed → resolved/dismissed), confidence levels, affected item/vendor tracking, impact description, recommended actions, and resolution tracking
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -274,6 +284,11 @@ Handles the return of products from customers back to the warehouse.
    python manage.py seed_returns
    ```
 
+7l. **Seed Analytics data**
+   ```bash
+   python manage.py seed_analytics
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -358,11 +373,17 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/qms/*)
 │   │   └── admin.py       # Django admin registration
-│   └── returns/           # Returns management (reverse logistics) module
-│       ├── models.py      # ReturnAuthorization, RMALineItem, Refund, Disposition, WarrantyClaim, WarrantyClaimItem, ReturnPortalSettings
-│       ├── views.py       # All returns CRUD & workflow views
+│   ├── returns/           # Returns management (reverse logistics) module
+│   │   ├── models.py      # ReturnAuthorization, RMALineItem, Refund, Disposition, WarrantyClaim, WarrantyClaimItem, ReturnPortalSettings
+│   │   ├── views.py       # All returns CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/returns/*)
+│   │   └── admin.py       # Django admin registration
+│   └── analytics/         # Supply chain analytics module
+│       ├── models.py      # InventoryAnalytics, InventoryAnalyticsItem, ProcurementAnalytics, ProcurementAnalyticsItem, LogisticsKPI, LogisticsKPIItem, FinancialReport, FinancialReportItem, PredictiveAlert
+│       ├── views.py       # All analytics CRUD, dashboard & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/returns/*)
+│       ├── urls.py        # URL routing (/analytics/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -448,12 +469,19 @@ NavSCM/
 │   │   ├── capa_*.html        # CAPA list, form, detail
 │   │   ├── audit_*.html       # Quality audit list, form, detail
 │   │   └── coa_*.html         # Certificate of analysis list, form, detail
-│   └── returns/           # Returns management templates
-│       ├── rma_*.html         # Return authorization list, form, detail
-│       ├── refund_*.html      # Refund list, form, detail
-│       ├── disposition_*.html # Disposition list, form, detail
-│       ├── warranty_*.html    # Warranty claim list, form, detail
-│       └── portal_settings.html # Return portal settings
+│   ├── returns/           # Returns management templates
+│   │   ├── rma_*.html         # Return authorization list, form, detail
+│   │   ├── refund_*.html      # Refund list, form, detail
+│   │   ├── disposition_*.html # Disposition list, form, detail
+│   │   ├── warranty_*.html    # Warranty claim list, form, detail
+│   │   └── portal_settings.html # Return portal settings
+│   └── analytics/         # Supply chain analytics templates
+│       ├── dashboard.html     # Analytics overview dashboard
+│       ├── inventory_*.html   # Inventory analytics list, form, detail
+│       ├── procurement_*.html # Procurement analytics list, form, detail
+│       ├── logistics_*.html   # Logistics KPI list, form, detail
+│       ├── financial_*.html   # Financial report list, form, detail
+│       └── alert_*.html       # Predictive alert list, form, detail
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
@@ -492,7 +520,7 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 | 9 | **Manufacturing / Production** | Bill of materials (BOM), production scheduling, work orders, MRP, shop floor control | Done |
 | 10 | **Quality Management (QMS)** | Quality inspection, non-conformance reports, CAPA, audit management, certificates of analysis | Done |
 | 11 | **Returns Management** | RMA workflows, refund processing, disposition management, return portal, warranty claims | Done |
-| 12 | **Supply Chain Analytics** | Inventory dashboards, procurement analytics, logistics KPIs, financial reporting, predictive analytics | Planned |
+| 12 | **Supply Chain Analytics** | Inventory dashboards, procurement analytics, logistics KPIs, financial reporting, predictive analytics | Done |
 | 13 | **Contract & Compliance** | Contract repository, compliance tracking, trade documentation, license management, sustainability tracking | Planned |
 | 14 | **Asset Management** | Asset registry, preventive/breakdown maintenance, spare parts inventory, asset depreciation | Planned |
 | 15 | **Labor Management** | Labor planning, time & attendance, task assignment, performance tracking, payroll integration | Planned |
