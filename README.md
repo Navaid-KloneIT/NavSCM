@@ -119,6 +119,16 @@ Ensures products meet quality standards and regulatory requirements.
 - **Audit Management** - Internal and external audit scheduling with types (internal, external, supplier, process, product, system), status workflow (draft → scheduled → in progress → completed → closed), finding classification (observation, minor/major non-conformance, opportunity for improvement, positive), severity tracking, and corrective action assignment
 - **Certificate of Analysis (CoA)** - Batch compliance certificates with test results (test name, method, specification, measured result, pass/fail), approval workflow (draft → pending review → approved → issued/revoked), production and expiry date tracking, and all-tests-passed validation
 
+### Module 10: Returns Management (Reverse Logistics)
+
+Handles the return of products from customers back to the warehouse.
+
+- **Return Merchandise Authorization (RMA)** - Customer return request workflow (draft → submitted → approved → receiving → received → closed / rejected) with return types (exchange, refund, repair, store credit), reason categories (defective, wrong item, damaged, not as described, changed mind), priority levels (low → urgent), line items with quantity and condition tracking, and approval with date/user audit trail
+- **Refund Processing** - Financial refund lifecycle (draft → pending approval → approved → processing → completed / failed / cancelled) linked to RMAs, with refund types (full, partial, store credit), refund methods (original payment, bank transfer, store credit, check), multi-currency support (USD, EUR, GBP, PKR, AED, SAR, INR, CNY), amount tracking, and transaction reference management
+- **Disposition Management** - Decision logic for returned items with inspection workflow (pending → inspecting → decided → processing → completed), condition assessment (new, like new, good, fair, poor, damaged, defective), disposition decisions (restock, refurbish, repair, scrap, return to supplier, donate), inspector assignment, and inspection/decision notes
+- **Warranty Claims** - Claims against suppliers or manufacturers (draft → submitted → under review → approved → settled / denied → closed) with claim types (manufacturer warranty, supplier warranty, extended warranty), warranty period tracking, claim and settlement amounts, multi-currency support, claim line items with quantity and cost breakdown, and vendor linkage
+- **Return Portal Settings** - Per-tenant configuration for return portal (enable/disable portal, return window days, approval requirements, auto-generate labels, restocking fee percentage, return policy text)
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -259,6 +269,11 @@ Ensures products meet quality standards and regulatory requirements.
    python manage.py seed_qms
    ```
 
+7k. **Seed Returns Management data**
+   ```bash
+   python manage.py seed_returns
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -337,11 +352,17 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/manufacturing/*)
 │   │   └── admin.py       # Django admin registration
-│   └── qms/               # Quality management system module
-│       ├── models.py      # InspectionTemplate, InspectionCriteria, QualityInspection, InspectionResult, NonConformanceReport, CAPA, CAPAAction, QualityAudit, AuditFinding, CertificateOfAnalysis, CoATestResult
-│       ├── views.py       # All QMS CRUD & workflow views
+│   ├── qms/               # Quality management system module
+│   │   ├── models.py      # InspectionTemplate, InspectionCriteria, QualityInspection, InspectionResult, NonConformanceReport, CAPA, CAPAAction, QualityAudit, AuditFinding, CertificateOfAnalysis, CoATestResult
+│   │   ├── views.py       # All QMS CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/qms/*)
+│   │   └── admin.py       # Django admin registration
+│   └── returns/           # Returns management (reverse logistics) module
+│       ├── models.py      # ReturnAuthorization, RMALineItem, Refund, Disposition, WarrantyClaim, WarrantyClaimItem, ReturnPortalSettings
+│       ├── views.py       # All returns CRUD & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/qms/*)
+│       ├── urls.py        # URL routing (/returns/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -420,13 +441,19 @@ NavSCM/
 │   │   ├── workorder_*.html   # Work order list, form, detail
 │   │   ├── mrp_*.html         # MRP run list, form, detail
 │   │   └── log_*.html         # Production log list, form, detail
-│   └── qms/               # QMS templates
-│       ├── template_*.html    # Inspection template list, form, detail
-│       ├── inspection_*.html  # Quality inspection list, form, detail
-│       ├── ncr_*.html         # Non-conformance report list, form, detail
-│       ├── capa_*.html        # CAPA list, form, detail
-│       ├── audit_*.html       # Quality audit list, form, detail
-│       └── coa_*.html         # Certificate of analysis list, form, detail
+│   ├── qms/               # QMS templates
+│   │   ├── template_*.html    # Inspection template list, form, detail
+│   │   ├── inspection_*.html  # Quality inspection list, form, detail
+│   │   ├── ncr_*.html         # Non-conformance report list, form, detail
+│   │   ├── capa_*.html        # CAPA list, form, detail
+│   │   ├── audit_*.html       # Quality audit list, form, detail
+│   │   └── coa_*.html         # Certificate of analysis list, form, detail
+│   └── returns/           # Returns management templates
+│       ├── rma_*.html         # Return authorization list, form, detail
+│       ├── refund_*.html      # Refund list, form, detail
+│       ├── disposition_*.html # Disposition list, form, detail
+│       ├── warranty_*.html    # Warranty claim list, form, detail
+│       └── portal_settings.html # Return portal settings
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
@@ -460,7 +487,7 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 | 4 | **Demand Planning & Forecasting** | Sales forecasting, seasonality analysis, demand sensing, collaborative planning, safety stock calculation | Done |
 | 5 | **Manufacturing / Production** | Bill of materials (BOM), production scheduling, work orders, MRP, shop floor control | Done |
 | 6 | **Quality Management (QMS)** | Quality inspection, non-conformance reports, CAPA, audit management, certificates of analysis | Done |
-| 7 | **Returns Management** | RMA workflows, refund processing, disposition management, return portal, warranty claims | Planned |
+| 7 | **Returns Management** | RMA workflows, refund processing, disposition management, return portal, warranty claims | Done |
 | 8 | **Supply Chain Analytics** | Inventory dashboards, procurement analytics, logistics KPIs, financial reporting, predictive analytics | Planned |
 | 9 | **Contract & Compliance** | Contract repository, compliance tracking, trade documentation, license management, sustainability tracking | Planned |
 | 10 | **Asset Management** | Asset registry, preventive/breakdown maintenance, spare parts inventory, asset depreciation | Planned |
