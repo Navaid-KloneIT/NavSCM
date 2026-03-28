@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}Dispositions{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>Dispositions</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Returns Management</li>
+            <li class="breadcrumb-item active">Dispositions</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'returns:disposition_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by DSP # or item...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Decision</label>
+                            <select class="form-select" name="decision">
+                                <option value="">All</option>
+                                {% for value, label in decision_choices %}
+                                    <option value="{{ value }}" {% if request.GET.decision == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Condition</label>
+                            <select class="form-select" name="condition">
+                                <option value="">All</option>
+                                {% for value, label in condition_choices %}
+                                    <option value="{{ value }}" {% if request.GET.condition == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'returns:disposition_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Disposition</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Dispositions</h5>
+                <span class="text-muted">{{ dispositions|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>DSP #</th>
+                                <th>RMA #</th>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Condition</th>
+                                <th>Decision</th>
+                                <th>Status</th>
+                                <th>Assigned To</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dsp in dispositions %}
+                            <tr>
+                                <td><a href="{% url 'returns:disposition_detail' dsp.pk %}" class="fw-medium">{{ dsp.disposition_number }}</a></td>
+                                <td><a href="{% url 'returns:rma_detail' dsp.rma.pk %}">{{ dsp.rma.rma_number }}</a></td>
+                                <td>{{ dsp.item.name }}</td>
+                                <td>{{ dsp.quantity }}</td>
+                                <td>{{ dsp.get_condition_received_display }}</td>
+                                <td>{{ dsp.get_disposition_decision_display|default:"-" }}</td>
+                                <td>
+                                    {% if dsp.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% elif dsp.status == 'inspecting' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Inspecting</span>
+                                    {% elif dsp.status == 'decided' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Decided</span>
+                                    {% elif dsp.status == 'processing' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Processing</span>
+                                    {% elif dsp.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ dsp.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ dsp.assigned_to|default:"-" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'returns:disposition_detail' dsp.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if dsp.status == 'pending' %}
+                                            <a href="{% url 'returns:disposition_edit' dsp.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                            <form method="POST" action="{% url 'returns:disposition_delete' dsp.pk %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this disposition?')"><i class="ri-delete-bin-line"></i></button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-survey-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No dispositions found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.decision or request.GET.condition %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first disposition.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
