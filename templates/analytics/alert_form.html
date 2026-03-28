@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Supply Chain Analytics</li>
+            <li class="breadcrumb-item"><a href="{% url 'analytics:alert_list' %}">Predictive Alerts</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Alert Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Alert Type *</label>
+                            {{ form.alert_type }}
+                            {% if form.alert_type.errors %}<div class="text-danger small">{{ form.alert_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Severity *</label>
+                            {{ form.severity }}
+                            {% if form.severity.errors %}<div class="text-danger small">{{ form.severity.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Affected Item</label>
+                            {{ form.affected_item }}
+                            {% if form.affected_item.errors %}<div class="text-danger small">{{ form.affected_item.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Affected Vendor</label>
+                            {{ form.affected_vendor }}
+                            {% if form.affected_vendor.errors %}<div class="text-danger small">{{ form.affected_vendor.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Predicted Date *</label>
+                            {{ form.predicted_date }}
+                            {% if form.predicted_date.errors %}<div class="text-danger small">{{ form.predicted_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Confidence Level *</label>
+                            {{ form.confidence_level }}
+                            {% if form.confidence_level.errors %}<div class="text-danger small">{{ form.confidence_level.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Impact Description</label>
+                            {{ form.impact_description }}
+                            {% if form.impact_description.errors %}<div class="text-danger small">{{ form.impact_description.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Recommended Action</label>
+                            {{ form.recommended_action }}
+                            {% if form.recommended_action.errors %}<div class="text-danger small">{{ form.recommended_action.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Alert</button>
+                    {% if alert %}
+                        <a href="{% url 'analytics:alert_detail' alert.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'analytics:alert_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
