@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Financial Reports{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Financial Reports</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'analytics:dashboard' %}">Supply Chain Analytics</a></li>
+            <li class="breadcrumb-item active">Financial Reports</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'analytics:financial_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by report number...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Report Type</label>
+                            <select class="form-select" name="report_type">
+                                <option value="">All</option>
+                                {% for value, label in type_choices %}
+                                <option value="{{ value }}" {% if request.GET.report_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'analytics:financial_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Report</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Financial Reports Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Financial Reports</h5>
+                <span class="text-muted">{{ reports|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Report #</th>
+                                <th>Type</th>
+                                <th>Period</th>
+                                <th>Revenue</th>
+                                <th>COGS</th>
+                                <th>Gross Margin %</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in reports %}
+                            <tr>
+                                <td><a href="{% url 'analytics:financial_detail' report.pk %}" class="fw-medium">{{ report.report_number }}</a></td>
+                                <td>{{ report.get_report_type_display }}</td>
+                                <td>{{ report.start_date|date:"M d, Y" }} - {{ report.end_date|date:"M d, Y" }}</td>
+                                <td>{{ report.total_revenue|default:"-" }}</td>
+                                <td>{{ report.total_cogs|default:"-" }}</td>
+                                <td>{{ report.gross_margin_percentage|default:"-" }}%</td>
+                                <td>
+                                    {% if report.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> {{ report.get_status_display }}</span>
+                                    {% elif report.status == 'generated' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> {{ report.get_status_display }}</span>
+                                    {% elif report.status == 'reviewed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> {{ report.get_status_display }}</span>
+                                    {% elif report.status == 'archived' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ report.get_status_display }}</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ report.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'analytics:financial_detail' report.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if report.status == 'draft' %}
+                                        <a href="{% url 'analytics:financial_edit' report.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                        <form method="POST" action="{% url 'analytics:financial_delete' report.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this financial report?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-money-dollar-circle-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No Financial Reports found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.report_type %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first financial report.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
