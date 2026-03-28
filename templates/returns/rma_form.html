@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Returns Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'returns:rma_list' %}">RMAs</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>RMA Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Customer *</label>
+                            {{ form.customer }}
+                            {% if form.customer.errors %}<div class="text-danger small">{{ form.customer.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Order</label>
+                            {{ form.order }}
+                            {% if form.order.errors %}<div class="text-danger small">{{ form.order.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Return Type *</label>
+                            {{ form.return_type }}
+                            {% if form.return_type.errors %}<div class="text-danger small">{{ form.return_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reason Category *</label>
+                            {{ form.reason_category }}
+                            {% if form.reason_category.errors %}<div class="text-danger small">{{ form.reason_category.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Priority *</label>
+                            {{ form.priority }}
+                            {% if form.priority.errors %}<div class="text-danger small">{{ form.priority.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Requested Date</label>
+                            {{ form.requested_date }}
+                            {% if form.requested_date.errors %}<div class="text-danger small">{{ form.requested_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <!-- Line Items Formset -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Return Items</h5>
+                </div>
+                <div class="card-body">
+                    {{ formset.management_form }}
+                    <div id="formset-container">
+                        {% for item_form in formset %}
+                        <div class="formset-row border rounded p-3 mb-3 {% if item_form.instance.pk and item_form.DELETE.value %}d-none{% endif %}">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Item *</label>
+                                    {{ item_form.item }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Quantity *</label>
+                                    {{ item_form.quantity }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Condition</label>
+                                    {{ item_form.condition }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Reason</label>
+                                    {{ item_form.reason }}
+                                </div>
+                            </div>
+                            {% if item_form.instance.pk %}
+                                <div class="mt-2">{{ item_form.DELETE }} <label class="form-check-label">Remove</label></div>
+                            {% endif %}
+                            {{ item_form.id }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save RMA</button>
+                    {% if rma %}
+                        <a href="{% url 'returns:rma_detail' rma.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'returns:rma_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
