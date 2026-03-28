@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Return Portal Settings{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>Return Portal Settings</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Returns Management</li>
+            <li class="breadcrumb-item active">Portal Settings</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Portal Configuration</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mb-3">
+                                {{ form.is_portal_enabled }}
+                                <label class="form-check-label ms-2">Enable Return Portal</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mb-3">
+                                {{ form.requires_approval }}
+                                <label class="form-check-label ms-2">Requires Approval</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mb-3">
+                                {{ form.auto_generate_labels }}
+                                <label class="form-check-label ms-2">Auto-Generate Return Labels</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Return Window (Days)</label>
+                            {{ form.return_window_days }}
+                            {% if form.return_window_days.errors %}<div class="text-danger small">{{ form.return_window_days.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Restocking Fee (%)</label>
+                            {{ form.restocking_fee_percentage }}
+                            {% if form.restocking_fee_percentage.errors %}<div class="text-danger small">{{ form.restocking_fee_percentage.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Return Policy Text</label>
+                            {{ form.return_policy_text }}
+                            {% if form.return_policy_text.errors %}<div class="text-danger small">{{ form.return_policy_text.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Settings</button>
+                    <a href="{% url 'returns:rma_list' %}" class="btn btn-light w-100">Back to RMAs</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
