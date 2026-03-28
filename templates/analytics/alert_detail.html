@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Alert: {{ alert.alert_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ alert.alert_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Supply Chain Analytics</li>
+            <li class="breadcrumb-item"><a href="{% url 'analytics:alert_list' %}">Predictive Alerts</a></li>
+            <li class="breadcrumb-item active">{{ alert.alert_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Alert Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Alert #</th><td>{{ alert.alert_number }}</td></tr>
+                            <tr><th class="ps-3">Title</th><td>{{ alert.title }}</td></tr>
+                            <tr><th class="ps-3">Type</th><td>{{ alert.get_alert_type_display }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Severity</th>
+                                <td>
+                                    {% if alert.severity == 'critical' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Critical</span>
+                                    {% elif alert.severity == 'high' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> High</span>
+                                    {% elif alert.severity == 'medium' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Medium</span>
+                                    {% elif alert.severity == 'low' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Low</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ alert.get_severity_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if alert.status == 'new' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> New</span>
+                                    {% elif alert.status == 'analyzing' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Analyzing</span>
+                                    {% elif alert.status == 'confirmed' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Confirmed</span>
+                                    {% elif alert.status == 'resolved' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Resolved</span>
+                                    {% elif alert.status == 'dismissed' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Dismissed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ alert.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Affected Item</th><td>{{ alert.affected_item.name|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Affected Vendor</th><td>{{ alert.affected_vendor.name|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Predicted Date</th><td>{{ alert.predicted_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Confidence Level</th><td>{{ alert.confidence_level }}%</td></tr>
+                            <tr><th class="ps-3">Description</th><td>{{ alert.description|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Impact Description</th><td>{{ alert.impact_description|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Recommended Action</th><td>{{ alert.recommended_action|default:"-" }}</td></tr>
+                            {% if alert.status == 'resolved' %}
+                                <tr><th class="ps-3">Resolution Notes</th><td>{{ alert.resolution_notes|default:"-" }}</td></tr>
+                            {% endif %}
+                            <tr><th class="ps-3">Resolved By</th><td>{{ alert.resolved_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Resolved Date</th><td>{{ alert.resolved_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ alert.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ alert.created_at|date:"M d, Y H:i" }}</td></tr>
+                            <tr><th class="ps-3">Days Since Created</th><td>{{ alert.days_since_created }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if alert.status == 'new' %}
+                    <a href="{% url 'analytics:alert_edit' alert.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'analytics:alert_analyze' alert.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-search-eye-line me-1"></i> Analyze</button>
+                    </form>
+                    <form method="POST" action="{% url 'analytics:alert_dismiss' alert.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2" onclick="return confirm('Dismiss this alert?')"><i class="ri-close-circle-line me-1"></i> Dismiss</button>
+                    </form>
+                    <form method="POST" action="{% url 'analytics:alert_delete' alert.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this alert?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif alert.status == 'analyzing' %}
+                    <form method="POST" action="{% url 'analytics:alert_confirm' alert.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-check-line me-1"></i> Confirm</button>
+                    </form>
+                    <form method="POST" action="{% url 'analytics:alert_dismiss' alert.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2" onclick="return confirm('Dismiss this alert?')"><i class="ri-close-circle-line me-1"></i> Dismiss</button>
+                    </form>
+                {% elif alert.status == 'confirmed' %}
+                    <form method="POST" action="{% url 'analytics:alert_resolve' alert.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Resolve</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'analytics:alert_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
