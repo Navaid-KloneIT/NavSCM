@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Refund: {{ refund.refund_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ refund.refund_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Returns Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'returns:refund_list' %}">Refunds</a></li>
+            <li class="breadcrumb-item active">{{ refund.refund_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Refund Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Refund #</th><td>{{ refund.refund_number }}</td></tr>
+                            <tr><th class="ps-3">RMA</th><td><a href="{% url 'returns:rma_detail' refund.rma.pk %}">{{ refund.rma.rma_number }}</a></td></tr>
+                            <tr><th class="ps-3">Customer</th><td>{{ refund.rma.customer }}</td></tr>
+                            <tr><th class="ps-3">Refund Type</th><td>{{ refund.get_refund_type_display }}</td></tr>
+                            <tr><th class="ps-3">Refund Method</th><td>{{ refund.get_refund_method_display }}</td></tr>
+                            <tr><th class="ps-3">Amount</th><td>{{ refund.currency }} {{ refund.amount }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if refund.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif refund.status == 'pending_approval' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Pending Approval</span>
+                                    {% elif refund.status == 'approved' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Approved</span>
+                                    {% elif refund.status == 'processing' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Processing</span>
+                                    {% elif refund.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% elif refund.status == 'failed' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Failed</span>
+                                    {% elif refund.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ refund.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Approved By</th><td>{{ refund.approved_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Processed Date</th><td>{{ refund.processed_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Transaction Reference</th><td>{{ refund.transaction_reference|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ refund.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ refund.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ refund.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if refund.status == 'draft' %}
+                    <a href="{% url 'returns:refund_edit' refund.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'returns:refund_submit' refund.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-send-plane-line me-1"></i> Submit for Approval</button>
+                    </form>
+                    <form method="POST" action="{% url 'returns:refund_delete' refund.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this refund?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif refund.status == 'pending_approval' %}
+                    <form method="POST" action="{% url 'returns:refund_approve' refund.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-line me-1"></i> Approve</button>
+                    </form>
+                {% elif refund.status == 'approved' %}
+                    <form method="POST" action="{% url 'returns:refund_process' refund.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-loader-4-line me-1"></i> Process</button>
+                    </form>
+                {% elif refund.status == 'processing' %}
+                    <form method="POST" action="{% url 'returns:refund_complete' refund.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-checkbox-circle-line me-1"></i> Complete</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'returns:refund_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
