@@ -1306,6 +1306,121 @@
                 </a>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Supply Chain Analytics <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Analytics Dashboard -->
+            <li class="nav-item">
+                <a href="{% url 'analytics:dashboard' %}" class="menu-link {% if request.resolver_match.url_name == 'dashboard' and request.resolver_match.namespace == 'analytics' %}active{% endif %}">
+                    <i class="ri-dashboard-3-line"></i>
+                    <span class="menu-text">Analytics Dashboard</span>
+                </a>
+            </li>
+
+            <!-- Inventory Analytics -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'inventory_list,inventory_create,inventory_detail,inventory_edit' and request.resolver_match.namespace == 'analytics' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-bar-chart-2-line"></i>
+                    <span class="menu-text">Inventory Analytics</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'analytics:inventory_list' %}" class="menu-link {% if request.resolver_match.url_name == 'inventory_list' or request.resolver_match.url_name == 'inventory_detail' or request.resolver_match.url_name == 'inventory_edit' %}{% if request.resolver_match.namespace == 'analytics' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'analytics:inventory_create' %}" class="menu-link {% if request.resolver_match.url_name == 'inventory_create' and request.resolver_match.namespace == 'analytics' %}active{% endif %}">
+                            <span class="menu-text">New Report</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Procurement Analytics -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'procurement_list,procurement_create,procurement_detail,procurement_edit' and request.resolver_match.namespace == 'analytics' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-pie-chart-2-line"></i>
+                    <span class="menu-text">Procurement Analytics</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'analytics:procurement_list' %}" class="menu-link {% if request.resolver_match.url_name == 'procurement_list' or request.resolver_match.url_name == 'procurement_detail' or request.resolver_match.url_name == 'procurement_edit' %}{% if request.resolver_match.namespace == 'analytics' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'analytics:procurement_create' %}" class="menu-link {% if request.resolver_match.url_name == 'procurement_create' and request.resolver_match.namespace == 'analytics' %}active{% endif %}">
+                            <span class="menu-text">New Report</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Logistics KPIs -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'logistics_list,logistics_create,logistics_detail,logistics_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-truck-line"></i>
+                    <span class="menu-text">Logistics KPIs</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'analytics:logistics_list' %}" class="menu-link {% if request.resolver_match.url_name == 'logistics_list' or request.resolver_match.url_name == 'logistics_detail' or request.resolver_match.url_name == 'logistics_edit' %}active{% endif %}">
+                            <span class="menu-text">All Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'analytics:logistics_create' %}" class="menu-link {% if request.resolver_match.url_name == 'logistics_create' %}active{% endif %}">
+                            <span class="menu-text">New Report</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Financial Reports -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'financial_list,financial_create,financial_detail,financial_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-money-dollar-circle-line"></i>
+                    <span class="menu-text">Financial Reports</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'analytics:financial_list' %}" class="menu-link {% if request.resolver_match.url_name == 'financial_list' or request.resolver_match.url_name == 'financial_detail' or request.resolver_match.url_name == 'financial_edit' %}active{% endif %}">
+                            <span class="menu-text">All Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'analytics:financial_create' %}" class="menu-link {% if request.resolver_match.url_name == 'financial_create' %}active{% endif %}">
+                            <span class="menu-text">New Report</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Predictive Alerts -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'alert_list,alert_create,alert_detail,alert_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-lightbulb-flash-line"></i>
+                    <span class="menu-text">Predictive Alerts</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'analytics:alert_list' %}" class="menu-link {% if request.resolver_match.url_name == 'alert_list' or request.resolver_match.url_name == 'alert_detail' or request.resolver_match.url_name == 'alert_edit' %}active{% endif %}">
+                            <span class="menu-text">All Alerts</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'analytics:alert_create' %}" class="menu-link {% if request.resolver_match.url_name == 'alert_create' %}active{% endif %}">
+                            <span class="menu-text">New Alert</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Audit &amp; Security <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Audit Logs -->
