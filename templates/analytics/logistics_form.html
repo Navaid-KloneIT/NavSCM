@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'analytics:logistics_list' %}">Supply Chain Analytics</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'analytics:logistics_list' %}">Logistics KPIs</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Report Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Report Type *</label>
+                            {{ form.report_type }}
+                            {% if form.report_type.errors %}<div class="text-danger small">{{ form.report_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6">
+                            <label class="form-label">Start Date *</label>
+                            {{ form.start_date }}
+                            {% if form.start_date.errors %}<div class="text-danger small">{{ form.start_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">End Date *</label>
+                            {{ form.end_date }}
+                            {% if form.end_date.errors %}<div class="text-danger small">{{ form.end_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carrier Breakdown Formset -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Carrier Breakdown</h5>
+                    <button type="button" class="btn btn-sm btn-soft-success" id="add-item-btn">
+                        <i class="ri-add-line me-1"></i> Add Carrier
+                    </button>
+                </div>
+                <div class="card-body">
+                    {{ formset.management_form }}
+                    <div id="formset-container">
+                        {% for item_form in formset %}
+                        <div class="formset-row border rounded p-3 mb-3">
+                            <div class="row g-3">
+                                {% if item_form.instance.pk %}{{ item_form.id }}{% endif %}
+                                <div class="col-md-4">
+                                    <label class="form-label">Carrier</label>
+                                    {{ item_form.carrier }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Shipments</label>
+                                    {{ item_form.shipment_count }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">On-Time</label>
+                                    {{ item_form.on_time_count }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Late</label>
+                                    {{ item_form.late_count }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">On-Time Rate</label>
+                                    {{ item_form.on_time_rate }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Total Cost</label>
+                                    {{ item_form.total_cost }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Avg Cost/Shipment</label>
+                                    {{ item_form.avg_cost_per_shipment }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Avg Transit Days</label>
+                                    {{ item_form.avg_transit_days }}
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <div class="form-check">
+                                        {{ item_form.DELETE }}
+                                        <label class="form-check-label text-danger">Remove</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Report</button>
+                    {% if report %}
+                        <a href="{% url 'analytics:logistics_detail' report.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'analytics:logistics_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('formset-container');
+    const addBtn = document.getElementById('add-item-btn');
+    const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+
+    addBtn.addEventListener('click', function() {
+        const formCount = parseInt(totalForms.value);
+        const lastForm = container.querySelector('.formset-row:last-child');
+        if (!lastForm) return;
+
+        const newForm = lastForm.cloneNode(true);
+        newForm.innerHTML = newForm.innerHTML.replace(/items-\d+-/g, 'items-' + formCount + '-');
+        newForm.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(i => i.value = '');
+        newForm.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+        newForm.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+        newForm.querySelectorAll('textarea').forEach(t => t.value = '');
+        const idField = newForm.querySelector('input[name$="-id"]');
+        if (idField) idField.value = '';
+        container.appendChild(newForm);
+        totalForms.value = formCount + 1;
+    });
+});
+</script>
+{% endblock %}
