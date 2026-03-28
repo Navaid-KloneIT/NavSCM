@@ -34,7 +34,7 @@ Manages the purchasing of goods and services to ensure cost-effectiveness and ti
 - **Vendor Management** - Vendor master data with contact details, payment terms, tax ID, and activity tracking
 - **Item Catalog** - Categorized item/service catalog with unit of measure, pricing, and active/inactive status
 
-### Module 2: Supplier Relationship Management (SRM)
+### Module 3: Supplier Relationship Management (SRM)
 
 Manages the full supplier lifecycle from onboarding and qualification through performance evaluation, contract management, and risk mitigation.
 
@@ -44,7 +44,7 @@ Manages the full supplier lifecycle from onboarding and qualification through pe
 - **Supplier Catalog Management** - Vendor-specific product catalogs with supplier part numbers, pricing, minimum order quantities, and lead times linked to the procurement item catalog
 - **Risk Assessment** - Comprehensive supplier risk evaluation across financial, geopolitical, compliance, and operational dimensions with likelihood/impact scoring, risk factor identification, and mitigation action tracking with assignments and due dates
 
-### Module 3: Inventory Management
+### Module 4: Inventory Management
 
 Manages stock levels, warehouse operations, and inventory valuation across multiple locations.
 
@@ -55,7 +55,7 @@ Manages stock levels, warehouse operations, and inventory valuation across multi
 - **Reorder Automation** - Configurable reorder rules with safety stock, lead times, and auto-generated reorder suggestions
 - **Inventory Valuation** - Stock valuation using FIFO, LIFO, or Weighted Average methods with per-item breakdown
 
-### Module 4: Warehouse Management System (WMS)
+### Module 5: Warehouse Management System (WMS)
 
 Controls the physical operations within the warehouse.
 
@@ -65,7 +65,7 @@ Controls the physical operations within the warehouse.
 - **Cycle Counting** - Scheduled count plans with configurable frequency (daily, weekly, monthly, quarterly) and count types (ABC analysis, location-based, random sample, full count), individual cycle count sessions with item-level variance tracking
 - **Yard Management** - Yard location mapping (dock doors, parking spots, staging areas, gates) with occupancy tracking, and yard visit management for trucks/trailers with full status workflow (expected → checked in → at dock → loading/unloading → completed → departed)
 
-### Module 5: Order Management System (OMS)
+### Module 6: Order Management System (OMS)
 
 Centralizes the processing of orders from various sales channels.
 
@@ -77,7 +77,7 @@ Centralizes the processing of orders from various sales channels.
 - **Backorder Management** - Automated tracking of out-of-stock order items with fulfillment status (pending → partially fulfilled → fulfilled), expected dates, and cancel workflows
 - **Customer Notifications** - Notification management for order lifecycle events (confirmation, validation, shipping, delivery, backorder alerts, cancellation) via email, SMS, or both with send status tracking
 
-### Module 6: Transportation Management System (TMS)
+### Module 7: Transportation Management System (TMS)
 
 Plans, executes, and optimizes the physical movement of goods.
 
@@ -88,7 +88,7 @@ Plans, executes, and optimizes the physical movement of goods.
 - **Freight Audit & Payment** - Freight bill verification against shipments with line-item charge breakdown (base freight, fuel surcharge, handling, insurance, customs, toll, accessorial), audit workflow (draft → pending review → approved/disputed → paid), dispute management, and payment reference tracking
 - **Load Optimization** - Cargo loading plans for vehicles/containers (20ft/40ft trucks, containers, vans, flatbeds, refrigerated, bulk) with weight/volume capacity tracking, utilization percentage calculation, load sequencing, and loading workflow (draft → planned → loading → loaded → closed)
 
-### Module 7: Demand Planning & Forecasting
+### Module 8: Demand Planning & Forecasting
 
 Uses data to predict future demand and align supply accordingly.
 
@@ -98,7 +98,7 @@ Uses data to predict future demand and align supply accordingly.
 - **Collaborative Planning** - Cross-functional planning interface for sales, marketing, finance, and operations teams with plan types (sales/marketing/finance/operations/consensus), approval workflow (draft → submitted → review → approved → finalized), optional forecast linking, line-item planning, and threaded discussion comments
 - **Safety Stock Calculation** - Dynamic buffer stock calculation using multiple methods (fixed quantity, percentage of demand, statistical Z-score, demand-based) with per-item/warehouse inputs (average demand, demand std deviation, lead time, lead time variability, service level), automated safety stock and reorder point computation, and one-click application to inventory reorder rules
 
-### Module 8: Manufacturing / Production
+### Module 9: Manufacturing / Production
 
 Manages the transformation of raw materials into finished goods for manufacturing tenants.
 
@@ -109,7 +109,7 @@ Manages the transformation of raw materials into finished goods for manufacturin
 - **Material Resource Planning (MRP)** - Automated material requirement calculation that explodes BOMs from active work orders, checks on-hand inventory and open purchase orders, computes net requirements, and generates planned order dates within a configurable planning horizon
 - **Shop Floor Control** - Production activity logging with log types (production, downtime, setup, maintenance, quality check), operator assignment, start/end time tracking, quantity produced vs. rejected, duration calculation, and yield rate monitoring
 
-### Module 9: Quality Management System (QMS)
+### Module 10: Quality Management System (QMS)
 
 Ensures products meet quality standards and regulatory requirements.
 
@@ -119,7 +119,7 @@ Ensures products meet quality standards and regulatory requirements.
 - **Audit Management** - Internal and external audit scheduling with types (internal, external, supplier, process, product, system), status workflow (draft → scheduled → in progress → completed → closed), finding classification (observation, minor/major non-conformance, opportunity for improvement, positive), severity tracking, and corrective action assignment
 - **Certificate of Analysis (CoA)** - Batch compliance certificates with test results (test name, method, specification, measured result, pass/fail), approval workflow (draft → pending review → approved → issued/revoked), production and expiry date tracking, and all-tests-passed validation
 
-### Module 10: Returns Management (Reverse Logistics)
+### Module 11: Returns Management (Reverse Logistics)
 
 Handles the return of products from customers back to the warehouse.
 
@@ -481,19 +481,23 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 
 | # | Module | Description | Status |
 |---|--------|-------------|--------|
-| 1 | **Warehouse Management (WMS)** | Inbound/outbound operations, bin/location management, cycle counting, yard management | Done |
-| 2 | **Order Management (OMS)** | Order capture, validation, allocation, backorder management, customer notifications | Done |
-| 3 | **Transportation Management (TMS)** | Route planning, freight audit, carrier management, shipment tracking, load optimization | Done |
-| 4 | **Demand Planning & Forecasting** | Sales forecasting, seasonality analysis, demand sensing, collaborative planning, safety stock calculation | Done |
-| 5 | **Manufacturing / Production** | Bill of materials (BOM), production scheduling, work orders, MRP, shop floor control | Done |
-| 6 | **Quality Management (QMS)** | Quality inspection, non-conformance reports, CAPA, audit management, certificates of analysis | Done |
-| 7 | **Returns Management** | RMA workflows, refund processing, disposition management, return portal, warranty claims | Done |
-| 8 | **Supply Chain Analytics** | Inventory dashboards, procurement analytics, logistics KPIs, financial reporting, predictive analytics | Planned |
-| 9 | **Contract & Compliance** | Contract repository, compliance tracking, trade documentation, license management, sustainability tracking | Planned |
-| 10 | **Asset Management** | Asset registry, preventive/breakdown maintenance, spare parts inventory, asset depreciation | Planned |
-| 11 | **Labor Management** | Labor planning, time & attendance, task assignment, performance tracking, payroll integration | Planned |
-| 12 | **Cold Chain Management** | Temperature monitoring (IoT), excursion management, cold storage inventory, compliance reporting | Planned |
-| 13 | **Customer Portal** | Order tracking, account management, document retrieval, support ticketing, catalog browsing | Planned |
-| 14 | **3PL Management** | Client billing, inventory segregation, SLA management, client integration, warehouse rental | Planned |
-| 15 | **Finance & Accounting Integration** | Accounts payable/receivable, landed cost calculation, budgeting, tax management | Planned |
-| 16 | **Integration & API Gateway** | ERP connectors (SAP, Oracle), e-commerce integration, IoT gateway, EDI, webhooks | Planned |
+| 1 | **Multi-Tenant Administration (Super Admin)** | Tenant onboarding, subscription management, RBAC, theme customization, audit logs & security | Done |
+| 2 | **Procurement Management** | Purchase requisitions, RFQs, purchase orders, vendor portal, invoice reconciliation, vendor & item management | Done |
+| 3 | **Supplier Relationship Management (SRM)** | Supplier onboarding, scorecards, contract management, supplier catalogs, risk assessment | Done |
+| 4 | **Inventory Management** | Warehouse management, stock control, warehouse transfers, stock adjustments, reorder automation, inventory valuation | Done |
+| 5 | **Warehouse Management (WMS)** | Inbound/outbound operations, bin/location management, cycle counting, yard management | Done |
+| 6 | **Order Management (OMS)** | Order capture, validation, allocation, backorder management, customer notifications | Done |
+| 7 | **Transportation Management (TMS)** | Route planning, freight audit, carrier management, shipment tracking, load optimization | Done |
+| 8 | **Demand Planning & Forecasting** | Sales forecasting, seasonality analysis, demand sensing, collaborative planning, safety stock calculation | Done |
+| 9 | **Manufacturing / Production** | Bill of materials (BOM), production scheduling, work orders, MRP, shop floor control | Done |
+| 10 | **Quality Management (QMS)** | Quality inspection, non-conformance reports, CAPA, audit management, certificates of analysis | Done |
+| 11 | **Returns Management** | RMA workflows, refund processing, disposition management, return portal, warranty claims | Done |
+| 12 | **Supply Chain Analytics** | Inventory dashboards, procurement analytics, logistics KPIs, financial reporting, predictive analytics | Planned |
+| 13 | **Contract & Compliance** | Contract repository, compliance tracking, trade documentation, license management, sustainability tracking | Planned |
+| 14 | **Asset Management** | Asset registry, preventive/breakdown maintenance, spare parts inventory, asset depreciation | Planned |
+| 15 | **Labor Management** | Labor planning, time & attendance, task assignment, performance tracking, payroll integration | Planned |
+| 16 | **Cold Chain Management** | Temperature monitoring (IoT), excursion management, cold storage inventory, compliance reporting | Planned |
+| 17 | **Customer Portal** | Order tracking, account management, document retrieval, support ticketing, catalog browsing | Planned |
+| 18 | **3PL Management** | Client billing, inventory segregation, SLA management, client integration, warehouse rental | Planned |
+| 19 | **Finance & Accounting Integration** | Accounts payable/receivable, landed cost calculation, budgeting, tax management | Planned |
+| 20 | **Integration & API Gateway** | ERP connectors (SAP, Oracle), e-commerce integration, IoT gateway, EDI, webhooks | Planned |
