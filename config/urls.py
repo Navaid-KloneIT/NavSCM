@@ -21,6 +21,7 @@ urlpatterns = [
     path('manufacturing/', include('apps.manufacturing.urls', namespace='manufacturing')),
     path('qms/', include('apps.qms.urls', namespace='qms')),
     path('returns/', include('apps.returns.urls', namespace='returns')),
+    path('analytics/', include('apps.analytics.urls', namespace='analytics')),
     path('', include('apps.dashboard.urls')),
 ]
 
