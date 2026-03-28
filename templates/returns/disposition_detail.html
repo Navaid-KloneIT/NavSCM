@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Disposition: {{ disposition.disposition_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ disposition.disposition_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Returns Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'returns:disposition_list' %}">Dispositions</a></li>
+            <li class="breadcrumb-item active">{{ disposition.disposition_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Disposition Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Disposition #</th><td>{{ disposition.disposition_number }}</td></tr>
+                            <tr><th class="ps-3">RMA</th><td><a href="{% url 'returns:rma_detail' disposition.rma.pk %}">{{ disposition.rma.rma_number }}</a></td></tr>
+                            <tr><th class="ps-3">RMA Line Item</th><td>{{ disposition.rma_item|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Item</th><td>{{ disposition.item.name }}</td></tr>
+                            <tr><th class="ps-3">Quantity</th><td>{{ disposition.quantity }}</td></tr>
+                            <tr><th class="ps-3">Condition Received</th><td>{{ disposition.get_condition_received_display }}</td></tr>
+                            <tr><th class="ps-3">Disposition Decision</th><td>{{ disposition.get_disposition_decision_display|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if disposition.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% elif disposition.status == 'inspecting' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Inspecting</span>
+                                    {% elif disposition.status == 'decided' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Decided</span>
+                                    {% elif disposition.status == 'processing' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Processing</span>
+                                    {% elif disposition.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ disposition.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Assigned To</th><td>{{ disposition.assigned_to|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Inspection Notes</th><td>{{ disposition.inspection_notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Decision Notes</th><td>{{ disposition.decision_notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Completed Date</th><td>{{ disposition.completed_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ disposition.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ disposition.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if disposition.status == 'pending' %}
+                    <a href="{% url 'returns:disposition_edit' disposition.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'returns:disposition_inspect' disposition.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-search-eye-line me-1"></i> Start Inspection</button>
+                    </form>
+                    <form method="POST" action="{% url 'returns:disposition_delete' disposition.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this disposition?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif disposition.status == 'inspecting' %}
+                    <form method="POST" action="{% url 'returns:disposition_decide' disposition.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-checkbox-circle-line me-1"></i> Record Decision</button>
+                    </form>
+                {% elif disposition.status == 'decided' %}
+                    <form method="POST" action="{% url 'returns:disposition_process' disposition.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-loader-4-line me-1"></i> Process</button>
+                    </form>
+                {% elif disposition.status == 'processing' %}
+                    <form method="POST" action="{% url 'returns:disposition_complete' disposition.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Complete</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'returns:disposition_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
