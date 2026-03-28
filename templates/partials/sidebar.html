@@ -1212,6 +1212,100 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Returns Management <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Return Authorizations -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'rma_list,rma_create,rma_detail,rma_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-arrow-go-back-line"></i>
+                    <span class="menu-text">Return Auth (RMA)</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'returns:rma_list' %}" class="menu-link {% if request.resolver_match.url_name == 'rma_list' or request.resolver_match.url_name == 'rma_detail' or request.resolver_match.url_name == 'rma_edit' %}active{% endif %}">
+                            <span class="menu-text">All RMAs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'returns:rma_create' %}" class="menu-link {% if request.resolver_match.url_name == 'rma_create' %}active{% endif %}">
+                            <span class="menu-text">New RMA</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Refund Processing -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'refund_list,refund_create,refund_detail,refund_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-refund-2-line"></i>
+                    <span class="menu-text">Refund Processing</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'returns:refund_list' %}" class="menu-link {% if request.resolver_match.url_name == 'refund_list' or request.resolver_match.url_name == 'refund_detail' or request.resolver_match.url_name == 'refund_edit' %}active{% endif %}">
+                            <span class="menu-text">All Refunds</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'returns:refund_create' %}" class="menu-link {% if request.resolver_match.url_name == 'refund_create' %}active{% endif %}">
+                            <span class="menu-text">New Refund</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Dispositions -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'disposition_list,disposition_create,disposition_detail,disposition_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-survey-line"></i>
+                    <span class="menu-text">Dispositions</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'returns:disposition_list' %}" class="menu-link {% if request.resolver_match.url_name == 'disposition_list' or request.resolver_match.url_name == 'disposition_detail' or request.resolver_match.url_name == 'disposition_edit' %}active{% endif %}">
+                            <span class="menu-text">All Dispositions</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'returns:disposition_create' %}" class="menu-link {% if request.resolver_match.url_name == 'disposition_create' %}active{% endif %}">
+                            <span class="menu-text">New Disposition</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Warranty Claims -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'warranty_list,warranty_create,warranty_detail,warranty_edit' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-shield-check-line"></i>
+                    <span class="menu-text">Warranty Claims</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'returns:warranty_list' %}" class="menu-link {% if request.resolver_match.url_name == 'warranty_list' or request.resolver_match.url_name == 'warranty_detail' or request.resolver_match.url_name == 'warranty_edit' %}active{% endif %}">
+                            <span class="menu-text">All Claims</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'returns:warranty_create' %}" class="menu-link {% if request.resolver_match.url_name == 'warranty_create' %}active{% endif %}">
+                            <span class="menu-text">New Claim</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Return Portal Settings -->
+            <li class="nav-item">
+                <a href="{% url 'returns:portal_settings' %}" class="menu-link {% if request.resolver_match.url_name == 'portal_settings' %}active{% endif %}">
+                    <i class="ri-settings-3-line"></i>
+                    <span class="menu-text">Return Settings</span>
+                </a>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Audit &amp; Security <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Audit Logs -->
