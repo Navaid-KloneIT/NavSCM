@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Inventory Report: {{ report.report_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ report.report_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Supply Chain Analytics</li>
+            <li class="breadcrumb-item"><a href="{% url 'analytics:inventory_list' %}">Inventory Analytics</a></li>
+            <li class="breadcrumb-item active">{{ report.report_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Report Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Report #</th><td>{{ report.report_number }}</td></tr>
+                            <tr><th class="ps-3">Type</th><td>{{ report.get_report_type_display }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if report.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif report.status == 'generated' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Generated</span>
+                                    {% elif report.status == 'reviewed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Reviewed</span>
+                                    {% elif report.status == 'archived' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Archived</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ report.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Period</th><td>{{ report.start_date|date:"M d, Y" }} - {{ report.end_date|date:"M d, Y" }}</td></tr>
+                            <tr><th class="ps-3">Total Items</th><td>{{ report.total_items|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Total Value</th><td>{{ report.total_value|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Turnover Rate</th><td>{{ report.turnover_rate|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Dead Stock Count</th><td>{{ report.dead_stock_count|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Dead Stock Value</th><td>{{ report.dead_stock_value|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Aging 0-30 Days</th><td>{{ report.aging_30_count|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Aging 31-60 Days</th><td>{{ report.aging_60_count|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Aging 61-90 Days</th><td>{{ report.aging_90_count|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Aging 90+ Days</th><td>{{ report.aging_90_plus_count|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ report.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ report.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ report.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Line Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Line Items</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Warehouse</th>
+                                <th>Qty On Hand</th>
+                                <th>Qty Reserved</th>
+                                <th>Unit Cost</th>
+                                <th>Total Value</th>
+                                <th>Days Idle</th>
+                                <th>Turnover Rate</th>
+                                <th>Dead Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.item }}</td>
+                                <td>{{ item.warehouse|default:"-" }}</td>
+                                <td>{{ item.quantity_on_hand|default:"-" }}</td>
+                                <td>{{ item.quantity_reserved|default:"-" }}</td>
+                                <td>{{ item.unit_cost|default:"-" }}</td>
+                                <td>{{ item.total_value|default:"-" }}</td>
+                                <td>{{ item.days_since_last_movement|default:"-" }}</td>
+                                <td>{{ item.turnover_rate|default:"-" }}</td>
+                                <td>
+                                    {% if item.is_dead_stock %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Yes</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-bar-chart-2-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No line items.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if report.status == 'draft' %}
+                    <a href="{% url 'analytics:inventory_edit' report.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'analytics:inventory_generate' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-play-line me-1"></i> Generate</button>
+                    </form>
+                    <form method="POST" action="{% url 'analytics:inventory_delete' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this report?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif report.status == 'generated' %}
+                    <form method="POST" action="{% url 'analytics:inventory_review' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Review</button>
+                    </form>
+                {% elif report.status == 'reviewed' %}
+                    <form method="POST" action="{% url 'analytics:inventory_archive' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2"><i class="ri-archive-line me-1"></i> Archive</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'analytics:inventory_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
