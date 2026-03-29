@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Compliance: {{ record.compliance_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ record.compliance_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Contract & Compliance</li>
+            <li class="breadcrumb-item"><a href="{% url 'contracts:compliance_list' %}">Compliance</a></li>
+            <li class="breadcrumb-item active">{{ record.compliance_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Compliance Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Record #</th><td>{{ record.compliance_number }}</td></tr>
+                            <tr><th class="ps-3">Regulation</th><td>{{ record.regulation_name }}</td></tr>
+                            <tr><th class="ps-3">Type</th><td>{{ record.get_regulation_type_display }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Risk Level</th>
+                                <td>
+                                    {% if record.risk_level == 'critical' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Critical</span>
+                                    {% elif record.risk_level == 'high' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> High</span>
+                                    {% elif record.risk_level == 'medium' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Medium</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Low</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if record.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif record.status == 'in_compliance' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> In Compliance</span>
+                                    {% elif record.status == 'non_compliant' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Non-Compliant</span>
+                                    {% elif record.status == 'under_review' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Under Review</span>
+                                    {% elif record.status == 'expired' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Expired</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ record.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Compliance Date</th><td>{{ record.compliance_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Expiry Date</th><td>{{ record.expiry_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Days Until Expiry</th><td>{{ record.days_until_expiry }}</td></tr>
+                            <tr><th class="ps-3">Responsible Person</th><td>{{ record.responsible_person|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Description</th><td>{{ record.description|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Corrective Action</th><td>{{ record.corrective_action|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ record.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ record.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Check Items -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Compliance Check Items ({{ check_items|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Check Item</th>
+                                <th>Result</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ci in check_items %}
+                            <tr>
+                                <td>{{ ci.check_item }}</td>
+                                <td>
+                                    {% if ci.result == 'pass' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Pass</span>
+                                    {% elif ci.result == 'fail' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Fail</span>
+                                    {% elif ci.result == 'pending' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Pending</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ ci.notes|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-checkbox-multiple-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No check items added.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if record.status == 'draft' %}
+                    <a href="{% url 'contracts:compliance_edit' record.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'contracts:compliance_review' record.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-search-eye-line me-1"></i> Send to Review</button>
+                    </form>
+                    <form method="POST" action="{% url 'contracts:compliance_compliant' record.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Mark Compliant</button>
+                    </form>
+                    <form method="POST" action="{% url 'contracts:compliance_delete' record.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this record?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif record.status == 'under_review' %}
+                    <form method="POST" action="{% url 'contracts:compliance_compliant' record.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Mark Compliant</button>
+                    </form>
+                    <form method="POST" action="{% url 'contracts:compliance_non_compliant' record.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2"><i class="ri-close-circle-line me-1"></i> Mark Non-Compliant</button>
+                    </form>
+                {% elif record.status == 'in_compliance' %}
+                    <form method="POST" action="{% url 'contracts:compliance_non_compliant' record.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Mark as non-compliant?')"><i class="ri-close-circle-line me-1"></i> Mark Non-Compliant</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'contracts:compliance_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
