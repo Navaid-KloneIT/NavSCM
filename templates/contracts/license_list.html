@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}License Management{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>License Management</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Contract & Compliance</li>
+            <li class="breadcrumb-item active">Licenses</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'contracts:license_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search by # or title...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">License Type</label>
+                            <select class="form-select" name="license_type">
+                                <option value="">All</option>
+                                {% for value, label in type_choices %}
+                                    <option value="{{ value }}" {% if request.GET.license_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'contracts:license_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New License</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Licenses</h5>
+                <span class="text-muted">{{ licenses|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>License #</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Authority</th>
+                                <th>Country</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lic in licenses %}
+                            <tr>
+                                <td><a href="{% url 'contracts:license_detail' lic.pk %}" class="fw-medium">{{ lic.license_number }}</a></td>
+                                <td>{{ lic.title|truncatewords:5 }}</td>
+                                <td>{{ lic.get_license_type_display }}</td>
+                                <td>{{ lic.issuing_authority|default:"-" }}</td>
+                                <td>{{ lic.country|default:"-" }}</td>
+                                <td>{{ lic.expiry_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    {% if lic.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif lic.status == 'active' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                    {% elif lic.status == 'expiring_soon' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Expiring Soon</span>
+                                    {% elif lic.status == 'expired' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Expired</span>
+                                    {% elif lic.status == 'suspended' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Suspended</span>
+                                    {% elif lic.status == 'revoked' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Revoked</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ lic.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'contracts:license_detail' lic.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if lic.status == 'draft' %}
+                                            <a href="{% url 'contracts:license_edit' lic.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                            <form method="POST" action="{% url 'contracts:license_delete' lic.pk %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this license?')"><i class="ri-delete-bin-line"></i></button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-government-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No licenses found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.license_type %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first license.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
