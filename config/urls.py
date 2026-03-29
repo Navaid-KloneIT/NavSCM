@@ -22,6 +22,7 @@ urlpatterns = [
     path('qms/', include('apps.qms.urls', namespace='qms')),
     path('returns/', include('apps.returns.urls', namespace='returns')),
     path('analytics/', include('apps.analytics.urls', namespace='analytics')),
+    path('contracts/', include('apps.contracts.urls', namespace='contracts')),
     path('', include('apps.dashboard.urls')),
 ]
 
