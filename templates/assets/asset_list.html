@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Asset Registry{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>Asset Registry</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Asset Management</li>
+            <li class="breadcrumb-item active">Assets</li>
+        </ol>
+    </nav>
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'assets:asset_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" name="asset_type">
+                                <option value="">All</option>
+                                {% for value, label in type_choices %}
+                                    <option value="{{ value }}" {% if request.GET.asset_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Condition</label>
+                            <select class="form-select" name="condition">
+                                <option value="">All</option>
+                                {% for value, label in condition_choices %}
+                                    <option value="{{ value }}" {% if request.GET.condition == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'assets:asset_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Asset</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Assets</h5>
+                <span class="text-muted">{{ assets|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Asset #</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Location</th>
+                                <th>Condition</th>
+                                <th>Status</th>
+                                <th>Purchase Cost</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in assets %}
+                            <tr>
+                                <td><a href="{% url 'assets:asset_detail' a.pk %}" class="fw-medium">{{ a.asset_number }}</a></td>
+                                <td>{{ a.name|truncatewords:5 }}</td>
+                                <td>{{ a.get_asset_type_display }}</td>
+                                <td>{{ a.location|default:"-" }}</td>
+                                <td>
+                                    {% if a.condition == 'new' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> New</span>
+                                    {% elif a.condition == 'good' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Good</span>
+                                    {% elif a.condition == 'fair' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Fair</span>
+                                    {% elif a.condition == 'poor' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Poor</span>
+                                    {% elif a.condition == 'critical' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Critical</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ a.get_condition_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if a.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif a.status == 'active' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                    {% elif a.status == 'in_maintenance' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> In Maintenance</span>
+                                    {% elif a.status == 'out_of_service' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Out of Service</span>
+                                    {% elif a.status == 'retired' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Retired</span>
+                                    {% elif a.status == 'disposed' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Disposed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ a.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ a.currency }} {{ a.purchase_cost }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'assets:asset_detail' a.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if a.status == 'draft' %}
+                                            <a href="{% url 'assets:asset_edit' a.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                            <form method="POST" action="{% url 'assets:asset_delete' a.pk %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this asset?')"><i class="ri-delete-bin-line"></i></button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-archive-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No assets found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.asset_type or request.GET.condition %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by registering your first asset.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
