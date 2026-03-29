@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Contract & Compliance</li>
+            <li class="breadcrumb-item"><a href="{% url 'contracts:license_list' %}">Licenses</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>License Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">License Type *</label>
+                            {{ form.license_type }}
+                            {% if form.license_type.errors %}<div class="text-danger small">{{ form.license_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Issuing Authority</label>
+                            {{ form.issuing_authority }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Issue Date</label>
+                            {{ form.issue_date }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Expiry Date</label>
+                            {{ form.expiry_date }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Country</label>
+                            {{ form.country }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">License Reference #</label>
+                            {{ form.license_reference }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Renewal Notes</label>
+                            {{ form.renewal_notes }}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save License</button>
+                    {% if license %}
+                        <a href="{% url 'contracts:license_detail' license.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'contracts:license_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
