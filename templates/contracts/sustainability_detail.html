@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Sustainability: {{ report.report_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ report.report_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Contract & Compliance</li>
+            <li class="breadcrumb-item"><a href="{% url 'contracts:sustainability_list' %}">Sustainability</a></li>
+            <li class="breadcrumb-item active">{{ report.report_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Report Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Report #</th><td>{{ report.report_number }}</td></tr>
+                            <tr><th class="ps-3">Title</th><td>{{ report.title }}</td></tr>
+                            <tr><th class="ps-3">Type</th><td>{{ report.get_report_type_display }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if report.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif report.status == 'submitted' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Submitted</span>
+                                    {% elif report.status == 'reviewed' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Reviewed</span>
+                                    {% elif report.status == 'approved' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Approved</span>
+                                    {% elif report.status == 'published' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Published</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ report.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Period</th><td>{{ report.period_start|date:"M d, Y"|default:"-" }} to {{ report.period_end|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Total CO2 (tons)</th><td>{{ report.total_carbon_footprint }}</td></tr>
+                            <tr><th class="ps-3">Carbon Offset (tons)</th><td>{{ report.carbon_offset }}</td></tr>
+                            <tr><th class="ps-3">Net Carbon (tons)</th><td>{{ report.net_carbon }}</td></tr>
+                            <tr><th class="ps-3">Sustainability Score</th><td>{{ report.sustainability_score }}/100</td></tr>
+                            <tr><th class="ps-3">Description</th><td>{{ report.description|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Recommendations</th><td>{{ report.recommendations|default:"-"|linebreaksbr }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ report.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ report.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Sustainability Metrics ({{ metrics|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                                <th>Unit</th>
+                                <th>Target</th>
+                                <th>Variance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in metrics %}
+                            <tr>
+                                <td>{{ m.metric_name }}</td>
+                                <td>{{ m.value }}</td>
+                                <td>{{ m.unit|default:"-" }}</td>
+                                <td>{{ m.target }}</td>
+                                <td>{{ m.variance }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-bar-chart-box-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No metrics added.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if report.status == 'draft' %}
+                    <a href="{% url 'contracts:sustainability_edit' report.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'contracts:sustainability_submit' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-send-plane-line me-1"></i> Submit</button>
+                    </form>
+                    <form method="POST" action="{% url 'contracts:sustainability_delete' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this report?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif report.status == 'submitted' %}
+                    <form method="POST" action="{% url 'contracts:sustainability_review' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-search-eye-line me-1"></i> Mark Reviewed</button>
+                    </form>
+                {% elif report.status == 'reviewed' %}
+                    <form method="POST" action="{% url 'contracts:sustainability_approve' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Approve</button>
+                    </form>
+                {% elif report.status == 'approved' %}
+                    <form method="POST" action="{% url 'contracts:sustainability_publish' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-global-line me-1"></i> Publish</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'contracts:sustainability_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
