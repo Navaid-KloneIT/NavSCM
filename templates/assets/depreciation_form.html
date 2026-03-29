@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Asset Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'assets:depreciation_list' %}">Depreciation</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Depreciation Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Asset *</label>
+                            {{ form.asset }}
+                            {% if form.asset.errors %}<div class="text-danger small">{{ form.asset.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Method *</label>
+                            {{ form.method }}
+                            {% if form.method.errors %}<div class="text-danger small">{{ form.method.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Original Cost *</label>
+                            {{ form.original_cost }}
+                            {% if form.original_cost.errors %}<div class="text-danger small">{{ form.original_cost.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Salvage Value</label>
+                            {{ form.salvage_value }}
+                            {% if form.salvage_value.errors %}<div class="text-danger small">{{ form.salvage_value.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Useful Life (Years) *</label>
+                            {{ form.useful_life_years }}
+                            {% if form.useful_life_years.errors %}<div class="text-danger small">{{ form.useful_life_years.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Start Date *</label>
+                            {{ form.start_date }}
+                            {% if form.start_date.errors %}<div class="text-danger small">{{ form.start_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Currency</label>
+                            {{ form.currency }}
+                            {% if form.currency.errors %}<div class="text-danger small">{{ form.currency.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Accumulated Depreciation</label>
+                            {{ form.accumulated_depreciation }}
+                            {% if form.accumulated_depreciation.errors %}<div class="text-danger small">{{ form.accumulated_depreciation.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Current Book Value</label>
+                            {{ form.current_book_value }}
+                            {% if form.current_book_value.errors %}<div class="text-danger small">{{ form.current_book_value.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Depreciation</button>
+                    {% if dep %}
+                        <a href="{% url 'assets:depreciation_detail' dep.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'assets:depreciation_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
