@@ -23,6 +23,7 @@ urlpatterns = [
     path('returns/', include('apps.returns.urls', namespace='returns')),
     path('analytics/', include('apps.analytics.urls', namespace='analytics')),
     path('contracts/', include('apps.contracts.urls', namespace='contracts')),
+    path('assets/', include('apps.assets.urls', namespace='assets')),
     path('', include('apps.dashboard.urls')),
 ]
 
