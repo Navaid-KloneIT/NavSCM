@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Contract & Compliance</li>
+            <li class="breadcrumb-item"><a href="{% url 'contracts:contract_list' %}">Contracts</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Contract Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Contract Type *</label>
+                            {{ form.contract_type }}
+                            {% if form.contract_type.errors %}<div class="text-danger small">{{ form.contract_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Vendor</label>
+                            {{ form.vendor }}
+                            {% if form.vendor.errors %}<div class="text-danger small">{{ form.vendor.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Start Date</label>
+                            {{ form.start_date }}
+                            {% if form.start_date.errors %}<div class="text-danger small">{{ form.start_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">End Date</label>
+                            {{ form.end_date }}
+                            {% if form.end_date.errors %}<div class="text-danger small">{{ form.end_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Value</label>
+                            {{ form.value }}
+                            {% if form.value.errors %}<div class="text-danger small">{{ form.value.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Currency</label>
+                            {{ form.currency }}
+                            {% if form.currency.errors %}<div class="text-danger small">{{ form.currency.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Terms & Conditions</label>
+                            {{ form.terms_and_conditions }}
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check mt-2">
+                                {{ form.auto_renew }}
+                                <label class="form-check-label">Auto-Renew</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Renewal Period (days)</label>
+                            {{ form.renewal_period_days }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Notice Period (days)</label>
+                            {{ form.notice_period_days }}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <!-- Documents Formset -->
+            <div class="card">
+                <div class="card-header"><h5>Documents</h5></div>
+                <div class="card-body">
+                    {{ formset.management_form }}
+                    <div id="formset-container">
+                        {% for doc_form in formset %}
+                        <div class="formset-row border rounded p-3 mb-3">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Document Name *</label>
+                                    {{ doc_form.document_name }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Description</label>
+                                    {{ doc_form.description }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">File Reference</label>
+                                    {{ doc_form.file_reference }}
+                                </div>
+                            </div>
+                            {% if doc_form.instance.pk %}
+                                <div class="mt-2">{{ doc_form.DELETE }} <label class="form-check-label">Remove</label></div>
+                            {% endif %}
+                            {{ doc_form.id }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Contract</button>
+                    {% if contract %}
+                        <a href="{% url 'contracts:contract_detail' contract.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'contracts:contract_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
