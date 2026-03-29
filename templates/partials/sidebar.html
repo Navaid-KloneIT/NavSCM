@@ -1421,6 +1421,113 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Asset Management <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Asset Registry -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'asset_list,asset_create,asset_detail,asset_edit' and request.resolver_match.namespace == 'assets' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-archive-line"></i>
+                    <span class="menu-text">Asset Registry</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'assets:asset_list' %}" class="menu-link {% if request.resolver_match.url_name == 'asset_list' or request.resolver_match.url_name == 'asset_detail' or request.resolver_match.url_name == 'asset_edit' %}{% if request.resolver_match.namespace == 'assets' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Assets</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'assets:asset_create' %}" class="menu-link {% if request.resolver_match.url_name == 'asset_create' and request.resolver_match.namespace == 'assets' %}active{% endif %}">
+                            <span class="menu-text">New Asset</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Preventive Maintenance -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'pm_list,pm_create,pm_detail,pm_edit' and request.resolver_match.namespace == 'assets' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-tools-line"></i>
+                    <span class="menu-text">Preventive Maintenance</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'assets:pm_list' %}" class="menu-link {% if request.resolver_match.url_name == 'pm_list' or request.resolver_match.url_name == 'pm_detail' or request.resolver_match.url_name == 'pm_edit' %}{% if request.resolver_match.namespace == 'assets' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Schedules</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'assets:pm_create' %}" class="menu-link {% if request.resolver_match.url_name == 'pm_create' and request.resolver_match.namespace == 'assets' %}active{% endif %}">
+                            <span class="menu-text">New PM Schedule</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Breakdown Maintenance -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'bm_list,bm_create,bm_detail,bm_edit' and request.resolver_match.namespace == 'assets' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-alarm-warning-line"></i>
+                    <span class="menu-text">Breakdown Maintenance</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'assets:bm_list' %}" class="menu-link {% if request.resolver_match.url_name == 'bm_list' or request.resolver_match.url_name == 'bm_detail' or request.resolver_match.url_name == 'bm_edit' %}{% if request.resolver_match.namespace == 'assets' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Breakdowns</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'assets:bm_create' %}" class="menu-link {% if request.resolver_match.url_name == 'bm_create' and request.resolver_match.namespace == 'assets' %}active{% endif %}">
+                            <span class="menu-text">Report Breakdown</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Spare Parts Inventory -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'spare_list,spare_create,spare_detail,spare_edit' and request.resolver_match.namespace == 'assets' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-settings-3-line"></i>
+                    <span class="menu-text">Spare Parts Inventory</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'assets:spare_list' %}" class="menu-link {% if request.resolver_match.url_name == 'spare_list' or request.resolver_match.url_name == 'spare_detail' or request.resolver_match.url_name == 'spare_edit' %}{% if request.resolver_match.namespace == 'assets' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Spare Parts</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'assets:spare_create' %}" class="menu-link {% if request.resolver_match.url_name == 'spare_create' and request.resolver_match.namespace == 'assets' %}active{% endif %}">
+                            <span class="menu-text">New Spare Part</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Asset Depreciation -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'depreciation_list,depreciation_create,depreciation_detail,depreciation_edit' and request.resolver_match.namespace == 'assets' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-funds-line"></i>
+                    <span class="menu-text">Asset Depreciation</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'assets:depreciation_list' %}" class="menu-link {% if request.resolver_match.url_name == 'depreciation_list' or request.resolver_match.url_name == 'depreciation_detail' or request.resolver_match.url_name == 'depreciation_edit' %}{% if request.resolver_match.namespace == 'assets' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Depreciations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'assets:depreciation_create' %}" class="menu-link {% if request.resolver_match.url_name == 'depreciation_create' and request.resolver_match.namespace == 'assets' %}active{% endif %}">
+                            <span class="menu-text">New Depreciation</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Contract &amp; Compliance <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Contract Repository -->
