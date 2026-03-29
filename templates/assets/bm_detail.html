@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Breakdown: {{ bm.bm_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ bm.bm_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Asset Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'assets:bm_list' %}">Breakdown Maintenance</a></li>
+            <li class="breadcrumb-item active">{{ bm.bm_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- BM Info -->
+        <div class="card">
+            <div class="card-header"><h5>Breakdown Maintenance Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">BM #</th><td>{{ bm.bm_number }}</td></tr>
+                            <tr><th class="ps-3">Asset</th><td>{{ bm.asset|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Title</th><td>{{ bm.title }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Severity</th>
+                                <td>
+                                    {% if bm.severity == 'critical' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Critical</span>
+                                    {% elif bm.severity == 'major' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Major</span>
+                                    {% elif bm.severity == 'moderate' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Moderate</span>
+                                    {% elif bm.severity == 'minor' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Minor</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ bm.get_severity_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if bm.status == 'reported' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Reported</span>
+                                    {% elif bm.status == 'assigned' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Assigned</span>
+                                    {% elif bm.status == 'diagnosing' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Diagnosing</span>
+                                    {% elif bm.status == 'repairing' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Repairing</span>
+                                    {% elif bm.status == 'completed' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Completed</span>
+                                    {% elif bm.status == 'closed' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Closed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ bm.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Reported Date</th><td>{{ bm.reported_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Started Date</th><td>{{ bm.started_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Completed Date</th><td>{{ bm.completed_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Downtime (hrs)</th><td>{{ bm.downtime_hours|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Repair Cost</th><td>{{ bm.repair_cost|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Root Cause</th><td>{{ bm.root_cause|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Repair Description</th><td>{{ bm.repair_description|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Assigned To</th><td>{{ bm.assigned_to|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Reported By</th><td>{{ bm.reported_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ bm.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parts Used -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Parts Used ({{ parts_used|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Spare Part</th>
+                                <th>Asset</th>
+                                <th>Quantity Used</th>
+                                <th>Date Used</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pu in parts_used %}
+                            <tr>
+                                <td>{{ pu.spare_part|default:"-" }}</td>
+                                <td>{{ pu.asset|default:"-" }}</td>
+                                <td>{{ pu.quantity_used }}</td>
+                                <td>{{ pu.date_used|date:"M d, Y"|default:"-" }}</td>
+                                <td>{{ pu.notes|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-settings-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No parts used.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Sidebar -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if bm.status == 'reported' %}
+                    <a href="{% url 'assets:bm_edit' bm.pk %}" class="btn btn-soft-warning w-100 mb-2">
+                        <i class="ri-pencil-line me-1"></i> Edit
+                    </a>
+                    <form method="POST" action="{% url 'assets:bm_assign' bm.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2">
+                            <i class="ri-user-add-line me-1"></i> Assign
+                        </button>
+                    </form>
+                    <form method="POST" action="{% url 'assets:bm_delete' bm.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-soft-danger w-100 mb-2" onclick="return confirm('Are you sure you want to delete this breakdown record?')">
+                            <i class="ri-delete-bin-line me-1"></i> Delete
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if bm.status == 'assigned' %}
+                    <form method="POST" action="{% url 'assets:bm_diagnose' bm.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2">
+                            <i class="ri-search-eye-line me-1"></i> Start Diagnosis
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if bm.status == 'diagnosing' %}
+                    <form method="POST" action="{% url 'assets:bm_repair' bm.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2">
+                            <i class="ri-tools-line me-1"></i> Start Repair
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if bm.status == 'repairing' %}
+                    <form method="POST" action="{% url 'assets:bm_complete' bm.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2">
+                            <i class="ri-check-double-line me-1"></i> Complete Repair
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if bm.status == 'completed' %}
+                    <form method="POST" action="{% url 'assets:bm_close' bm.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2">
+                            <i class="ri-lock-line me-1"></i> Close
+                        </button>
+                    </form>
+                {% endif %}
+
+                <a href="{% url 'assets:bm_list' %}" class="btn btn-light w-100">
+                    <i class="ri-arrow-left-line me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
