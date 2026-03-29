@@ -139,16 +139,6 @@ Provides insights into supply chain performance and efficiency.
 - **Financial Reporting** - Gross margin analysis and supply chain cost breakdowns with types (gross margin, cost breakdown, revenue analysis, profitability), aggregate metrics (total revenue, total COGS, gross margin, gross margin percentage, procurement/logistics/manufacturing/warehousing costs), and cost category line items with percentage of total
 - **Predictive Analytics** - AI-driven prediction alerts with types (demand spike, supply disruption, stockout risk, price fluctuation, delivery delay), severity levels (low → critical), status workflow (new → analyzing → confirmed → resolved/dismissed), confidence levels, affected item/vendor tracking, impact description, recommended actions, and resolution tracking
 
-### Module 14: Asset Management
-
-Manages the physical assets used to run the supply chain (trucks, forklifts, machinery).
-
-- **Asset Registry** - Database of all physical assets with types (truck, forklift, machinery, conveyor, vehicle, equipment, computer, furniture), condition tracking (new → critical), status lifecycle (draft → active → in maintenance → out of service → retired → disposed), specifications with key-value pairs, manufacturer/model/serial tracking, warranty expiry monitoring, location and user assignment
-- **Preventive Maintenance** - Scheduling of regular maintenance tasks with configurable frequency (daily, weekly, bi-weekly, monthly, quarterly, semi-annual, annual), priority levels (low → urgent), status workflow (draft → scheduled → in progress → completed/overdue/cancelled), task checklists with individual status tracking, estimated vs. actual duration and cost comparison, next due date tracking
-- **Breakdown Maintenance** - Logging of unplanned repairs with severity levels (minor, moderate, major, critical), status workflow (reported → assigned → diagnosing → repairing → completed → closed), downtime hours tracking, repair cost recording, root cause analysis, resolution time calculation, spare parts usage linkage
-- **Spare Parts Inventory** - Management of maintenance parts with stock levels, reorder points and quantities, unit cost tracking, stock status (in stock, low stock, out of stock, discontinued), vendor linkage, usage history tracking per asset and breakdown, total inventory value calculation, compatible asset mapping
-- **Asset Depreciation** - Financial tracking with multiple methods (straight line, declining balance, double declining, sum of years, units of production), auto-calculated annual depreciation, accumulated depreciation and current book value tracking, depreciation percentage, status lifecycle (draft → active → fully depreciated → disposed), salvage value and useful life configuration
-
 ### Module 13: Contract & Compliance Management
 
 Manages legal agreements and regulatory adherence across the supply chain.
@@ -158,6 +148,16 @@ Manages legal agreements and regulatory adherence across the supply chain.
 - **Trade Documentation** - Generation and management of import/export documents (Bill of Lading, Commercial Invoice, Packing List, Certificate of Origin, Customs Declaration, Letter of Credit, Insurance Certificate) with status workflow (draft → issued → in transit → delivered → archived), origin/destination country tracking, line items with quantity and value breakdown
 - **License Management** - Tracking of import/export licenses, transit permits, bonded warehouse licenses, customs broker authorizations, and special permits with status workflow (draft → active → expiring soon → expired/suspended/revoked), issuing authority, country, expiry monitoring, and renewal notes
 - **Sustainability Tracking** - Carbon footprint reporting (total CO2, carbon offset, net carbon calculation), ethical sourcing compliance, waste management, energy consumption, and water usage reports with sustainability scoring (0-100), approval workflow (draft → submitted → reviewed → approved → published), and per-metric tracking with targets and variance analysis
+
+### Module 14: Asset Management
+
+Manages the physical assets used to run the supply chain (trucks, forklifts, machinery).
+
+- **Asset Registry** - Database of all physical assets with types (truck, forklift, machinery, conveyor, vehicle, equipment, computer, furniture), condition tracking (new → critical), status lifecycle (draft → active → in maintenance → out of service → retired → disposed), specifications with key-value pairs, manufacturer/model/serial tracking, warranty expiry monitoring, location and user assignment
+- **Preventive Maintenance** - Scheduling of regular maintenance tasks with configurable frequency (daily, weekly, bi-weekly, monthly, quarterly, semi-annual, annual), priority levels (low → urgent), status workflow (draft → scheduled → in progress → completed/overdue/cancelled), task checklists with individual status tracking, estimated vs. actual duration and cost comparison, next due date tracking
+- **Breakdown Maintenance** - Logging of unplanned repairs with severity levels (minor, moderate, major, critical), status workflow (reported → assigned → diagnosing → repairing → completed → closed), downtime hours tracking, repair cost recording, root cause analysis, resolution time calculation, spare parts usage linkage
+- **Spare Parts Inventory** - Management of maintenance parts with stock levels, reorder points and quantities, unit cost tracking, stock status (in stock, low stock, out of stock, discontinued), vendor linkage, usage history tracking per asset and breakdown, total inventory value calculation, compatible asset mapping
+- **Asset Depreciation** - Financial tracking with multiple methods (straight line, declining balance, double declining, sum of years, units of production), auto-calculated annual depreciation, accumulated depreciation and current book value tracking, depreciation percentage, status lifecycle (draft → active → fully depreciated → disposed), salvage value and useful life configuration
 
 ### Authentication & User Management
 - Login, registration, forgot password
