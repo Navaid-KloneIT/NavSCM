@@ -139,6 +139,16 @@ Provides insights into supply chain performance and efficiency.
 - **Financial Reporting** - Gross margin analysis and supply chain cost breakdowns with types (gross margin, cost breakdown, revenue analysis, profitability), aggregate metrics (total revenue, total COGS, gross margin, gross margin percentage, procurement/logistics/manufacturing/warehousing costs), and cost category line items with percentage of total
 - **Predictive Analytics** - AI-driven prediction alerts with types (demand spike, supply disruption, stockout risk, price fluctuation, delivery delay), severity levels (low → critical), status workflow (new → analyzing → confirmed → resolved/dismissed), confidence levels, affected item/vendor tracking, impact description, recommended actions, and resolution tracking
 
+### Module 13: Contract & Compliance Management
+
+Manages legal agreements and regulatory adherence across the supply chain.
+
+- **Contract Repository** - Centralized storage for logistics contracts, supplier agreements, and NDAs with document attachments, auto-renewal settings, notice periods, and full contract lifecycle management (draft → active → under review → expired/terminated), multi-currency support (USD, EUR, GBP, PKR, AED, SAR, INR, CNY)
+- **Compliance Tracking** - Monitoring adherence to regulations (FDA, HazMat, GDPR, ISO, Customs, Environmental, Labor, Trade Sanctions) with risk level assessment (low → critical), compliance check items with pass/fail/pending results, responsible person assignment, corrective action tracking, and expiry monitoring
+- **Trade Documentation** - Generation and management of import/export documents (Bill of Lading, Commercial Invoice, Packing List, Certificate of Origin, Customs Declaration, Letter of Credit, Insurance Certificate) with status workflow (draft → issued → in transit → delivered → archived), origin/destination country tracking, line items with quantity and value breakdown
+- **License Management** - Tracking of import/export licenses, transit permits, bonded warehouse licenses, customs broker authorizations, and special permits with status workflow (draft → active → expiring soon → expired/suspended/revoked), issuing authority, country, expiry monitoring, and renewal notes
+- **Sustainability Tracking** - Carbon footprint reporting (total CO2, carbon offset, net carbon calculation), ethical sourcing compliance, waste management, energy consumption, and water usage reports with sustainability scoring (0-100), approval workflow (draft → submitted → reviewed → approved → published), and per-metric tracking with targets and variance analysis
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -289,6 +299,11 @@ Provides insights into supply chain performance and efficiency.
    python manage.py seed_analytics
    ```
 
+7m. **Seed Contract & Compliance data**
+   ```bash
+   python manage.py seed_contracts
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -379,11 +394,17 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/returns/*)
 │   │   └── admin.py       # Django admin registration
-│   └── analytics/         # Supply chain analytics module
-│       ├── models.py      # InventoryAnalytics, InventoryAnalyticsItem, ProcurementAnalytics, ProcurementAnalyticsItem, LogisticsKPI, LogisticsKPIItem, FinancialReport, FinancialReportItem, PredictiveAlert
-│       ├── views.py       # All analytics CRUD, dashboard & workflow views
+│   ├── analytics/         # Supply chain analytics module
+│   │   ├── models.py      # InventoryAnalytics, InventoryAnalyticsItem, ProcurementAnalytics, ProcurementAnalyticsItem, LogisticsKPI, LogisticsKPIItem, FinancialReport, FinancialReportItem, PredictiveAlert
+│   │   ├── views.py       # All analytics CRUD, dashboard & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/analytics/*)
+│   │   └── admin.py       # Django admin registration
+│   └── contracts/         # Contract & compliance management module
+│       ├── models.py      # Contract, ContractDocument, ComplianceRecord, ComplianceCheckItem, TradeDocument, TradeDocumentItem, License, SustainabilityReport, SustainabilityMetric
+│       ├── views.py       # All contract & compliance CRUD & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/analytics/*)
+│       ├── urls.py        # URL routing (/contracts/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -475,13 +496,19 @@ NavSCM/
 │   │   ├── disposition_*.html # Disposition list, form, detail
 │   │   ├── warranty_*.html    # Warranty claim list, form, detail
 │   │   └── portal_settings.html # Return portal settings
-│   └── analytics/         # Supply chain analytics templates
-│       ├── dashboard.html     # Analytics overview dashboard
-│       ├── inventory_*.html   # Inventory analytics list, form, detail
-│       ├── procurement_*.html # Procurement analytics list, form, detail
-│       ├── logistics_*.html   # Logistics KPI list, form, detail
-│       ├── financial_*.html   # Financial report list, form, detail
-│       └── alert_*.html       # Predictive alert list, form, detail
+│   ├── analytics/         # Supply chain analytics templates
+│   │   ├── dashboard.html     # Analytics overview dashboard
+│   │   ├── inventory_*.html   # Inventory analytics list, form, detail
+│   │   ├── procurement_*.html # Procurement analytics list, form, detail
+│   │   ├── logistics_*.html   # Logistics KPI list, form, detail
+│   │   ├── financial_*.html   # Financial report list, form, detail
+│   │   └── alert_*.html       # Predictive alert list, form, detail
+│   └── contracts/         # Contract & compliance templates
+│       ├── contract_*.html        # Contract list, form, detail
+│       ├── compliance_*.html      # Compliance record list, form, detail
+│       ├── trade_doc_*.html       # Trade document list, form, detail
+│       ├── license_*.html         # License list, form, detail
+│       └── sustainability_*.html  # Sustainability report list, form, detail
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
@@ -521,7 +548,7 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 | 10 | **Quality Management (QMS)** | Quality inspection, non-conformance reports, CAPA, audit management, certificates of analysis | Done |
 | 11 | **Returns Management** | RMA workflows, refund processing, disposition management, return portal, warranty claims | Done |
 | 12 | **Supply Chain Analytics** | Inventory dashboards, procurement analytics, logistics KPIs, financial reporting, predictive analytics | Done |
-| 13 | **Contract & Compliance** | Contract repository, compliance tracking, trade documentation, license management, sustainability tracking | Planned |
+| 13 | **Contract & Compliance** | Contract repository, compliance tracking, trade documentation, license management, sustainability tracking | Done |
 | 14 | **Asset Management** | Asset registry, preventive/breakdown maintenance, spare parts inventory, asset depreciation | Planned |
 | 15 | **Labor Management** | Labor planning, time & attendance, task assignment, performance tracking, payroll integration | Planned |
 | 16 | **Cold Chain Management** | Temperature monitoring (IoT), excursion management, cold storage inventory, compliance reporting | Planned |
