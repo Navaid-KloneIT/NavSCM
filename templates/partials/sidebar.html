@@ -1421,6 +1421,113 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Contract &amp; Compliance <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Contract Repository -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'contract_list,contract_create,contract_detail,contract_edit' and request.resolver_match.namespace == 'contracts' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-text-line"></i>
+                    <span class="menu-text">Contract Repository</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'contracts:contract_list' %}" class="menu-link {% if request.resolver_match.url_name == 'contract_list' or request.resolver_match.url_name == 'contract_detail' or request.resolver_match.url_name == 'contract_edit' %}{% if request.resolver_match.namespace == 'contracts' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Contracts</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'contracts:contract_create' %}" class="menu-link {% if request.resolver_match.url_name == 'contract_create' and request.resolver_match.namespace == 'contracts' %}active{% endif %}">
+                            <span class="menu-text">New Contract</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Compliance Tracking -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'compliance_list,compliance_create,compliance_detail,compliance_edit' and request.resolver_match.namespace == 'contracts' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-shield-check-line"></i>
+                    <span class="menu-text">Compliance Tracking</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'contracts:compliance_list' %}" class="menu-link {% if request.resolver_match.url_name == 'compliance_list' or request.resolver_match.url_name == 'compliance_detail' or request.resolver_match.url_name == 'compliance_edit' %}{% if request.resolver_match.namespace == 'contracts' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Records</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'contracts:compliance_create' %}" class="menu-link {% if request.resolver_match.url_name == 'compliance_create' and request.resolver_match.namespace == 'contracts' %}active{% endif %}">
+                            <span class="menu-text">New Record</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Trade Documentation -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'trade_doc_list,trade_doc_create,trade_doc_detail,trade_doc_edit' and request.resolver_match.namespace == 'contracts' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-ship-line"></i>
+                    <span class="menu-text">Trade Documentation</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'contracts:trade_doc_list' %}" class="menu-link {% if request.resolver_match.url_name == 'trade_doc_list' or request.resolver_match.url_name == 'trade_doc_detail' or request.resolver_match.url_name == 'trade_doc_edit' %}{% if request.resolver_match.namespace == 'contracts' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Documents</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'contracts:trade_doc_create' %}" class="menu-link {% if request.resolver_match.url_name == 'trade_doc_create' and request.resolver_match.namespace == 'contracts' %}active{% endif %}">
+                            <span class="menu-text">New Document</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- License Management -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'license_list,license_create,license_detail,license_edit' and request.resolver_match.namespace == 'contracts' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-government-line"></i>
+                    <span class="menu-text">License Management</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'contracts:license_list' %}" class="menu-link {% if request.resolver_match.url_name == 'license_list' or request.resolver_match.url_name == 'license_detail' or request.resolver_match.url_name == 'license_edit' %}{% if request.resolver_match.namespace == 'contracts' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Licenses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'contracts:license_create' %}" class="menu-link {% if request.resolver_match.url_name == 'license_create' and request.resolver_match.namespace == 'contracts' %}active{% endif %}">
+                            <span class="menu-text">New License</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Sustainability Tracking -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'sustainability_list,sustainability_create,sustainability_detail,sustainability_edit' and request.resolver_match.namespace == 'contracts' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-leaf-line"></i>
+                    <span class="menu-text">Sustainability Tracking</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'contracts:sustainability_list' %}" class="menu-link {% if request.resolver_match.url_name == 'sustainability_list' or request.resolver_match.url_name == 'sustainability_detail' or request.resolver_match.url_name == 'sustainability_edit' %}{% if request.resolver_match.namespace == 'contracts' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'contracts:sustainability_create' %}" class="menu-link {% if request.resolver_match.url_name == 'sustainability_create' and request.resolver_match.namespace == 'contracts' %}active{% endif %}">
+                            <span class="menu-text">New Report</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Audit &amp; Security <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Audit Logs -->
