@@ -96,7 +96,7 @@
                 {% endif %}
 
                 {% if dep.status == 'active' %}
-                    <form method="POST" action="{% url 'assets:depreciation_fully_depreciate' dep.pk %}">
+                    <form method="POST" action="{% url 'assets:depreciation_fully_depreciated' dep.pk %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-secondary w-100 mb-2">
                             <i class="ri-check-double-line me-1"></i> Mark Fully Depreciated
