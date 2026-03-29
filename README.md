@@ -139,6 +139,16 @@ Provides insights into supply chain performance and efficiency.
 - **Financial Reporting** - Gross margin analysis and supply chain cost breakdowns with types (gross margin, cost breakdown, revenue analysis, profitability), aggregate metrics (total revenue, total COGS, gross margin, gross margin percentage, procurement/logistics/manufacturing/warehousing costs), and cost category line items with percentage of total
 - **Predictive Analytics** - AI-driven prediction alerts with types (demand spike, supply disruption, stockout risk, price fluctuation, delivery delay), severity levels (low → critical), status workflow (new → analyzing → confirmed → resolved/dismissed), confidence levels, affected item/vendor tracking, impact description, recommended actions, and resolution tracking
 
+### Module 14: Asset Management
+
+Manages the physical assets used to run the supply chain (trucks, forklifts, machinery).
+
+- **Asset Registry** - Database of all physical assets with types (truck, forklift, machinery, conveyor, vehicle, equipment, computer, furniture), condition tracking (new → critical), status lifecycle (draft → active → in maintenance → out of service → retired → disposed), specifications with key-value pairs, manufacturer/model/serial tracking, warranty expiry monitoring, location and user assignment
+- **Preventive Maintenance** - Scheduling of regular maintenance tasks with configurable frequency (daily, weekly, bi-weekly, monthly, quarterly, semi-annual, annual), priority levels (low → urgent), status workflow (draft → scheduled → in progress → completed/overdue/cancelled), task checklists with individual status tracking, estimated vs. actual duration and cost comparison, next due date tracking
+- **Breakdown Maintenance** - Logging of unplanned repairs with severity levels (minor, moderate, major, critical), status workflow (reported → assigned → diagnosing → repairing → completed → closed), downtime hours tracking, repair cost recording, root cause analysis, resolution time calculation, spare parts usage linkage
+- **Spare Parts Inventory** - Management of maintenance parts with stock levels, reorder points and quantities, unit cost tracking, stock status (in stock, low stock, out of stock, discontinued), vendor linkage, usage history tracking per asset and breakdown, total inventory value calculation, compatible asset mapping
+- **Asset Depreciation** - Financial tracking with multiple methods (straight line, declining balance, double declining, sum of years, units of production), auto-calculated annual depreciation, accumulated depreciation and current book value tracking, depreciation percentage, status lifecycle (draft → active → fully depreciated → disposed), salvage value and useful life configuration
+
 ### Module 13: Contract & Compliance Management
 
 Manages legal agreements and regulatory adherence across the supply chain.
@@ -304,6 +314,11 @@ Manages legal agreements and regulatory adherence across the supply chain.
    python manage.py seed_contracts
    ```
 
+7n. **Seed Asset Management data**
+   ```bash
+   python manage.py seed_assets
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -399,6 +414,12 @@ NavSCM/
 │   │   ├── views.py       # All analytics CRUD, dashboard & workflow views
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/analytics/*)
+│   │   └── admin.py       # Django admin registration
+│   ├── assets/            # Asset management module
+│   │   ├── models.py      # Asset, AssetSpecification, PreventiveMaintenance, MaintenanceTask, BreakdownMaintenance, SparePart, SparePartUsage, AssetDepreciation
+│   │   ├── views.py       # All asset management CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/assets/*)
 │   │   └── admin.py       # Django admin registration
 │   └── contracts/         # Contract & compliance management module
 │       ├── models.py      # Contract, ContractDocument, ComplianceRecord, ComplianceCheckItem, TradeDocument, TradeDocumentItem, License, SustainabilityReport, SustainabilityMetric
@@ -503,6 +524,12 @@ NavSCM/
 │   │   ├── logistics_*.html   # Logistics KPI list, form, detail
 │   │   ├── financial_*.html   # Financial report list, form, detail
 │   │   └── alert_*.html       # Predictive alert list, form, detail
+│   ├── assets/            # Asset management templates
+│   │   ├── asset_*.html       # Asset registry list, form, detail
+│   │   ├── pm_*.html          # Preventive maintenance list, form, detail
+│   │   ├── bm_*.html          # Breakdown maintenance list, form, detail
+│   │   ├── spare_*.html       # Spare parts list, form, detail
+│   │   └── depreciation_*.html # Asset depreciation list, form, detail
 │   └── contracts/         # Contract & compliance templates
 │       ├── contract_*.html        # Contract list, form, detail
 │       ├── compliance_*.html      # Compliance record list, form, detail
@@ -549,7 +576,7 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 | 11 | **Returns Management** | RMA workflows, refund processing, disposition management, return portal, warranty claims | Done |
 | 12 | **Supply Chain Analytics** | Inventory dashboards, procurement analytics, logistics KPIs, financial reporting, predictive analytics | Done |
 | 13 | **Contract & Compliance** | Contract repository, compliance tracking, trade documentation, license management, sustainability tracking | Done |
-| 14 | **Asset Management** | Asset registry, preventive/breakdown maintenance, spare parts inventory, asset depreciation | Planned |
+| 14 | **Asset Management** | Asset registry, preventive/breakdown maintenance, spare parts inventory, asset depreciation | Done |
 | 15 | **Labor Management** | Labor planning, time & attendance, task assignment, performance tracking, payroll integration | Planned |
 | 16 | **Cold Chain Management** | Temperature monitoring (IoT), excursion management, cold storage inventory, compliance reporting | Planned |
 | 17 | **Customer Portal** | Order tracking, account management, document retrieval, support ticketing, catalog browsing | Planned |
