@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Contract & Compliance</li>
+            <li class="breadcrumb-item"><a href="{% url 'contracts:sustainability_list' %}">Sustainability</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Report Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Report Type *</label>
+                            {{ form.report_type }}
+                            {% if form.report_type.errors %}<div class="text-danger small">{{ form.report_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Period Start</label>
+                            {{ form.period_start }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Period End</label>
+                            {{ form.period_end }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Total CO2 (tons)</label>
+                            {{ form.total_carbon_footprint }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Carbon Offset (tons)</label>
+                            {{ form.carbon_offset }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Sustainability Score (0-100)</label>
+                            {{ form.sustainability_score }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Recommendations</label>
+                            {{ form.recommendations }}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <!-- Metrics Formset -->
+            <div class="card">
+                <div class="card-header"><h5>Sustainability Metrics</h5></div>
+                <div class="card-body">
+                    {{ formset.management_form }}
+                    <div id="formset-container">
+                        {% for metric_form in formset %}
+                        <div class="formset-row border rounded p-3 mb-3">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Metric Name *</label>
+                                    {{ metric_form.metric_name }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Value</label>
+                                    {{ metric_form.value }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Unit</label>
+                                    {{ metric_form.unit }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Target</label>
+                                    {{ metric_form.target }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Variance</label>
+                                    {{ metric_form.variance }}
+                                </div>
+                            </div>
+                            {% if metric_form.instance.pk %}
+                                <div class="mt-2">{{ metric_form.DELETE }} <label class="form-check-label">Remove</label></div>
+                            {% endif %}
+                            {{ metric_form.id }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Report</button>
+                    {% if report %}
+                        <a href="{% url 'contracts:sustainability_detail' report.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'contracts:sustainability_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
