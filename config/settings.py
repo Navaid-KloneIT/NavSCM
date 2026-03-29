@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'apps.qms',
     'apps.returns',
     'apps.analytics',
+    'apps.contracts',
 ]
 
 # ==============================================================================
