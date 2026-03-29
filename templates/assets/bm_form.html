@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Asset Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'assets:bm_list' %}">Breakdown Maintenance</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Breakdown Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Asset *</label>
+                            {{ form.asset }}
+                            {% if form.asset.errors %}<div class="text-danger small">{{ form.asset.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Severity *</label>
+                            {{ form.severity }}
+                            {% if form.severity.errors %}<div class="text-danger small">{{ form.severity.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Assigned To</label>
+                            {{ form.assigned_to }}
+                            {% if form.assigned_to.errors %}<div class="text-danger small">{{ form.assigned_to.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Downtime Hours</label>
+                            {{ form.downtime_hours }}
+                            {% if form.downtime_hours.errors %}<div class="text-danger small">{{ form.downtime_hours.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Repair Cost</label>
+                            {{ form.repair_cost }}
+                            {% if form.repair_cost.errors %}<div class="text-danger small">{{ form.repair_cost.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Root Cause</label>
+                            {{ form.root_cause }}
+                            {% if form.root_cause.errors %}<div class="text-danger small">{{ form.root_cause.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Repair Description</label>
+                            {{ form.repair_description }}
+                            {% if form.repair_description.errors %}<div class="text-danger small">{{ form.repair_description.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Breakdown</button>
+                    {% if bm %}
+                        <a href="{% url 'assets:bm_detail' bm.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'assets:bm_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
