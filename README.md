@@ -169,6 +169,26 @@ Optimizes the workforce within warehouses and logistics.
 - **Performance Tracking** - Measuring worker productivity with period-based reviews, tasks completed count, total units processed, total hours worked, error tracking, auto-calculated units per hour, accuracy rate percentage, and weighted overall score, rating system (exceptional, exceeds expectations, meets expectations, needs improvement, unsatisfactory), reviewer assignment, status workflow (draft → submitted → approved → closed/cancelled), reviewer and worker comments
 - **Payroll Integration** - Aggregating labor data for payroll processing with regular and overtime hours tracking, configurable hourly and overtime rates, auto-calculated regular pay, overtime pay, gross pay (regular + overtime + bonuses), and net pay (gross - deductions), multi-currency support (USD, EUR, GBP, PKR, AED, SAR, INR, CNY), days worked/absent tracking, status workflow (draft → calculated → approved → exported/cancelled), export timestamp tracking
 
+### Module 16: Cold Chain Management
+
+Specialized module for temperature-sensitive logistics (Pharma/Food).
+
+- **Temperature Monitoring** - IoT sensor registry with types (thermocouple, RTD, thermistor, infrared, data logger), location types (warehouse, truck, container, cold room, freezer), status lifecycle (draft → active → offline → maintenance → retired), calibration tracking with interval configuration, reading range configuration, periodic temperature and humidity readings with in-range validation
+- **Excursion Management** - Temperature deviation alerts with severity levels (minor, moderate, major, critical), status workflow (detected → acknowledged → investigating → resolved → closed), sensor and zone linkage, recorded vs. expected temperature comparison, duration tracking, affected items count, impact description, corrective action documentation, resolution tracking with timestamps
+- **Cold Storage Inventory** - Storage unit registry with types (walk-in cooler, walk-in freezer, reach-in refrigerator, blast freezer, ultra-low freezer, refrigerated container), temperature zone assignment, capacity tracking, current temperature/humidity monitoring, item-level tracking with batch/lot numbers, expiry dates, condition assessment (good, near expiry, expired, compromised), temperature requirement ranges per item
+- **Compliance Reporting** - Automated health/safety audit reports with types (temperature log, excursion summary, storage audit, equipment qualification, regulatory filing), regulatory body tracking (FDA, EMA, WHO, HACCP, GMP, ISO), status workflow (draft → generated → reviewed → submitted → approved), report items with parameter/specification/measured value and pass/fail results, approval tracking
+- **Reefer Maintenance** - Refrigerated unit registry with types (reefer container, refrigerated truck, cold room, display case, transport cooler), refrigerant type tracking (R-134a, R-404A, R-410A, R-290, R-744, ammonia), maintenance scheduling with types (routine inspection, compressor service, refrigerant check, thermostat calibration, defrost cycle, emergency repair), frequency configuration, priority levels (low → urgent), status workflow (draft → scheduled → in progress → completed/overdue/cancelled), estimated vs. actual cost tracking
+
+### Module 17: Customer Portal
+
+A dedicated interface for clients (B2B or B2C) to interact with the supply chain.
+
+- **Portal Accounts** - Customer portal account management linked to OMS customers with display name, portal email, phone, preferred language (English, Spanish, French, German, Arabic, Urdu, Chinese), billing/shipping addresses, payment method configuration (credit card, bank transfer, PayPal, COD, store credit), payment reference tracking, status lifecycle (pending → active → suspended → closed)
+- **Order Tracking** - Real-time order visibility with tracking number auto-generation (OT-XXXXX), portal account and OMS order linkage, TMS shipment integration, carrier name and tracking URL, current status workflow (processing → shipped → in transit → out for delivery → delivered/delayed/returned/cancelled), estimated and actual delivery dates, last known location, days in transit calculation, and per-milestone tracking events with date, location, status, and description
+- **Document Retrieval** - Centralized document access with types (invoice, proof of delivery, contract, packing list, credit note, statement, certificate), portal account and order linkage, file path and size tracking with human-readable display, reference number, status workflow (draft → published → archived), issue and expiry date tracking with auto-expired detection
+- **Support Ticketing** - Customer support system with categories (order issue, delivery issue, billing, product inquiry, return request, general, complaint), priority levels (low → urgent), status workflow (open → in progress → waiting on customer → resolved → closed, with reopen capability), portal account and order linkage, agent assignment, resolution timestamp and notes, auto-calculated response time in hours, threaded messages with sender type (customer, agent, system)
+- **Catalog Browsing** - Product catalog linked to procurement items with portal-specific naming and descriptions, category assignment, unit pricing with multi-currency support (USD, EUR, GBP, PKR, AED, SAR, INR, CNY), stock status tracking (in stock, low stock, out of stock, pre-order, discontinued), available quantity, minimum order quantity, lead time in days, image URL, featured flag, active/inactive status
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -334,6 +354,16 @@ Optimizes the workforce within warehouses and logistics.
    python manage.py seed_labor
    ```
 
+7p. **Seed Cold Chain Management data**
+   ```bash
+   python manage.py seed_cold_chain
+   ```
+
+7q. **Seed Customer Portal data**
+   ```bash
+   python manage.py seed_portal
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -442,11 +472,23 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/contracts/*)
 │   │   └── admin.py       # Django admin registration
-│   └── labor/             # Labor management module
-│       ├── models.py      # LaborPlan, LaborPlanLine, Attendance, TaskAssignment, TaskChecklistItem, PerformanceReview, PayrollRecord
-│       ├── views.py       # All labor management CRUD & workflow views
+│   ├── labor/             # Labor management module
+│   │   ├── models.py      # LaborPlan, LaborPlanLine, Attendance, TaskAssignment, TaskChecklistItem, PerformanceReview, PayrollRecord
+│   │   ├── views.py       # All labor management CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/labor/*)
+│   │   └── admin.py       # Django admin registration
+│   ├── portal/            # Customer portal module
+│   │   ├── models.py      # PortalAccount, OrderTracking, TrackingEvent, PortalDocument, SupportTicket, TicketMessage, CatalogItem
+│   │   ├── views.py       # All portal CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/portal/*)
+│   │   └── admin.py       # Django admin registration
+│   └── cold_chain/        # Cold chain management module
+│       ├── models.py      # TemperatureSensor, TemperatureReading, TemperatureZone, TemperatureExcursion, ColdStorageUnit, ColdStorageItem, ComplianceReport, ComplianceReportItem, ReeferUnit, ReeferMaintenance
+│       ├── views.py       # All cold chain CRUD & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/labor/*)
+│       ├── urls.py        # URL routing (/cold-chain/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -557,12 +599,26 @@ NavSCM/
 │   │   ├── trade_doc_*.html       # Trade document list, form, detail
 │   │   ├── license_*.html         # License list, form, detail
 │   │   └── sustainability_*.html  # Sustainability report list, form, detail
-│   └── labor/             # Labor management templates
-│       ├── plan_*.html            # Labor plan list, form, detail
-│       ├── attendance_*.html      # Time & attendance list, form, detail
-│       ├── task_*.html            # Task assignment list, form, detail
-│       ├── performance_*.html     # Performance review list, form, detail
-│       └── payroll_*.html         # Payroll record list, form, detail
+│   ├── labor/             # Labor management templates
+│   │   ├── plan_*.html            # Labor plan list, form, detail
+│   │   ├── attendance_*.html      # Time & attendance list, form, detail
+│   │   ├── task_*.html            # Task assignment list, form, detail
+│   │   ├── performance_*.html     # Performance review list, form, detail
+│   │   └── payroll_*.html         # Payroll record list, form, detail
+│   ├── portal/            # Customer portal templates
+│   │   ├── account_*.html         # Portal account list, form, detail
+│   │   ├── tracking_*.html        # Order tracking list, form, detail
+│   │   ├── document_*.html        # Portal document list, form, detail
+│   │   ├── ticket_*.html          # Support ticket list, form, detail
+│   │   └── catalog_*.html         # Catalog item list, form, detail
+│   └── cold_chain/        # Cold chain management templates
+│       ├── sensor_*.html          # Temperature sensor list, form, detail
+│       ├── zone_*.html            # Temperature zone list, form, detail
+│       ├── excursion_*.html       # Temperature excursion list, form, detail
+│       ├── storage_*.html         # Cold storage unit list, form, detail
+│       ├── compliance_*.html      # Compliance report list, form, detail
+│       ├── reefer_*.html          # Reefer unit list, form, detail
+│       └── reefer_maint_*.html    # Reefer maintenance list, form, detail
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
@@ -605,8 +661,8 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 | 13 | **Contract & Compliance** | Contract repository, compliance tracking, trade documentation, license management, sustainability tracking | Done |
 | 14 | **Asset Management** | Asset registry, preventive/breakdown maintenance, spare parts inventory, asset depreciation | Done |
 | 15 | **Labor Management** | Labor planning, time & attendance, task assignment, performance tracking, payroll integration | Done |
-| 16 | **Cold Chain Management** | Temperature monitoring (IoT), excursion management, cold storage inventory, compliance reporting | Planned |
-| 17 | **Customer Portal** | Order tracking, account management, document retrieval, support ticketing, catalog browsing | Planned |
+| 16 | **Cold Chain Management** | Temperature monitoring (IoT), excursion management, cold storage inventory, compliance reporting, reefer maintenance | Done |
+| 17 | **Customer Portal** | Order tracking, account management, document retrieval, support ticketing, catalog browsing | Done |
 | 18 | **3PL Management** | Client billing, inventory segregation, SLA management, client integration, warehouse rental | Planned |
 | 19 | **Finance & Accounting Integration** | Accounts payable/receivable, landed cost calculation, budgeting, tax management | Planned |
 | 20 | **Integration & API Gateway** | ERP connectors (SAP, Oracle), e-commerce integration, IoT gateway, EDI, webhooks | Planned |
