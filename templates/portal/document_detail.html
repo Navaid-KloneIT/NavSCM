@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Document: {{ doc.document_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ doc.document_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Customer Portal</li>
+            <li class="breadcrumb-item"><a href="{% url 'portal:document_list' %}">Documents</a></li>
+            <li class="breadcrumb-item active">{{ doc.document_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Document Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">DOC #</th><td>{{ doc.document_number }}</td></tr>
+                            <tr><th class="ps-3">Account</th><td>{{ doc.portal_account|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Type</th><td>{{ doc.get_document_type_display }}</td></tr>
+                            <tr><th class="ps-3">Title</th><td>{{ doc.title|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Reference</th><td>{{ doc.reference_number|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Order</th><td>{{ doc.order|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">File Path</th><td>{{ doc.file_path|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">File Size</th><td>{{ doc.file_size_display|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if doc.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif doc.status == 'published' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Published</span>
+                                    {% elif doc.status == 'archived' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Archived</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ doc.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Issue Date</th><td>{{ doc.issue_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Expiry Date</th><td>{{ doc.expiry_date|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Expired?</th>
+                                <td>
+                                    {% if doc.is_expired %}
+                                        <span class="text-danger fw-medium">Yes</span>
+                                    {% else %}
+                                        <span class="text-success">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ doc.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Uploaded By</th><td>{{ doc.uploaded_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ doc.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if doc.status == 'draft' %}
+                    <a href="{% url 'portal:document_edit' doc.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'portal:document_publish' doc.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-line me-1"></i> Publish</button>
+                    </form>
+                    <form method="POST" action="{% url 'portal:document_delete' doc.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this document?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif doc.status == 'published' %}
+                    <form method="POST" action="{% url 'portal:document_archive' doc.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2"><i class="ri-archive-line me-1"></i> Archive</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'portal:document_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
