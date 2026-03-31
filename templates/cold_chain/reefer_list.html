@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Reefer Units{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>Reefer Units</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Cold Chain Management</li>
+            <li class="breadcrumb-item active">Reefer Units</li>
+        </ol>
+    </nav>
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'cold_chain:reefer_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Unit Type</label>
+                            <select class="form-select" name="unit_type">
+                                <option value="">All</option>
+                                {% for value, label in type_choices %}
+                                    <option value="{{ value }}" {% if request.GET.unit_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Refrigerant</label>
+                            <select class="form-select" name="refrigerant_type">
+                                <option value="">All</option>
+                                {% for value, label in refrigerant_choices %}
+                                    <option value="{{ value }}" {% if request.GET.refrigerant_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-1">
+                            <a href="{% url 'cold_chain:reefer_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Reefer Units</h5>
+                <span class="text-muted">{{ reefers|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Unit #</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Refrigerant</th>
+                                <th>Set Temp</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in reefers %}
+                            <tr>
+                                <td><a href="{% url 'cold_chain:reefer_detail' r.pk %}" class="fw-medium">{{ r.unit_number }}</a></td>
+                                <td>{{ r.name|truncatewords:5 }}</td>
+                                <td>{{ r.get_unit_type_display }}</td>
+                                <td>{{ r.get_refrigerant_type_display }}</td>
+                                <td>{% if r.set_temperature %}{{ r.set_temperature }}°C{% else %}-{% endif %}</td>
+                                <td>
+                                    {% if r.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif r.status == 'active' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                    {% elif r.status == 'maintenance' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Maintenance</span>
+                                    {% elif r.status == 'out_of_service' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Out of Service</span>
+                                    {% elif r.status == 'retired' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Retired</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ r.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'cold_chain:reefer_detail' r.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if r.status == 'draft' %}
+                                            <a href="{% url 'cold_chain:reefer_edit' r.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                            <form method="POST" action="{% url 'cold_chain:reefer_delete' r.pk %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this reefer unit?')"><i class="ri-delete-bin-line"></i></button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-fridge-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No reefer units found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.unit_type or request.GET.refrigerant_type %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by registering your first reefer unit.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
