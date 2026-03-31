@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Temperature Sensors{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>Temperature Sensors</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Cold Chain Management</li>
+            <li class="breadcrumb-item active">Sensors</li>
+        </ol>
+    </nav>
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'cold_chain:sensor_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Sensor Type</label>
+                            <select class="form-select" name="sensor_type">
+                                <option value="">All</option>
+                                {% for value, label in type_choices %}
+                                    <option value="{{ value }}" {% if request.GET.sensor_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Location</label>
+                            <select class="form-select" name="location_type">
+                                <option value="">All</option>
+                                {% for value, label in location_choices %}
+                                    <option value="{{ value }}" {% if request.GET.location_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'cold_chain:sensor_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Sensor</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Temperature Sensors</h5>
+                <span class="text-muted">{{ sensors|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Sensor #</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Location</th>
+                                <th>Next Calibration</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in sensors %}
+                            <tr>
+                                <td><a href="{% url 'cold_chain:sensor_detail' s.pk %}" class="fw-medium">{{ s.sensor_number }}</a></td>
+                                <td>{{ s.name|truncatewords:5 }}</td>
+                                <td>{{ s.get_sensor_type_display }}</td>
+                                <td>{{ s.get_location_type_display }}</td>
+                                <td>{{ s.next_calibration_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    {% if s.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif s.status == 'active' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                    {% elif s.status == 'offline' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Offline</span>
+                                    {% elif s.status == 'maintenance' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Maintenance</span>
+                                    {% elif s.status == 'retired' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Retired</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ s.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'cold_chain:sensor_detail' s.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if s.status == 'draft' %}
+                                            <a href="{% url 'cold_chain:sensor_edit' s.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                            <form method="POST" action="{% url 'cold_chain:sensor_delete' s.pk %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this sensor?')"><i class="ri-delete-bin-line"></i></button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-temp-cold-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No sensors found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.sensor_type or request.GET.location_type %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by registering your first temperature sensor.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
