@@ -159,6 +159,16 @@ Manages the physical assets used to run the supply chain (trucks, forklifts, mac
 - **Spare Parts Inventory** - Management of maintenance parts with stock levels, reorder points and quantities, unit cost tracking, stock status (in stock, low stock, out of stock, discontinued), vendor linkage, usage history tracking per asset and breakdown, total inventory value calculation, compatible asset mapping
 - **Asset Depreciation** - Financial tracking with multiple methods (straight line, declining balance, double declining, sum of years, units of production), auto-calculated annual depreciation, accumulated depreciation and current book value tracking, depreciation percentage, status lifecycle (draft → active → fully depreciated → disposed), salvage value and useful life configuration
 
+### Module 15: Labor Management
+
+Optimizes the workforce within warehouses and logistics.
+
+- **Labor Planning** - Forecasting labor requirements based on inbound/outbound volume with department assignment (receiving, picking, packing, shipping, loading, inventory control), shift scheduling (morning, afternoon, night, flexible), required vs. available headcount tracking, headcount gap analysis, warehouse assignment, status workflow (draft → approved → active → completed/cancelled), and per-role breakdown with hourly rate tracking
+- **Time & Attendance** - Clock-in/out functionality with break tracking (start/end times, duration in minutes), overtime calculation (auto-calculated from net hours vs. standard hours per day), shift assignment, warehouse location tracking, status workflow (clocked in → on break → clocked out → approved → locked), total hours/net hours/overtime computation
+- **Task Assignment** - Assigning specific warehouse tasks (picking, packing, receiving, loading, put away, cycle counting, cleaning, replenishment) to individual workers with priority levels (low → urgent), status workflow (pending → assigned → in progress → completed/cancelled), due date and overdue tracking, estimated vs. actual duration, units to process/processed tracking, error counting, checklist items with completion status, and auto-calculated units per hour and accuracy rate
+- **Performance Tracking** - Measuring worker productivity with period-based reviews, tasks completed count, total units processed, total hours worked, error tracking, auto-calculated units per hour, accuracy rate percentage, and weighted overall score, rating system (exceptional, exceeds expectations, meets expectations, needs improvement, unsatisfactory), reviewer assignment, status workflow (draft → submitted → approved → closed/cancelled), reviewer and worker comments
+- **Payroll Integration** - Aggregating labor data for payroll processing with regular and overtime hours tracking, configurable hourly and overtime rates, auto-calculated regular pay, overtime pay, gross pay (regular + overtime + bonuses), and net pay (gross - deductions), multi-currency support (USD, EUR, GBP, PKR, AED, SAR, INR, CNY), days worked/absent tracking, status workflow (draft → calculated → approved → exported/cancelled), export timestamp tracking
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -319,6 +329,11 @@ Manages the physical assets used to run the supply chain (trucks, forklifts, mac
    python manage.py seed_assets
    ```
 
+7o. **Seed Labor Management data**
+   ```bash
+   python manage.py seed_labor
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -421,11 +436,17 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/assets/*)
 │   │   └── admin.py       # Django admin registration
-│   └── contracts/         # Contract & compliance management module
-│       ├── models.py      # Contract, ContractDocument, ComplianceRecord, ComplianceCheckItem, TradeDocument, TradeDocumentItem, License, SustainabilityReport, SustainabilityMetric
-│       ├── views.py       # All contract & compliance CRUD & workflow views
+│   ├── contracts/         # Contract & compliance management module
+│   │   ├── models.py      # Contract, ContractDocument, ComplianceRecord, ComplianceCheckItem, TradeDocument, TradeDocumentItem, License, SustainabilityReport, SustainabilityMetric
+│   │   ├── views.py       # All contract & compliance CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/contracts/*)
+│   │   └── admin.py       # Django admin registration
+│   └── labor/             # Labor management module
+│       ├── models.py      # LaborPlan, LaborPlanLine, Attendance, TaskAssignment, TaskChecklistItem, PerformanceReview, PayrollRecord
+│       ├── views.py       # All labor management CRUD & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/contracts/*)
+│       ├── urls.py        # URL routing (/labor/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -530,12 +551,18 @@ NavSCM/
 │   │   ├── bm_*.html          # Breakdown maintenance list, form, detail
 │   │   ├── spare_*.html       # Spare parts list, form, detail
 │   │   └── depreciation_*.html # Asset depreciation list, form, detail
-│   └── contracts/         # Contract & compliance templates
-│       ├── contract_*.html        # Contract list, form, detail
-│       ├── compliance_*.html      # Compliance record list, form, detail
-│       ├── trade_doc_*.html       # Trade document list, form, detail
-│       ├── license_*.html         # License list, form, detail
-│       └── sustainability_*.html  # Sustainability report list, form, detail
+│   ├── contracts/         # Contract & compliance templates
+│   │   ├── contract_*.html        # Contract list, form, detail
+│   │   ├── compliance_*.html      # Compliance record list, form, detail
+│   │   ├── trade_doc_*.html       # Trade document list, form, detail
+│   │   ├── license_*.html         # License list, form, detail
+│   │   └── sustainability_*.html  # Sustainability report list, form, detail
+│   └── labor/             # Labor management templates
+│       ├── plan_*.html            # Labor plan list, form, detail
+│       ├── attendance_*.html      # Time & attendance list, form, detail
+│       ├── task_*.html            # Task assignment list, form, detail
+│       ├── performance_*.html     # Performance review list, form, detail
+│       └── payroll_*.html         # Payroll record list, form, detail
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
@@ -577,7 +604,7 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 | 12 | **Supply Chain Analytics** | Inventory dashboards, procurement analytics, logistics KPIs, financial reporting, predictive analytics | Done |
 | 13 | **Contract & Compliance** | Contract repository, compliance tracking, trade documentation, license management, sustainability tracking | Done |
 | 14 | **Asset Management** | Asset registry, preventive/breakdown maintenance, spare parts inventory, asset depreciation | Done |
-| 15 | **Labor Management** | Labor planning, time & attendance, task assignment, performance tracking, payroll integration | Planned |
+| 15 | **Labor Management** | Labor planning, time & attendance, task assignment, performance tracking, payroll integration | Done |
 | 16 | **Cold Chain Management** | Temperature monitoring (IoT), excursion management, cold storage inventory, compliance reporting | Planned |
 | 17 | **Customer Portal** | Order tracking, account management, document retrieval, support ticketing, catalog browsing | Planned |
 | 18 | **3PL Management** | Client billing, inventory segregation, SLA management, client integration, warehouse rental | Planned |
