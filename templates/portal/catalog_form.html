@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Customer Portal</li>
+            <li class="breadcrumb-item"><a href="{% url 'portal:catalog_list' %}">Catalog</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Catalog Item Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Source Item *</label>
+                            {{ form.item }}
+                            {% if form.item.errors %}<div class="text-danger small">{{ form.item.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Product Name *</label>
+                            {{ form.portal_name }}
+                            {% if form.portal_name.errors %}<div class="text-danger small">{{ form.portal_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Category</label>
+                            {{ form.category }}
+                            {% if form.category.errors %}<div class="text-danger small">{{ form.category.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Unit Price *</label>
+                            {{ form.unit_price }}
+                            {% if form.unit_price.errors %}<div class="text-danger small">{{ form.unit_price.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Currency</label>
+                            {{ form.currency }}
+                            {% if form.currency.errors %}<div class="text-danger small">{{ form.currency.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Stock Status *</label>
+                            {{ form.stock_status }}
+                            {% if form.stock_status.errors %}<div class="text-danger small">{{ form.stock_status.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Available Quantity</label>
+                            {{ form.available_quantity }}
+                            {% if form.available_quantity.errors %}<div class="text-danger small">{{ form.available_quantity.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Minimum Order Quantity</label>
+                            {{ form.minimum_order_quantity }}
+                            {% if form.minimum_order_quantity.errors %}<div class="text-danger small">{{ form.minimum_order_quantity.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Lead Time (Days)</label>
+                            {{ form.lead_time_days }}
+                            {% if form.lead_time_days.errors %}<div class="text-danger small">{{ form.lead_time_days.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Image URL</label>
+                            {{ form.image_url }}
+                            {% if form.image_url.errors %}<div class="text-danger small">{{ form.image_url.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check mt-4">
+                                {{ form.is_featured }}
+                                <label class="form-check-label">Featured</label>
+                                {% if form.is_featured.errors %}<div class="text-danger small">{{ form.is_featured.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check mt-4">
+                                {{ form.is_active }}
+                                <label class="form-check-label">Active</label>
+                                {% if form.is_active.errors %}<div class="text-danger small">{{ form.is_active.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.portal_description }}
+                            {% if form.portal_description.errors %}<div class="text-danger small">{{ form.portal_description.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Catalog Item</button>
+                    {% if item %}
+                        <a href="{% url 'portal:catalog_detail' item.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'portal:catalog_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
