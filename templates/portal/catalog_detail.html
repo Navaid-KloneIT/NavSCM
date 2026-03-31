@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Catalog: {{ item.catalog_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ item.catalog_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Customer Portal</li>
+            <li class="breadcrumb-item"><a href="{% url 'portal:catalog_list' %}">Catalog</a></li>
+            <li class="breadcrumb-item active">{{ item.catalog_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Catalog Item Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">CAT #</th><td>{{ item.catalog_number }}</td></tr>
+                            <tr><th class="ps-3">Source Item</th><td>{{ item.item|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Product Name</th><td>{{ item.portal_name }}</td></tr>
+                            <tr><th class="ps-3">Category</th><td>{{ item.category|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Description</th><td>{{ item.portal_description|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Price</th><td>{{ item.currency }} {{ item.unit_price }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Stock Status</th>
+                                <td>
+                                    {% if item.stock_status == 'in_stock' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> In Stock</span>
+                                    {% elif item.stock_status == 'low_stock' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Low Stock</span>
+                                    {% elif item.stock_status == 'out_of_stock' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Out of Stock</span>
+                                    {% elif item.stock_status == 'pre_order' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Pre Order</span>
+                                    {% elif item.stock_status == 'discontinued' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Discontinued</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ item.get_stock_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Available Qty</th><td>{{ item.available_quantity|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Min Order Qty</th><td>{{ item.minimum_order_quantity|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Lead Time</th><td>{% if item.lead_time_days %}{{ item.lead_time_days }} days{% else %}-{% endif %}</td></tr>
+                            <tr>
+                                <th class="ps-3">Image URL</th>
+                                <td>
+                                    {% if item.image_url %}
+                                        <a href="{{ item.image_url }}" target="_blank">{{ item.image_url|truncatewords:8 }}</a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Featured</th><td>{% if item.is_featured %}Yes{% else %}No{% endif %}</td></tr>
+                            <tr><th class="ps-3">Active</th><td>{% if item.is_active %}Yes{% else %}No{% endif %}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ item.created_by.get_full_name|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ item.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Sidebar -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                <a href="{% url 'portal:catalog_edit' item.pk %}" class="btn btn-soft-warning w-100 mb-2">
+                    <i class="ri-pencil-line me-1"></i> Edit
+                </a>
+                <form method="POST" action="{% url 'portal:catalog_delete' item.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-soft-danger w-100 mb-2" onclick="return confirm('Are you sure you want to delete this catalog item?')">
+                        <i class="ri-delete-bin-line me-1"></i> Delete
+                    </button>
+                </form>
+                <a href="{% url 'portal:catalog_list' %}" class="btn btn-light w-100">
+                    <i class="ri-arrow-left-line me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
