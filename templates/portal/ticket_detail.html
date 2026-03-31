@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}Ticket: {{ ticket.ticket_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ ticket.ticket_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Customer Portal</li>
+            <li class="breadcrumb-item"><a href="{% url 'portal:ticket_list' %}">Tickets</a></li>
+            <li class="breadcrumb-item active">{{ ticket.ticket_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Ticket Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Ticket #</th><td>{{ ticket.ticket_number }}</td></tr>
+                            <tr><th class="ps-3">Account</th><td>{{ ticket.portal_account }}</td></tr>
+                            <tr><th class="ps-3">Order</th><td>{{ ticket.order|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Subject</th><td>{{ ticket.subject }}</td></tr>
+                            <tr><th class="ps-3">Category</th><td>{{ ticket.get_category_display }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Priority</th>
+                                <td>
+                                    {% if ticket.priority == 'urgent' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Urgent</span>
+                                    {% elif ticket.priority == 'high' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> High</span>
+                                    {% elif ticket.priority == 'medium' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Medium</span>
+                                    {% elif ticket.priority == 'low' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Low</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ ticket.get_priority_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if ticket.status == 'open' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Open</span>
+                                    {% elif ticket.status == 'in_progress' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> In Progress</span>
+                                    {% elif ticket.status == 'waiting_on_customer' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Waiting on Customer</span>
+                                    {% elif ticket.status == 'resolved' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Resolved</span>
+                                    {% elif ticket.status == 'closed' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Closed</span>
+                                    {% elif ticket.status == 'reopened' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Reopened</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ ticket.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Description</th><td>{{ ticket.description|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Assigned To</th><td>{{ ticket.assigned_to|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Resolved At</th><td>{{ ticket.resolved_at|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Resolution Notes</th><td>{{ ticket.resolution_notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Response Time</th><td>{% if ticket.response_time_hours %}{{ ticket.response_time_hours }} hrs{% else %}-{% endif %}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ ticket.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ ticket.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Messages ({{ messages|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Sent At</th>
+                                <th>Sender</th>
+                                <th>Type</th>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for msg in messages %}
+                            <tr>
+                                <td>{{ msg.sent_at|date:"M d, Y H:i" }}</td>
+                                <td>{{ msg.sender_name }}</td>
+                                <td>
+                                    {% if msg.sender_type == 'customer' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Customer</span>
+                                    {% elif msg.sender_type == 'agent' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Agent</span>
+                                    {% elif msg.sender_type == 'system' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> System</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ msg.get_sender_type_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ msg.message }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-chat-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No messages yet.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if ticket.status == 'open' %}
+                    <a href="{% url 'portal:ticket_edit' ticket.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'portal:ticket_in_progress' ticket.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-user-follow-line me-1"></i> Assign (In Progress)</button>
+                    </form>
+                    <form method="POST" action="{% url 'portal:ticket_delete' ticket.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this ticket?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif ticket.status == 'in_progress' %}
+                    <form method="POST" action="{% url 'portal:ticket_resolve' ticket.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Resolve</button>
+                    </form>
+                {% elif ticket.status == 'waiting_on_customer' or ticket.status == 'reopened' %}
+                    <form method="POST" action="{% url 'portal:ticket_in_progress' ticket.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-user-follow-line me-1"></i> In Progress</button>
+                    </form>
+                    <form method="POST" action="{% url 'portal:ticket_resolve' ticket.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-check-double-line me-1"></i> Resolve</button>
+                    </form>
+                {% elif ticket.status == 'resolved' %}
+                    <form method="POST" action="{% url 'portal:ticket_close' ticket.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2"><i class="ri-lock-line me-1"></i> Close</button>
+                    </form>
+                    <form method="POST" action="{% url 'portal:ticket_reopen' ticket.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-warning w-100 mb-2"><i class="ri-arrow-go-back-line me-1"></i> Reopen</button>
+                    </form>
+                {% elif ticket.status == 'closed' %}
+                    <form method="POST" action="{% url 'portal:ticket_reopen' ticket.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-warning w-100 mb-2"><i class="ri-arrow-go-back-line me-1"></i> Reopen</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'portal:ticket_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
