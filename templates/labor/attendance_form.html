@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Labor Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'labor:attendance_list' %}">Attendance</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Attendance Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Worker *</label>
+                            {{ form.worker }}
+                            {% if form.worker.errors %}<div class="text-danger small">{{ form.worker.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Warehouse</label>
+                            {{ form.warehouse }}
+                            {% if form.warehouse.errors %}<div class="text-danger small">{{ form.warehouse.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Date *</label>
+                            {{ form.date }}
+                            {% if form.date.errors %}<div class="text-danger small">{{ form.date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Shift *</label>
+                            {{ form.shift }}
+                            {% if form.shift.errors %}<div class="text-danger small">{{ form.shift.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Clock In *</label>
+                            {{ form.clock_in }}
+                            {% if form.clock_in.errors %}<div class="text-danger small">{{ form.clock_in.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Clock Out</label>
+                            {{ form.clock_out }}
+                            {% if form.clock_out.errors %}<div class="text-danger small">{{ form.clock_out.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Break Start</label>
+                            {{ form.break_start }}
+                            {% if form.break_start.errors %}<div class="text-danger small">{{ form.break_start.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Break End</label>
+                            {{ form.break_end }}
+                            {% if form.break_end.errors %}<div class="text-danger small">{{ form.break_end.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Break Duration (min)</label>
+                            {{ form.break_duration_minutes }}
+                            {% if form.break_duration_minutes.errors %}<div class="text-danger small">{{ form.break_duration_minutes.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Overtime Hours</label>
+                            {{ form.overtime_hours }}
+                            {% if form.overtime_hours.errors %}<div class="text-danger small">{{ form.overtime_hours.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Std Hours/Day</label>
+                            {{ form.standard_hours_per_day }}
+                            {% if form.standard_hours_per_day.errors %}<div class="text-danger small">{{ form.standard_hours_per_day.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Record</button>
+                    {% if record %}
+                        <a href="{% url 'labor:attendance_detail' record.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'labor:attendance_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
