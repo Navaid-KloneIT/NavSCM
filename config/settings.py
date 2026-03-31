@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'apps.analytics',
     'apps.contracts',
     'apps.assets',
+    'apps.labor',
 ]
 
 # ==============================================================================
