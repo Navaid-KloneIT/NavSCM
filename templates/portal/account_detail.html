@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Portal Account: {{ account.account_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ account.account_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Customer Portal</li>
+            <li class="breadcrumb-item"><a href="{% url 'portal:account_list' %}">Accounts</a></li>
+            <li class="breadcrumb-item active">{{ account.account_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Account Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Account #</th><td>{{ account.account_number }}</td></tr>
+                            <tr><th class="ps-3">Display Name</th><td>{{ account.display_name }}</td></tr>
+                            <tr><th class="ps-3">Customer</th><td>{{ account.customer }}</td></tr>
+                            <tr><th class="ps-3">Email</th><td>{{ account.portal_email|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Phone</th><td>{{ account.phone|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Language</th><td>{{ account.get_preferred_language_display|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if account.status == 'active' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                    {% elif account.status == 'suspended' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Suspended</span>
+                                    {% elif account.status == 'pending' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Pending</span>
+                                    {% elif account.status == 'closed' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Closed</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ account.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Payment Method</th><td>{{ account.get_payment_method_display|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Payment Reference</th><td>{{ account.payment_reference|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Billing Address</th><td>{{ account.billing_address|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Shipping Address</th><td>{{ account.shipping_address|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ account.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ account.created_by.get_full_name|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ account.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card table-card">
+            <div class="card-header"><h5>Recent Trackings ({{ trackings|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Tracking #</th>
+                                <th>Order</th>
+                                <th>Status</th>
+                                <th>Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in trackings %}
+                            <tr>
+                                <td>{{ t.tracking_number }}</td>
+                                <td>{{ t.order|default:"-" }}</td>
+                                <td>{{ t.get_status_display }}</td>
+                                <td>{{ t.updated_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-map-pin-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No trackings found.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card table-card">
+            <div class="card-header"><h5>Recent Tickets ({{ tickets|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Ticket #</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in tickets %}
+                            <tr>
+                                <td>{{ t.ticket_number }}</td>
+                                <td>{{ t.subject|truncatewords:8 }}</td>
+                                <td>{{ t.get_status_display }}</td>
+                                <td>{{ t.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-customer-service-2-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No tickets found.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card table-card">
+            <div class="card-header"><h5>Recent Documents ({{ documents|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Document #</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Uploaded</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in documents %}
+                            <tr>
+                                <td>{{ d.document_number }}</td>
+                                <td>{{ d.title|truncatewords:8 }}</td>
+                                <td>{{ d.get_document_type_display }}</td>
+                                <td>{{ d.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No documents found.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if account.status == 'pending' %}
+                    <a href="{% url 'portal:account_edit' account.pk %}" class="btn btn-soft-warning w-100 mb-2">
+                        <i class="ri-pencil-line me-1"></i> Edit
+                    </a>
+                    <form method="POST" action="{% url 'portal:account_activate' account.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2">
+                            <i class="ri-check-line me-1"></i> Activate
+                        </button>
+                    </form>
+                    <form method="POST" action="{% url 'portal:account_delete' account.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-soft-danger w-100 mb-2" onclick="return confirm('Are you sure you want to delete this account?')">
+                            <i class="ri-delete-bin-line me-1"></i> Delete
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if account.status == 'active' %}
+                    <form method="POST" action="{% url 'portal:account_suspend' account.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-soft-warning w-100 mb-2">
+                            <i class="ri-pause-circle-line me-1"></i> Suspend
+                        </button>
+                    </form>
+                    <form method="POST" action="{% url 'portal:account_close' account.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2" onclick="return confirm('Are you sure you want to close this account?')">
+                            <i class="ri-close-circle-line me-1"></i> Close
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if account.status == 'suspended' %}
+                    <form method="POST" action="{% url 'portal:account_activate' account.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2">
+                            <i class="ri-check-line me-1"></i> Activate
+                        </button>
+                    </form>
+                    <form method="POST" action="{% url 'portal:account_close' account.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary w-100 mb-2" onclick="return confirm('Are you sure you want to close this account?')">
+                            <i class="ri-close-circle-line me-1"></i> Close
+                        </button>
+                    </form>
+                {% endif %}
+
+                <a href="{% url 'portal:account_list' %}" class="btn btn-light w-100">
+                    <i class="ri-arrow-left-line me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
