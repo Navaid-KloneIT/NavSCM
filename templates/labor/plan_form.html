@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Labor Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'labor:plan_list' %}">Plans</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Plan Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Warehouse</label>
+                            {{ form.warehouse }}
+                            {% if form.warehouse.errors %}<div class="text-danger small">{{ form.warehouse.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Plan Date *</label>
+                            {{ form.plan_date }}
+                            {% if form.plan_date.errors %}<div class="text-danger small">{{ form.plan_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Department *</label>
+                            {{ form.department }}
+                            {% if form.department.errors %}<div class="text-danger small">{{ form.department.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Shift *</label>
+                            {{ form.shift }}
+                            {% if form.shift.errors %}<div class="text-danger small">{{ form.shift.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Expected Inbound Volume</label>
+                            {{ form.expected_inbound_volume }}
+                            {% if form.expected_inbound_volume.errors %}<div class="text-danger small">{{ form.expected_inbound_volume.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Expected Outbound Volume</label>
+                            {{ form.expected_outbound_volume }}
+                            {% if form.expected_outbound_volume.errors %}<div class="text-danger small">{{ form.expected_outbound_volume.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Required Headcount</label>
+                            {{ form.required_headcount }}
+                            {% if form.required_headcount.errors %}<div class="text-danger small">{{ form.required_headcount.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Available Headcount</label>
+                            {{ form.available_headcount }}
+                            {% if form.available_headcount.errors %}<div class="text-danger small">{{ form.available_headcount.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <!-- Plan Lines Formset -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Role Breakdown</h5>
+                    <button type="button" class="btn btn-sm btn-soft-success" id="add-item-btn">
+                        <i class="ri-add-line me-1"></i> Add Role
+                    </button>
+                </div>
+                <div class="card-body">
+                    {{ formset.management_form }}
+                    <div id="formset-container">
+                        {% for item_form in formset %}
+                        <div class="formset-row border rounded p-3 mb-3">
+                            <div class="row g-3">
+                                {% if item_form.instance.pk %}
+                                    {{ item_form.id }}
+                                {% endif %}
+                                <div class="col-md-3">
+                                    <label class="form-label">Role *</label>
+                                    {{ item_form.role }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Required</label>
+                                    {{ item_form.required_count }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Available</label>
+                                    {{ item_form.available_count }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Hourly Rate</label>
+                                    {{ item_form.hourly_rate }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Notes</label>
+                                    {{ item_form.notes }}
+                                </div>
+                            </div>
+                            {% if item_form.instance.pk %}
+                                <div class="mt-2">{{ item_form.DELETE }} <label class="form-check-label text-danger">Remove</label></div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Plan</button>
+                    {% if plan %}
+                        <a href="{% url 'labor:plan_detail' plan.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'labor:plan_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('formset-container');
+    const addBtn = document.getElementById('add-item-btn');
+    const totalForms = document.getElementById('id_lines-TOTAL_FORMS');
+
+    addBtn.addEventListener('click', function() {
+        const formCount = parseInt(totalForms.value);
+        const lastForm = container.querySelector('.formset-row:last-child');
+        if (!lastForm) return;
+
+        const newForm = lastForm.cloneNode(true);
+        newForm.innerHTML = newForm.innerHTML.replace(/lines-\d+-/g, 'lines-' + formCount + '-');
+        newForm.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(function(input) {
+            input.value = '';
+        });
+        newForm.querySelectorAll('select').forEach(function(select) {
+            select.selectedIndex = 0;
+        });
+        newForm.querySelectorAll('input[type=checkbox]').forEach(function(cb) {
+            cb.checked = false;
+        });
+        const idField = newForm.querySelector('input[name$="-id"]');
+        if (idField) idField.value = '';
+        const deleteRow = newForm.querySelector('.mt-2');
+        if (deleteRow) deleteRow.remove();
+
+        container.appendChild(newForm);
+        totalForms.value = formCount + 1;
+    });
+});
+</script>
+{% endblock %}
