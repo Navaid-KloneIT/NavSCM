@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}Tracking: {{ tracking.tracking_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ tracking.tracking_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Customer Portal</li>
+            <li class="breadcrumb-item"><a href="{% url 'portal:tracking_list' %}">Tracking</a></li>
+            <li class="breadcrumb-item active">{{ tracking.tracking_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Tracking Information -->
+        <div class="card">
+            <div class="card-header"><h5>Tracking Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Tracking #</th><td>{{ tracking.tracking_number }}</td></tr>
+                            <tr><th class="ps-3">Account</th><td>{{ tracking.portal_account|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Order</th><td>{{ tracking.order|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Shipment</th><td>{{ tracking.shipment|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if tracking.current_status == 'processing' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Processing</span>
+                                    {% elif tracking.current_status == 'shipped' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Shipped</span>
+                                    {% elif tracking.current_status == 'in_transit' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Transit</span>
+                                    {% elif tracking.current_status == 'out_for_delivery' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Out for Delivery</span>
+                                    {% elif tracking.current_status == 'delivered' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Delivered</span>
+                                    {% elif tracking.current_status == 'delayed' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Delayed</span>
+                                    {% elif tracking.current_status == 'returned' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Returned</span>
+                                    {% elif tracking.current_status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ tracking.get_current_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Carrier</th><td>{{ tracking.carrier_name|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Tracking URL</th>
+                                <td>
+                                    {% if tracking.carrier_tracking_url %}
+                                        <a href="{{ tracking.carrier_tracking_url }}" target="_blank" rel="noopener noreferrer">{{ tracking.carrier_tracking_url }}</a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Est. Delivery</th><td>{{ tracking.estimated_delivery|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Actual Delivery</th><td>{{ tracking.actual_delivery|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Last Location</th><td>{{ tracking.last_location|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Days in Transit</th><td>{{ tracking.days_in_transit }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ tracking.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ tracking.created_by|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ tracking.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tracking Events -->
+        <div class="card table-card">
+            <div class="card-header"><h5>Tracking Events ({{ events|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Event Date</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for e in events %}
+                            <tr>
+                                <td>{{ e.event_date|date:"M d, Y H:i" }}</td>
+                                <td>{{ e.location|default:"-" }}</td>
+                                <td>
+                                    {% if e.status == 'processing' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Processing</span>
+                                    {% elif e.status == 'shipped' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Shipped</span>
+                                    {% elif e.status == 'in_transit' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> In Transit</span>
+                                    {% elif e.status == 'out_for_delivery' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Out for Delivery</span>
+                                    {% elif e.status == 'delivered' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Delivered</span>
+                                    {% elif e.status == 'delayed' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Delayed</span>
+                                    {% elif e.status == 'returned' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Returned</span>
+                                    {% elif e.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ e.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ e.description|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-route-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No tracking events recorded.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if tracking.current_status == 'processing' %}
+                    <a href="{% url 'portal:tracking_edit' tracking.pk %}" class="btn btn-warning w-100 mb-2"><i class="ri-pencil-line me-1"></i> Edit</a>
+                    <form method="POST" action="{% url 'portal:tracking_ship' tracking.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2"><i class="ri-truck-line me-1"></i> Mark as Shipped</button>
+                    </form>
+                    <form method="POST" action="{% url 'portal:tracking_delete' tracking.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Delete this tracking?')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                    </form>
+                {% elif tracking.current_status == 'shipped' or tracking.current_status == 'in_transit' or tracking.current_status == 'out_for_delivery' %}
+                    <form method="POST" action="{% url 'portal:tracking_deliver' tracking.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-checkbox-circle-line me-1"></i> Mark as Delivered</button>
+                    </form>
+                    <form method="POST" action="{% url 'portal:tracking_delay' tracking.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-warning w-100 mb-2"><i class="ri-time-line me-1"></i> Mark as Delayed</button>
+                    </form>
+                    <form method="POST" action="{% url 'portal:tracking_cancel' tracking.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Cancel this tracking?')"><i class="ri-close-circle-line me-1"></i> Cancel</button>
+                    </form>
+                {% elif tracking.current_status == 'delayed' %}
+                    <form method="POST" action="{% url 'portal:tracking_deliver' tracking.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2"><i class="ri-checkbox-circle-line me-1"></i> Mark as Delivered</button>
+                    </form>
+                    <form method="POST" action="{% url 'portal:tracking_cancel' tracking.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2" onclick="return confirm('Cancel this tracking?')"><i class="ri-close-circle-line me-1"></i> Cancel</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'portal:tracking_list' %}" class="btn btn-light w-100"><i class="ri-arrow-left-line me-1"></i> Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
