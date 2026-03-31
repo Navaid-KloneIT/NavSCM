@@ -1635,6 +1635,262 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Customer Portal <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Portal Accounts -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'account_list,account_create,account_detail,account_edit' and request.resolver_match.namespace == 'portal' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-user-settings-line"></i>
+                    <span class="menu-text">Portal Accounts</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'portal:account_list' %}" class="menu-link {% if request.resolver_match.url_name == 'account_list' or request.resolver_match.url_name == 'account_detail' or request.resolver_match.url_name == 'account_edit' %}{% if request.resolver_match.namespace == 'portal' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Accounts</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'portal:account_create' %}" class="menu-link {% if request.resolver_match.url_name == 'account_create' and request.resolver_match.namespace == 'portal' %}active{% endif %}">
+                            <span class="menu-text">New Account</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Order Tracking -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'tracking_list,tracking_create,tracking_detail,tracking_edit' and request.resolver_match.namespace == 'portal' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-map-pin-line"></i>
+                    <span class="menu-text">Order Tracking</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'portal:tracking_list' %}" class="menu-link {% if request.resolver_match.url_name == 'tracking_list' or request.resolver_match.url_name == 'tracking_detail' or request.resolver_match.url_name == 'tracking_edit' %}{% if request.resolver_match.namespace == 'portal' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Trackings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'portal:tracking_create' %}" class="menu-link {% if request.resolver_match.url_name == 'tracking_create' and request.resolver_match.namespace == 'portal' %}active{% endif %}">
+                            <span class="menu-text">New Tracking</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Portal Documents -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'document_list,document_create,document_detail,document_edit' and request.resolver_match.namespace == 'portal' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-list-3-line"></i>
+                    <span class="menu-text">Documents</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'portal:document_list' %}" class="menu-link {% if request.resolver_match.url_name == 'document_list' or request.resolver_match.url_name == 'document_detail' or request.resolver_match.url_name == 'document_edit' %}{% if request.resolver_match.namespace == 'portal' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Documents</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'portal:document_create' %}" class="menu-link {% if request.resolver_match.url_name == 'document_create' and request.resolver_match.namespace == 'portal' %}active{% endif %}">
+                            <span class="menu-text">New Document</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Support Tickets -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'ticket_list,ticket_create,ticket_detail,ticket_edit' and request.resolver_match.namespace == 'portal' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-customer-service-2-line"></i>
+                    <span class="menu-text">Support Tickets</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'portal:ticket_list' %}" class="menu-link {% if request.resolver_match.url_name == 'ticket_list' or request.resolver_match.url_name == 'ticket_detail' or request.resolver_match.url_name == 'ticket_edit' %}{% if request.resolver_match.namespace == 'portal' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Tickets</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'portal:ticket_create' %}" class="menu-link {% if request.resolver_match.url_name == 'ticket_create' and request.resolver_match.namespace == 'portal' %}active{% endif %}">
+                            <span class="menu-text">New Ticket</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Product Catalog -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'catalog_list,catalog_create,catalog_detail,catalog_edit' and request.resolver_match.namespace == 'portal' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-shopping-bag-line"></i>
+                    <span class="menu-text">Product Catalog</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'portal:catalog_list' %}" class="menu-link {% if request.resolver_match.url_name == 'catalog_list' or request.resolver_match.url_name == 'catalog_detail' or request.resolver_match.url_name == 'catalog_edit' %}{% if request.resolver_match.namespace == 'portal' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Items</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'portal:catalog_create' %}" class="menu-link {% if request.resolver_match.url_name == 'catalog_create' and request.resolver_match.namespace == 'portal' %}active{% endif %}">
+                            <span class="menu-text">New Item</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="menu-title" data-toggle="menu-section">Cold Chain Management <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Temperature Sensors -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'sensor_list,sensor_create,sensor_detail,sensor_edit' and request.resolver_match.namespace == 'cold_chain' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-temp-cold-line"></i>
+                    <span class="menu-text">Temperature Sensors</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'sensor_list,sensor_create,sensor_detail,sensor_edit' and request.resolver_match.namespace == 'cold_chain' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:sensor_list' %}" class="menu-link {% if request.resolver_match.url_name == 'sensor_list' or request.resolver_match.url_name == 'sensor_detail' or request.resolver_match.url_name == 'sensor_edit' %}{% if request.resolver_match.namespace == 'cold_chain' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Sensors</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:sensor_create' %}" class="menu-link {% if request.resolver_match.url_name == 'sensor_create' and request.resolver_match.namespace == 'cold_chain' %}active{% endif %}">
+                            <span class="menu-text">New Sensor</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Temperature Zones -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'zone_list,zone_create,zone_detail,zone_edit' and request.resolver_match.namespace == 'cold_chain' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-thermometer-line"></i>
+                    <span class="menu-text">Temperature Zones</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'zone_list,zone_create,zone_detail,zone_edit' and request.resolver_match.namespace == 'cold_chain' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:zone_list' %}" class="menu-link {% if request.resolver_match.url_name == 'zone_list' or request.resolver_match.url_name == 'zone_detail' or request.resolver_match.url_name == 'zone_edit' %}{% if request.resolver_match.namespace == 'cold_chain' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Zones</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:zone_create' %}" class="menu-link {% if request.resolver_match.url_name == 'zone_create' and request.resolver_match.namespace == 'cold_chain' %}active{% endif %}">
+                            <span class="menu-text">New Zone</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Temperature Excursions -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'excursion_list,excursion_create,excursion_detail,excursion_edit' and request.resolver_match.namespace == 'cold_chain' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-alarm-warning-line"></i>
+                    <span class="menu-text">Excursion Management</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'excursion_list,excursion_create,excursion_detail,excursion_edit' and request.resolver_match.namespace == 'cold_chain' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:excursion_list' %}" class="menu-link {% if request.resolver_match.url_name == 'excursion_list' or request.resolver_match.url_name == 'excursion_detail' or request.resolver_match.url_name == 'excursion_edit' %}{% if request.resolver_match.namespace == 'cold_chain' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Excursions</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:excursion_create' %}" class="menu-link {% if request.resolver_match.url_name == 'excursion_create' and request.resolver_match.namespace == 'cold_chain' %}active{% endif %}">
+                            <span class="menu-text">New Excursion</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Cold Storage Units -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'storage_list,storage_create,storage_detail,storage_edit' and request.resolver_match.namespace == 'cold_chain' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-fridge-line"></i>
+                    <span class="menu-text">Cold Storage</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'storage_list,storage_create,storage_detail,storage_edit' and request.resolver_match.namespace == 'cold_chain' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:storage_list' %}" class="menu-link {% if request.resolver_match.url_name == 'storage_list' or request.resolver_match.url_name == 'storage_detail' or request.resolver_match.url_name == 'storage_edit' %}{% if request.resolver_match.namespace == 'cold_chain' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Storage Units</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:storage_create' %}" class="menu-link {% if request.resolver_match.url_name == 'storage_create' and request.resolver_match.namespace == 'cold_chain' %}active{% endif %}">
+                            <span class="menu-text">New Storage Unit</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Compliance Reporting -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'compliance_list,compliance_create,compliance_detail,compliance_edit' and request.resolver_match.namespace == 'cold_chain' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-chart-line"></i>
+                    <span class="menu-text">Compliance Reports</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'compliance_list,compliance_create,compliance_detail,compliance_edit' and request.resolver_match.namespace == 'cold_chain' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:compliance_list' %}" class="menu-link {% if request.resolver_match.url_name == 'compliance_list' or request.resolver_match.url_name == 'compliance_detail' or request.resolver_match.url_name == 'compliance_edit' %}{% if request.resolver_match.namespace == 'cold_chain' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:compliance_create' %}" class="menu-link {% if request.resolver_match.url_name == 'compliance_create' and request.resolver_match.namespace == 'cold_chain' %}active{% endif %}">
+                            <span class="menu-text">New Report</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Reefer Units -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'reefer_list,reefer_create,reefer_detail,reefer_edit' and request.resolver_match.namespace == 'cold_chain' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-fridge-line"></i>
+                    <span class="menu-text">Reefer Units</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'reefer_list,reefer_create,reefer_detail,reefer_edit' and request.resolver_match.namespace == 'cold_chain' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:reefer_list' %}" class="menu-link {% if request.resolver_match.url_name == 'reefer_list' or request.resolver_match.url_name == 'reefer_detail' or request.resolver_match.url_name == 'reefer_edit' %}{% if request.resolver_match.namespace == 'cold_chain' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Reefers</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:reefer_create' %}" class="menu-link {% if request.resolver_match.url_name == 'reefer_create' and request.resolver_match.namespace == 'cold_chain' %}active{% endif %}">
+                            <span class="menu-text">New Reefer</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Reefer Maintenance -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'reefer_maint_list,reefer_maint_create,reefer_maint_detail,reefer_maint_edit' and request.resolver_match.namespace == 'cold_chain' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-tools-line"></i>
+                    <span class="menu-text">Reefer Maintenance</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'reefer_maint_list,reefer_maint_create,reefer_maint_detail,reefer_maint_edit' and request.resolver_match.namespace == 'cold_chain' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:reefer_maint_list' %}" class="menu-link {% if request.resolver_match.url_name == 'reefer_maint_list' or request.resolver_match.url_name == 'reefer_maint_detail' or request.resolver_match.url_name == 'reefer_maint_edit' %}{% if request.resolver_match.namespace == 'cold_chain' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Maintenance</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'cold_chain:reefer_maint_create' %}" class="menu-link {% if request.resolver_match.url_name == 'reefer_maint_create' and request.resolver_match.namespace == 'cold_chain' %}active{% endif %}">
+                            <span class="menu-text">New Maintenance</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Contract &amp; Compliance <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Contract Repository -->
