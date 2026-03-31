@@ -1528,6 +1528,113 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Labor Management <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Labor Planning -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'plan_list,plan_create,plan_detail,plan_edit' and request.resolver_match.namespace == 'labor' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-calendar-schedule-line"></i>
+                    <span class="menu-text">Labor Planning</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'labor:plan_list' %}" class="menu-link {% if request.resolver_match.url_name == 'plan_list' or request.resolver_match.url_name == 'plan_detail' or request.resolver_match.url_name == 'plan_edit' %}{% if request.resolver_match.namespace == 'labor' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Plans</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'labor:plan_create' %}" class="menu-link {% if request.resolver_match.url_name == 'plan_create' and request.resolver_match.namespace == 'labor' %}active{% endif %}">
+                            <span class="menu-text">New Plan</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Time & Attendance -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'attendance_list,attendance_create,attendance_detail,attendance_edit' and request.resolver_match.namespace == 'labor' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-time-line"></i>
+                    <span class="menu-text">Time & Attendance</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'labor:attendance_list' %}" class="menu-link {% if request.resolver_match.url_name == 'attendance_list' or request.resolver_match.url_name == 'attendance_detail' or request.resolver_match.url_name == 'attendance_edit' %}{% if request.resolver_match.namespace == 'labor' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Records</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'labor:attendance_create' %}" class="menu-link {% if request.resolver_match.url_name == 'attendance_create' and request.resolver_match.namespace == 'labor' %}active{% endif %}">
+                            <span class="menu-text">Clock In</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Task Assignment -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'task_list,task_create,task_detail,task_edit' and request.resolver_match.namespace == 'labor' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-task-line"></i>
+                    <span class="menu-text">Task Assignment</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'labor:task_list' %}" class="menu-link {% if request.resolver_match.url_name == 'task_list' or request.resolver_match.url_name == 'task_detail' or request.resolver_match.url_name == 'task_edit' %}{% if request.resolver_match.namespace == 'labor' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Tasks</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'labor:task_create' %}" class="menu-link {% if request.resolver_match.url_name == 'task_create' and request.resolver_match.namespace == 'labor' %}active{% endif %}">
+                            <span class="menu-text">New Task</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Performance Tracking -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'performance_list,performance_create,performance_detail,performance_edit' and request.resolver_match.namespace == 'labor' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-bar-chart-line"></i>
+                    <span class="menu-text">Performance Tracking</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'labor:performance_list' %}" class="menu-link {% if request.resolver_match.url_name == 'performance_list' or request.resolver_match.url_name == 'performance_detail' or request.resolver_match.url_name == 'performance_edit' %}{% if request.resolver_match.namespace == 'labor' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Reviews</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'labor:performance_create' %}" class="menu-link {% if request.resolver_match.url_name == 'performance_create' and request.resolver_match.namespace == 'labor' %}active{% endif %}">
+                            <span class="menu-text">New Review</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Payroll Integration -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'payroll_list,payroll_create,payroll_detail,payroll_edit' and request.resolver_match.namespace == 'labor' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-money-dollar-circle-line"></i>
+                    <span class="menu-text">Payroll Integration</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'labor:payroll_list' %}" class="menu-link {% if request.resolver_match.url_name == 'payroll_list' or request.resolver_match.url_name == 'payroll_detail' or request.resolver_match.url_name == 'payroll_edit' %}{% if request.resolver_match.namespace == 'labor' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Records</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'labor:payroll_create' %}" class="menu-link {% if request.resolver_match.url_name == 'payroll_create' and request.resolver_match.namespace == 'labor' %}active{% endif %}">
+                            <span class="menu-text">New Payroll</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Contract &amp; Compliance <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Contract Repository -->
