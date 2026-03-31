@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Labor Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'labor:payroll_list' %}">Payroll</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Payroll Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Worker *</label>
+                            {{ form.worker }}
+                            {% if form.worker.errors %}<div class="text-danger small">{{ form.worker.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Currency</label>
+                            {{ form.currency }}
+                            {% if form.currency.errors %}<div class="text-danger small">{{ form.currency.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Period Start *</label>
+                            {{ form.period_start }}
+                            {% if form.period_start.errors %}<div class="text-danger small">{{ form.period_start.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Period End *</label>
+                            {{ form.period_end }}
+                            {% if form.period_end.errors %}<div class="text-danger small">{{ form.period_end.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Regular Hours</label>
+                            {{ form.regular_hours }}
+                            {% if form.regular_hours.errors %}<div class="text-danger small">{{ form.regular_hours.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Overtime Hours</label>
+                            {{ form.overtime_hours }}
+                            {% if form.overtime_hours.errors %}<div class="text-danger small">{{ form.overtime_hours.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Hourly Rate</label>
+                            {{ form.hourly_rate }}
+                            {% if form.hourly_rate.errors %}<div class="text-danger small">{{ form.hourly_rate.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Overtime Rate</label>
+                            {{ form.overtime_rate }}
+                            {% if form.overtime_rate.errors %}<div class="text-danger small">{{ form.overtime_rate.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Deductions</label>
+                            {{ form.deductions }}
+                            {% if form.deductions.errors %}<div class="text-danger small">{{ form.deductions.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Bonuses</label>
+                            {{ form.bonuses }}
+                            {% if form.bonuses.errors %}<div class="text-danger small">{{ form.bonuses.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Days Worked</label>
+                            {{ form.days_worked }}
+                            {% if form.days_worked.errors %}<div class="text-danger small">{{ form.days_worked.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Days Absent</label>
+                            {{ form.days_absent }}
+                            {% if form.days_absent.errors %}<div class="text-danger small">{{ form.days_absent.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Payroll</button>
+                    {% if record %}
+                        <a href="{% url 'labor:payroll_detail' record.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'labor:payroll_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
