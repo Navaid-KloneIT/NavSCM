@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Compliance Reports{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>Compliance Reports</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Cold Chain Management</li>
+            <li class="breadcrumb-item active">Compliance</li>
+        </ol>
+    </nav>
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'cold_chain:compliance_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Report Type</label>
+                            <select class="form-select" name="report_type">
+                                <option value="">All</option>
+                                {% for value, label in type_choices %}
+                                    <option value="{{ value }}" {% if request.GET.report_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Regulatory Body</label>
+                            <select class="form-select" name="regulatory_body">
+                                <option value="">All</option>
+                                {% for value, label in body_choices %}
+                                    <option value="{{ value }}" {% if request.GET.regulatory_body == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-1">
+                            <a href="{% url 'cold_chain:compliance_create' %}" class="btn btn-success w-100">New</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Compliance Reports</h5>
+                <span class="text-muted">{{ reports|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Report #</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Regulatory Body</th>
+                                <th>Period</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in reports %}
+                            <tr>
+                                <td><a href="{% url 'cold_chain:compliance_detail' r.pk %}" class="fw-medium">{{ r.report_number }}</a></td>
+                                <td>{{ r.title|truncatewords:5 }}</td>
+                                <td>{{ r.get_report_type_display }}</td>
+                                <td>{{ r.get_regulatory_body_display }}</td>
+                                <td>{{ r.period_start|date:"M d, Y" }} to {{ r.period_end|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if r.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif r.status == 'generated' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Generated</span>
+                                    {% elif r.status == 'reviewed' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Reviewed</span>
+                                    {% elif r.status == 'submitted' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Submitted</span>
+                                    {% elif r.status == 'approved' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Approved</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ r.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'cold_chain:compliance_detail' r.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if r.status == 'draft' %}
+                                            <a href="{% url 'cold_chain:compliance_edit' r.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                            <form method="POST" action="{% url 'cold_chain:compliance_delete' r.pk %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this compliance report?')"><i class="ri-delete-bin-line"></i></button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-chart-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No compliance reports found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.report_type or request.GET.regulatory_body %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first compliance report.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
