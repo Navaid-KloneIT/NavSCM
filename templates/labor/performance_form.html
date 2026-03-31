@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Labor Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'labor:performance_list' %}">Performance</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Review Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Worker *</label>
+                            {{ form.worker }}
+                            {% if form.worker.errors %}<div class="text-danger small">{{ form.worker.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Warehouse</label>
+                            {{ form.warehouse }}
+                            {% if form.warehouse.errors %}<div class="text-danger small">{{ form.warehouse.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Period Start *</label>
+                            {{ form.period_start }}
+                            {% if form.period_start.errors %}<div class="text-danger small">{{ form.period_start.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Period End *</label>
+                            {{ form.period_end }}
+                            {% if form.period_end.errors %}<div class="text-danger small">{{ form.period_end.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tasks Completed</label>
+                            {{ form.tasks_completed }}
+                            {% if form.tasks_completed.errors %}<div class="text-danger small">{{ form.tasks_completed.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Total Units Processed</label>
+                            {{ form.total_units_processed }}
+                            {% if form.total_units_processed.errors %}<div class="text-danger small">{{ form.total_units_processed.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Total Hours Worked</label>
+                            {{ form.total_hours_worked }}
+                            {% if form.total_hours_worked.errors %}<div class="text-danger small">{{ form.total_hours_worked.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Total Errors</label>
+                            {{ form.total_errors }}
+                            {% if form.total_errors.errors %}<div class="text-danger small">{{ form.total_errors.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Rating *</label>
+                            {{ form.rating }}
+                            {% if form.rating.errors %}<div class="text-danger small">{{ form.rating.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reviewed By</label>
+                            {{ form.reviewed_by }}
+                            {% if form.reviewed_by.errors %}<div class="text-danger small">{{ form.reviewed_by.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Reviewer Comments</label>
+                            {{ form.reviewer_comments }}
+                            {% if form.reviewer_comments.errors %}<div class="text-danger small">{{ form.reviewer_comments.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Worker Comments</label>
+                            {{ form.worker_comments }}
+                            {% if form.worker_comments.errors %}<div class="text-danger small">{{ form.worker_comments.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Review</button>
+                    {% if review %}
+                        <a href="{% url 'labor:performance_detail' review.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'labor:performance_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
