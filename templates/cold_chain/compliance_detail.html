@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Report: {{ report.report_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ report.report_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Cold Chain Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'cold_chain:compliance_list' %}">Compliance</a></li>
+            <li class="breadcrumb-item active">{{ report.report_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Report Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Report #</th><td>{{ report.report_number }}</td></tr>
+                            <tr><th class="ps-3">Title</th><td>{{ report.title }}</td></tr>
+                            <tr><th class="ps-3">Type</th><td>{{ report.get_report_type_display }}</td></tr>
+                            <tr><th class="ps-3">Regulatory Body</th><td>{{ report.get_regulatory_body_display }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if report.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif report.status == 'generated' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Generated</span>
+                                    {% elif report.status == 'reviewed' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Reviewed</span>
+                                    {% elif report.status == 'submitted' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Submitted</span>
+                                    {% elif report.status == 'approved' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Approved</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ report.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Period Start</th><td>{{ report.period_start|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Period End</th><td>{{ report.period_end|date:"M d, Y"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Findings Summary</th><td>{{ report.findings_summary|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Recommendations</th><td>{{ report.recommendations|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Approved By</th><td>{{ report.approved_by.get_full_name|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Approved At</th><td>{{ report.approved_at|date:"M d, Y H:i"|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ report.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ report.created_by.get_full_name|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ report.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card table-card">
+            <div class="card-header"><h5>Report Items ({{ items|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Specification</th>
+                                <th>Measured Value</th>
+                                <th>Unit</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.parameter_name }}</td>
+                                <td>{{ item.specification|default:"-" }}</td>
+                                <td>{{ item.measured_value }}</td>
+                                <td>{{ item.unit_of_measure|default:"-" }}</td>
+                                <td>
+                                    {% if item.result == 'pass' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Pass</span>
+                                    {% elif item.result == 'fail' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Fail</span>
+                                    {% elif item.result == 'warning' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Warning</span>
+                                    {% elif item.result == 'not_tested' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Not Tested</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ item.get_result_display|default:"-" }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No report items found.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if report.status == 'draft' %}
+                    <a href="{% url 'cold_chain:compliance_edit' report.pk %}" class="btn btn-soft-warning w-100 mb-2">
+                        <i class="ri-pencil-line me-1"></i> Edit
+                    </a>
+                    <form method="POST" action="{% url 'cold_chain:compliance_generate' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2">
+                            <i class="ri-file-chart-line me-1"></i> Generate
+                        </button>
+                    </form>
+                    <form method="POST" action="{% url 'cold_chain:compliance_delete' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-soft-danger w-100 mb-2" onclick="return confirm('Are you sure you want to delete this compliance report?')">
+                            <i class="ri-delete-bin-line me-1"></i> Delete
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if report.status == 'generated' %}
+                    <form method="POST" action="{% url 'cold_chain:compliance_review' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100 mb-2">
+                            <i class="ri-check-double-line me-1"></i> Review
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if report.status == 'reviewed' %}
+                    <form method="POST" action="{% url 'cold_chain:compliance_submit' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100 mb-2">
+                            <i class="ri-send-plane-line me-1"></i> Submit
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if report.status == 'submitted' %}
+                    <form method="POST" action="{% url 'cold_chain:compliance_approve' report.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2">
+                            <i class="ri-check-line me-1"></i> Approve
+                        </button>
+                    </form>
+                {% endif %}
+
+                <a href="{% url 'cold_chain:compliance_list' %}" class="btn btn-light w-100">
+                    <i class="ri-arrow-left-line me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
