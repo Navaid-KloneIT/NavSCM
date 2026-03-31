@@ -25,6 +25,8 @@ urlpatterns = [
     path('contracts/', include('apps.contracts.urls', namespace='contracts')),
     path('assets/', include('apps.assets.urls', namespace='assets')),
     path('labor/', include('apps.labor.urls', namespace='labor')),
+    path('portal/', include('apps.portal.urls', namespace='portal')),
+    path('cold-chain/', include('apps.cold_chain.urls', namespace='cold_chain')),
     path('', include('apps.dashboard.urls')),
 ]
 
