@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Product Catalog{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>Product Catalog</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Customer Portal</li>
+            <li class="breadcrumb-item active">Catalog</li>
+        </ol>
+    </nav>
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'portal:catalog_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Stock Status</label>
+                            <select class="form-select" name="stock_status">
+                                <option value="">All</option>
+                                {% for value, label in stock_choices %}
+                                    <option value="{{ value }}" {% if request.GET.stock_status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Active</label>
+                            <select class="form-select" name="active">
+                                <option value="">All</option>
+                                <option value="active" {% if request.GET.active == 'active' %}selected{% endif %}>Active</option>
+                                <option value="inactive" {% if request.GET.active == 'inactive' %}selected{% endif %}>Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Featured</label>
+                            <select class="form-select" name="featured">
+                                <option value="">All</option>
+                                <option value="yes" {% if request.GET.featured == 'yes' %}selected{% endif %}>Yes</option>
+                                <option value="no" {% if request.GET.featured == 'no' %}selected{% endif %}>No</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'portal:catalog_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Item</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Catalog Items</h5>
+                <span class="text-muted">{{ items|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>CAT #</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock Status</th>
+                                <th>Qty Available</th>
+                                <th>Featured</th>
+                                <th>Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in items %}
+                            <tr>
+                                <td><a href="{% url 'portal:catalog_detail' i.pk %}" class="fw-medium">{{ i.catalog_number }}</a></td>
+                                <td>{{ i.portal_name|truncatewords:5 }}</td>
+                                <td>{{ i.category|default:"-" }}</td>
+                                <td>{{ i.currency }} {{ i.unit_price }}</td>
+                                <td>
+                                    {% if i.stock_status == 'in_stock' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> In Stock</span>
+                                    {% elif i.stock_status == 'low_stock' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Low Stock</span>
+                                    {% elif i.stock_status == 'out_of_stock' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Out of Stock</span>
+                                    {% elif i.stock_status == 'pre_order' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Pre Order</span>
+                                    {% elif i.stock_status == 'discontinued' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Discontinued</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ i.get_stock_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ i.available_quantity|default:"-" }}</td>
+                                <td>
+                                    {% if i.is_featured %}<span class="text-success"><i class="ri-star-fill"></i></span>{% else %}-{% endif %}
+                                </td>
+                                <td>
+                                    {% if i.is_active %}<span class="status-badge badge-soft-success">Active</span>{% else %}<span class="status-badge badge-soft-secondary">Inactive</span>{% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'portal:catalog_detail' i.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        <a href="{% url 'portal:catalog_edit' i.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                        <form method="POST" action="{% url 'portal:catalog_delete' i.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this catalog item?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-shopping-bag-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No catalog items found.</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.stock_status or request.GET.active or request.GET.featured %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by adding your first catalog item.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
