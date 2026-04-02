@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}AP Invoice: {{ invoice.invoice_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ invoice.invoice_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Finance &amp; Accounting</li>
+            <li class="breadcrumb-item"><a href="{% url 'finance:ap_invoice_list' %}">AP Invoices</a></li>
+            <li class="breadcrumb-item active">{{ invoice.invoice_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Invoice Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Invoice #</th><td>{{ invoice.invoice_number }}</td></tr>
+                            <tr><th class="ps-3">Vendor</th><td>{{ invoice.vendor }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Status</th>
+                                <td>
+                                    {% if invoice.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif invoice.status == 'pending_approval' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Pending Approval</span>
+                                    {% elif invoice.status == 'approved' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Approved</span>
+                                    {% elif invoice.status == 'partially_paid' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Partially Paid</span>
+                                    {% elif invoice.status == 'paid' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Paid</span>
+                                    {% elif invoice.status == 'overdue' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Overdue</span>
+                                    {% elif invoice.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ invoice.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Invoice Date</th><td>{{ invoice.invoice_date|date:"M d, Y" }}</td></tr>
+                            <tr><th class="ps-3">Due Date</th><td>{{ invoice.due_date|date:"M d, Y" }}</td></tr>
+                            <tr><th class="ps-3">Currency</th><td>{{ invoice.currency|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Payment Terms</th><td>{{ invoice.get_payment_terms_display|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Subtotal</th><td>{{ invoice.subtotal }}</td></tr>
+                            <tr><th class="ps-3">Tax</th><td>{{ invoice.tax_amount }}</td></tr>
+                            <tr><th class="ps-3">Total</th><td>{{ invoice.total_amount }}</td></tr>
+                            <tr><th class="ps-3">Amount Paid</th><td>{{ invoice.amount_paid }}</td></tr>
+                            <tr><th class="ps-3">Balance Due</th><td>{{ invoice.balance_due }}</td></tr>
+                            <tr><th class="ps-3">Days Outstanding</th><td>{{ invoice.days_outstanding|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ invoice.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ invoice.created_by.get_full_name|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ invoice.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card table-card">
+            <div class="card-header"><h5>Line Items ({{ line_items|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Qty</th>
+                                <th>Unit Price</th>
+                                <th>Tax Rate %</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in line_items %}
+                            <tr>
+                                <td>{{ item.description }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.unit_price }}</td>
+                                <td>{{ item.tax_rate|default:"0" }}%</td>
+                                <td>{{ item.total_price }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-list-check" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No line items.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card table-card">
+            <div class="card-header"><h5>Payments ({{ payments|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Payment #</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in payments %}
+                            <tr>
+                                <td><a href="{% url 'finance:ap_payment_detail' p.pk %}" class="fw-medium">{{ p.payment_number }}</a></td>
+                                <td>{{ p.payment_date|date:"M d, Y" }}</td>
+                                <td>{{ p.amount }}</td>
+                                <td>{{ p.get_payment_method_display|default:"-" }}</td>
+                                <td>{{ p.reference|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-bank-card-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No payments recorded.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                {% if invoice.status == 'draft' %}
+                    <a href="{% url 'finance:ap_invoice_edit' invoice.pk %}" class="btn btn-soft-warning w-100 mb-2">
+                        <i class="ri-pencil-line me-1"></i> Edit
+                    </a>
+                    <form method="POST" action="{% url 'finance:ap_invoice_approve' invoice.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2">
+                            <i class="ri-check-line me-1"></i> Approve
+                        </button>
+                    </form>
+                    <form method="POST" action="{% url 'finance:ap_invoice_cancel' invoice.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-soft-danger w-100 mb-2" onclick="return confirm('Are you sure you want to cancel this invoice?')">
+                            <i class="ri-close-circle-line me-1"></i> Cancel Invoice
+                        </button>
+                    </form>
+                    <form method="POST" action="{% url 'finance:ap_invoice_delete' invoice.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-soft-danger w-100 mb-2" onclick="return confirm('Are you sure you want to delete this invoice?')">
+                            <i class="ri-delete-bin-line me-1"></i> Delete
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if invoice.status == 'pending_approval' %}
+                    <form method="POST" action="{% url 'finance:ap_invoice_approve' invoice.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2">
+                            <i class="ri-check-line me-1"></i> Approve
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if invoice.status == 'approved' %}
+                    <a href="{% url 'finance:ap_payment_create' %}?invoice={{ invoice.pk }}" class="btn btn-primary w-100 mb-2">
+                        <i class="ri-bank-card-line me-1"></i> Record Payment
+                    </a>
+                    <form method="POST" action="{% url 'finance:ap_invoice_overdue' invoice.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-warning w-100 mb-2">
+                            <i class="ri-alarm-warning-line me-1"></i> Mark Overdue
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if invoice.status == 'partially_paid' %}
+                    <a href="{% url 'finance:ap_payment_create' %}?invoice={{ invoice.pk }}" class="btn btn-primary w-100 mb-2">
+                        <i class="ri-bank-card-line me-1"></i> Record Payment
+                    </a>
+                    <form method="POST" action="{% url 'finance:ap_invoice_overdue' invoice.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-warning w-100 mb-2">
+                            <i class="ri-alarm-warning-line me-1"></i> Mark Overdue
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if invoice.status == 'overdue' %}
+                    <a href="{% url 'finance:ap_payment_create' %}?invoice={{ invoice.pk }}" class="btn btn-primary w-100 mb-2">
+                        <i class="ri-bank-card-line me-1"></i> Record Payment
+                    </a>
+                {% endif %}
+
+                <a href="{% url 'finance:ap_invoice_list' %}" class="btn btn-light w-100">
+                    <i class="ri-arrow-left-line me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
