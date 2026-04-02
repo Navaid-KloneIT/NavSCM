@@ -189,6 +189,17 @@ A dedicated interface for clients (B2B or B2C) to interact with the supply chain
 - **Support Ticketing** - Customer support system with categories (order issue, delivery issue, billing, product inquiry, return request, general, complaint), priority levels (low → urgent), status workflow (open → in progress → waiting on customer → resolved → closed, with reopen capability), portal account and order linkage, agent assignment, resolution timestamp and notes, auto-calculated response time in hours, threaded messages with sender type (customer, agent, system)
 - **Catalog Browsing** - Product catalog linked to procurement items with portal-specific naming and descriptions, category assignment, unit pricing with multi-currency support (USD, EUR, GBP, PKR, AED, SAR, INR, CNY), stock status tracking (in stock, low stock, out of stock, pre-order, discontinued), available quantity, minimum order quantity, lead time in days, image URL, featured flag, active/inactive status
 
+### Module 18: Third-Party Logistics (3PL) Management
+
+Specifically for tenants acting as logistics providers for other companies.
+
+- **Client Management** - 3PL client registry with contact details, contract dates, default currency (USD, EUR, GBP, PKR, AED, SAR, INR, CNY), status lifecycle (draft → active → suspended → terminated), and centralized hub linking to billing, inventory, SLAs, integrations, and rental agreements
+- **Client Billing** - Automated billing with configurable rate types (per storage unit, per transaction, per weight unit, fixed fee), unit of measure and rate amount tracking, invoice generation with billing period, subtotal/tax/total calculation, line items linked to rates, status workflow (draft → sent → paid/overdue/cancelled), due date and issued date tracking
+- **Client Inventory Segregation** - Strict client inventory separation with dedicated/shared storage zones mapped to warehouses, zone capacity tracking (sq ft, sq m, pallets, cubic meters), per-client inventory items with SKU, quantity, weight (kg, lbs, metric tons), unit of measure, and received date tracking
+- **SLA Management** - Service Level Agreement lifecycle (draft → active → breached → expired) with review frequency (weekly, monthly, quarterly), penalty clauses, KPI metrics (on-time delivery %, order accuracy %, turnaround time, damage rate %, custom), target vs. actual value tracking, breach detection and notes
+- **Client Integration** - API configuration per client with API key management, endpoint and webhook URL tracking, sync direction (inbound, outbound, bidirectional), sync frequency (real-time, hourly, daily, manual), status lifecycle (draft → active → paused → error → disabled), integration logs with sync/webhook/error type, records processed/failed counts, request/response payload tracking
+- **Warehouse Rental Management** - Space rental agreements with dedicated/shared space types, warehouse linkage, area size and unit tracking, configurable rate periods (daily, weekly, monthly), multi-currency support, status lifecycle (draft → active → expired → terminated), periodic space usage records with utilization percentage and calculated charges
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -364,6 +375,11 @@ A dedicated interface for clients (B2B or B2C) to interact with the supply chain
    python manage.py seed_portal
    ```
 
+7r. **Seed 3PL Management data**
+   ```bash
+   python manage.py seed_tpl
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -484,11 +500,17 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/portal/*)
 │   │   └── admin.py       # Django admin registration
-│   └── cold_chain/        # Cold chain management module
-│       ├── models.py      # TemperatureSensor, TemperatureReading, TemperatureZone, TemperatureExcursion, ColdStorageUnit, ColdStorageItem, ComplianceReport, ComplianceReportItem, ReeferUnit, ReeferMaintenance
-│       ├── views.py       # All cold chain CRUD & workflow views
+│   ├── cold_chain/        # Cold chain management module
+│   │   ├── models.py      # TemperatureSensor, TemperatureReading, TemperatureZone, TemperatureExcursion, ColdStorageUnit, ColdStorageItem, ComplianceReport, ComplianceReportItem, ReeferUnit, ReeferMaintenance
+│   │   ├── views.py       # All cold chain CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/cold-chain/*)
+│   │   └── admin.py       # Django admin registration
+│   └── tpl/               # 3PL management module
+│       ├── models.py      # Client, BillingRate, BillingInvoice, BillingInvoiceItem, ClientStorageZone, ClientInventoryItem, SLA, SLAMetric, IntegrationConfig, IntegrationLog, RentalAgreement, SpaceUsageRecord
+│       ├── views.py       # All 3PL CRUD & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/cold-chain/*)
+│       ├── urls.py        # URL routing (/3pl/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -611,14 +633,23 @@ NavSCM/
 │   │   ├── document_*.html        # Portal document list, form, detail
 │   │   ├── ticket_*.html          # Support ticket list, form, detail
 │   │   └── catalog_*.html         # Catalog item list, form, detail
-│   └── cold_chain/        # Cold chain management templates
-│       ├── sensor_*.html          # Temperature sensor list, form, detail
-│       ├── zone_*.html            # Temperature zone list, form, detail
-│       ├── excursion_*.html       # Temperature excursion list, form, detail
-│       ├── storage_*.html         # Cold storage unit list, form, detail
-│       ├── compliance_*.html      # Compliance report list, form, detail
-│       ├── reefer_*.html          # Reefer unit list, form, detail
-│       └── reefer_maint_*.html    # Reefer maintenance list, form, detail
+│   ├── cold_chain/        # Cold chain management templates
+│   │   ├── sensor_*.html          # Temperature sensor list, form, detail
+│   │   ├── zone_*.html            # Temperature zone list, form, detail
+│   │   ├── excursion_*.html       # Temperature excursion list, form, detail
+│   │   ├── storage_*.html         # Cold storage unit list, form, detail
+│   │   ├── compliance_*.html      # Compliance report list, form, detail
+│   │   ├── reefer_*.html          # Reefer unit list, form, detail
+│   │   └── reefer_maint_*.html    # Reefer maintenance list, form, detail
+│   └── tpl/               # 3PL management templates
+│       ├── client_*.html          # 3PL client list, form, detail
+│       ├── billing_rate_*.html    # Billing rate list, form, detail
+│       ├── billing_invoice_*.html # Billing invoice list, form, detail
+│       ├── storage_zone_*.html    # Storage zone list, form, detail
+│       ├── client_inventory_*.html # Client inventory list, form, detail
+│       ├── sla_*.html             # SLA list, form, detail
+│       ├── integration_*.html     # Integration config list, form, detail
+│       └── rental_*.html          # Rental agreement list, form, detail
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
