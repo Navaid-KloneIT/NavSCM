@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Tax Transactions{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>Tax Transactions</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Finance &amp; Accounting</li>
+            <li class="breadcrumb-item active">Tax Transactions</li>
+        </ol>
+    </nav>
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'finance:tax_transaction_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Transaction Type</label>
+                            <select class="form-select" name="type">
+                                <option value="">All</option>
+                                {% for value, label in type_choices %}
+                                    <option value="{{ value }}" {% if request.GET.type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'finance:tax_transaction_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Transaction</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Tax Transactions</h5>
+                <span class="text-muted">{{ transactions|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Transaction #</th>
+                                <th>Tax Rate</th>
+                                <th>Type</th>
+                                <th>Taxable Amount</th>
+                                <th>Tax Amount</th>
+                                <th>Date</th>
+                                <th>Reference Type</th>
+                                <th>Reference #</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in transactions %}
+                            <tr>
+                                <td><a href="{% url 'finance:tax_transaction_detail' t.pk %}" class="fw-medium">{{ t.transaction_number }}</a></td>
+                                <td>{{ t.tax_rate.name|default:"-" }}</td>
+                                <td>
+                                    {% if t.transaction_type == 'collected' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> {{ t.get_transaction_type_display }}</span>
+                                    {% elif t.transaction_type == 'paid' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> {{ t.get_transaction_type_display }}</span>
+                                    {% elif t.transaction_type == 'refund' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> {{ t.get_transaction_type_display }}</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ t.get_transaction_type_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ t.taxable_amount }}</td>
+                                <td>{{ t.tax_amount }}</td>
+                                <td>{{ t.transaction_date|date:"M d, Y" }}</td>
+                                <td>{{ t.reference_type|default:"-" }}</td>
+                                <td>{{ t.reference_number|default:"-" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'finance:tax_transaction_detail' t.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No tax transactions found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.type %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first tax transaction.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
