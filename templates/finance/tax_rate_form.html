@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ title|default:"New Tax Rate" }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title|default:"New Tax Rate" }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Finance &amp; Accounting</li>
+            <li class="breadcrumb-item"><a href="{% url 'finance:tax_rate_list' %}">Tax Rates</a></li>
+            <li class="breadcrumb-item active">{{ title|default:"New Tax Rate" }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Tax Rate Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Name *</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tax Type *</label>
+                            {{ form.tax_type }}
+                            {% if form.tax_type.errors %}<div class="text-danger small">{{ form.tax_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Rate *</label>
+                            {{ form.rate }}
+                            {% if form.rate.errors %}<div class="text-danger small">{{ form.rate.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Country</label>
+                            {{ form.country }}
+                            {% if form.country.errors %}<div class="text-danger small">{{ form.country.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Region</label>
+                            {{ form.region }}
+                            {% if form.region.errors %}<div class="text-danger small">{{ form.region.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Effective From</label>
+                            {{ form.effective_from }}
+                            {% if form.effective_from.errors %}<div class="text-danger small">{{ form.effective_from.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Effective To</label>
+                            {{ form.effective_to }}
+                            {% if form.effective_to.errors %}<div class="text-danger small">{{ form.effective_to.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mt-4">
+                                {{ form.is_active }}
+                                <label class="form-check-label">Active</label>
+                                {% if form.is_active.errors %}<div class="text-danger small">{{ form.is_active.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Tax Rate</button>
+                    <a href="{% url 'finance:tax_rate_list' %}" class="btn btn-light w-100">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
