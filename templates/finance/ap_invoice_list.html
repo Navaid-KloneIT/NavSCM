@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}AP Invoices{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>AP Invoices</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Finance &amp; Accounting</li>
+            <li class="breadcrumb-item active">AP Invoices</li>
+        </ol>
+    </nav>
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'finance:ap_invoice_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'finance:ap_invoice_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Invoice</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>AP Invoices</h5>
+                <span class="text-muted">{{ invoices|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Vendor</th>
+                                <th>Invoice Date</th>
+                                <th>Due Date</th>
+                                <th>Total</th>
+                                <th>Paid</th>
+                                <th>Balance</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in invoices %}
+                            <tr>
+                                <td><a href="{% url 'finance:ap_invoice_detail' i.pk %}" class="fw-medium">{{ i.invoice_number }}</a></td>
+                                <td>{{ i.vendor }}</td>
+                                <td>{{ i.invoice_date|date:"M d, Y" }}</td>
+                                <td>{{ i.due_date|date:"M d, Y" }}</td>
+                                <td>{{ i.total_amount }}</td>
+                                <td>{{ i.amount_paid }}</td>
+                                <td>{{ i.balance_due }}</td>
+                                <td>
+                                    {% if i.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif i.status == 'pending_approval' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Pending Approval</span>
+                                    {% elif i.status == 'approved' %}
+                                        <span class="status-badge badge-soft-primary"><span class="status-dot bg-primary"></span> Approved</span>
+                                    {% elif i.status == 'partially_paid' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Partially Paid</span>
+                                    {% elif i.status == 'paid' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Paid</span>
+                                    {% elif i.status == 'overdue' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Overdue</span>
+                                    {% elif i.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Cancelled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ i.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'finance:ap_invoice_detail' i.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if i.status == 'draft' %}
+                                            <a href="{% url 'finance:ap_invoice_edit' i.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                            <form method="POST" action="{% url 'finance:ap_invoice_delete' i.pk %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this AP invoice?')"><i class="ri-delete-bin-line"></i></button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-money-dollar-circle-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No AP invoices found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first AP invoice.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
