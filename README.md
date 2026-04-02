@@ -200,6 +200,16 @@ Specifically for tenants acting as logistics providers for other companies.
 - **Client Integration** - API configuration per client with API key management, endpoint and webhook URL tracking, sync direction (inbound, outbound, bidirectional), sync frequency (real-time, hourly, daily, manual), status lifecycle (draft → active → paused → error → disabled), integration logs with sync/webhook/error type, records processed/failed counts, request/response payload tracking
 - **Warehouse Rental Management** - Space rental agreements with dedicated/shared space types, warehouse linkage, area size and unit tracking, configurable rate periods (daily, weekly, monthly), multi-currency support, status lifecycle (draft → active → expired → terminated), periodic space usage records with utilization percentage and calculated charges
 
+### Module 19: Finance & Accounting Integration
+
+Connects supply chain operations with financial records.
+
+- **Accounts Payable** - Vendor invoice management with purchase order linkage, line items with quantity/unit price/tax rate, status workflow (draft → pending approval → approved → partially paid → paid/overdue/cancelled), configurable payment terms (due on receipt, net 15/30/45/60/90), payment recording with method tracking (bank transfer, check, cash, wire, credit card), balance due and days outstanding calculation, aging detection
+- **Accounts Receivable** - Customer invoice management with sales order linkage, line items with quantity/unit price/tax rate, status workflow (draft → sent → partially paid → paid/overdue/cancelled), payment received tracking with method and reference, balance due and days outstanding calculation, overdue detection
+- **Landed Cost Calculation** - Cost sheet creation linked to shipments, purchase orders, and carriers, cost components (freight, customs duty, insurance, handling, inspection, warehousing, brokerage, other), allocation methods (by value, by weight, by quantity, equal), total goods cost and total landed cost calculation, status workflow (draft → calculated → finalized)
+- **Budgeting** - Department-level budget planning with period types (monthly, quarterly, annual), planned vs. actual amount tracking, variance and variance percentage calculation, over-budget detection, budget entries with date/description/amount and generic reference linking, status workflow (draft → active → closed)
+- **Tax Management** - Tax rate configuration with types (sales tax, VAT, customs duty, excise, withholding, other), percentage rate with 4-decimal precision, country/region targeting, effective date ranges, active/inactive status, tax transaction log with collected/paid/refund types, taxable and tax amounts, generic reference linking to any module
+
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, manager, employee, viewer)
@@ -380,6 +390,11 @@ Specifically for tenants acting as logistics providers for other companies.
    python manage.py seed_tpl
    ```
 
+7s. **Seed Finance & Accounting data**
+   ```bash
+   python manage.py seed_finance
+   ```
+
 8. **Run the development server**
    ```bash
    python manage.py runserver
@@ -506,11 +521,17 @@ NavSCM/
 │   │   ├── forms.py       # Forms & inline formsets for all models
 │   │   ├── urls.py        # URL routing (/cold-chain/*)
 │   │   └── admin.py       # Django admin registration
-│   └── tpl/               # 3PL management module
-│       ├── models.py      # Client, BillingRate, BillingInvoice, BillingInvoiceItem, ClientStorageZone, ClientInventoryItem, SLA, SLAMetric, IntegrationConfig, IntegrationLog, RentalAgreement, SpaceUsageRecord
-│       ├── views.py       # All 3PL CRUD & workflow views
+│   ├── tpl/               # 3PL management module
+│   │   ├── models.py      # Client, BillingRate, BillingInvoice, BillingInvoiceItem, ClientStorageZone, ClientInventoryItem, SLA, SLAMetric, IntegrationConfig, IntegrationLog, RentalAgreement, SpaceUsageRecord
+│   │   ├── views.py       # All 3PL CRUD & workflow views
+│   │   ├── forms.py       # Forms & inline formsets for all models
+│   │   ├── urls.py        # URL routing (/3pl/*)
+│   │   └── admin.py       # Django admin registration
+│   └── finance/           # Finance & accounting module
+│       ├── models.py      # APInvoice, APInvoiceItem, APPayment, ARInvoice, ARInvoiceItem, ARPayment, LandedCostSheet, LandedCostComponent, Budget, BudgetEntry, TaxRate, TaxTransaction
+│       ├── views.py       # All finance CRUD & workflow views
 │       ├── forms.py       # Forms & inline formsets for all models
-│       ├── urls.py        # URL routing (/3pl/*)
+│       ├── urls.py        # URL routing (/finance/*)
 │       └── admin.py       # Django admin registration
 ├── config/                # Django settings, URLs, WSGI, ASGI
 ├── static/
@@ -641,15 +662,24 @@ NavSCM/
 │   │   ├── compliance_*.html      # Compliance report list, form, detail
 │   │   ├── reefer_*.html          # Reefer unit list, form, detail
 │   │   └── reefer_maint_*.html    # Reefer maintenance list, form, detail
-│   └── tpl/               # 3PL management templates
-│       ├── client_*.html          # 3PL client list, form, detail
-│       ├── billing_rate_*.html    # Billing rate list, form, detail
-│       ├── billing_invoice_*.html # Billing invoice list, form, detail
-│       ├── storage_zone_*.html    # Storage zone list, form, detail
-│       ├── client_inventory_*.html # Client inventory list, form, detail
-│       ├── sla_*.html             # SLA list, form, detail
-│       ├── integration_*.html     # Integration config list, form, detail
-│       └── rental_*.html          # Rental agreement list, form, detail
+│   ├── tpl/               # 3PL management templates
+│   │   ├── client_*.html          # 3PL client list, form, detail
+│   │   ├── billing_rate_*.html    # Billing rate list, form, detail
+│   │   ├── billing_invoice_*.html # Billing invoice list, form, detail
+│   │   ├── storage_zone_*.html    # Storage zone list, form, detail
+│   │   ├── client_inventory_*.html # Client inventory list, form, detail
+│   │   ├── sla_*.html             # SLA list, form, detail
+│   │   ├── integration_*.html     # Integration config list, form, detail
+│   │   └── rental_*.html          # Rental agreement list, form, detail
+│   └── finance/           # Finance & accounting templates
+│       ├── ap_invoice_*.html      # AP invoice list, form, detail
+│       ├── ap_payment_*.html      # AP payment list, form, detail
+│       ├── ar_invoice_*.html      # AR invoice list, form, detail
+│       ├── ar_payment_*.html      # AR payment list, form, detail
+│       ├── landed_cost_*.html     # Landed cost sheet list, form, detail
+│       ├── budget_*.html          # Budget list, form, detail
+│       ├── tax_rate_*.html        # Tax rate list, form
+│       └── tax_transaction_*.html # Tax transaction list, form, detail
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
@@ -695,5 +725,5 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 | 16 | **Cold Chain Management** | Temperature monitoring (IoT), excursion management, cold storage inventory, compliance reporting, reefer maintenance | Done |
 | 17 | **Customer Portal** | Order tracking, account management, document retrieval, support ticketing, catalog browsing | Done |
 | 18 | **3PL Management** | Client billing, inventory segregation, SLA management, client integration, warehouse rental | Done |
-| 19 | **Finance & Accounting Integration** | Accounts payable/receivable, landed cost calculation, budgeting, tax management | Planned |
+| 19 | **Finance & Accounting Integration** | Accounts payable/receivable, landed cost calculation, budgeting, tax management | Done |
 | 20 | **Integration & API Gateway** | ERP connectors (SAP, Oracle), e-commerce integration, IoT gateway, EDI, webhooks | Planned |
