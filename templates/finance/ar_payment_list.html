@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}AR Payments{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>AR Payments</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Finance &amp; Accounting</li>
+            <li class="breadcrumb-item active">AR Payments</li>
+        </ol>
+    </nav>
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'finance:ar_payment_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'finance:ar_payment_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Payment</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>AR Payments</h5>
+                <span class="text-muted">{{ payments|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Payment #</th>
+                                <th>Invoice</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Reference</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in payments %}
+                            <tr>
+                                <td><a href="{% url 'finance:ar_payment_detail' p.pk %}" class="fw-medium">{{ p.payment_number }}</a></td>
+                                <td>{{ p.invoice.invoice_number }}</td>
+                                <td>{{ p.invoice.customer.name }}</td>
+                                <td>{{ p.payment_date|date:"M d, Y" }}</td>
+                                <td>{{ p.amount }}</td>
+                                <td>{{ p.get_payment_method_display }}</td>
+                                <td>{{ p.reference_number|default:"-" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'finance:ar_payment_detail' p.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        <form method="POST" action="{% url 'finance:ar_payment_delete' p.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this payment?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-wallet-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No AR payments found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q %}
+                                                Try adjusting your search criteria.
+                                            {% else %}
+                                                Get started by recording your first AR payment.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
