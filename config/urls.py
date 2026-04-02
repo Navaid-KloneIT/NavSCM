@@ -27,6 +27,7 @@ urlpatterns = [
     path('labor/', include('apps.labor.urls', namespace='labor')),
     path('portal/', include('apps.portal.urls', namespace='portal')),
     path('cold-chain/', include('apps.cold_chain.urls', namespace='cold_chain')),
+    path('3pl/', include('apps.tpl.urls', namespace='tpl')),
     path('', include('apps.dashboard.urls')),
 ]
 
