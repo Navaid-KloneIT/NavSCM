@@ -2061,6 +2061,176 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Finance &amp; Accounting <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- AP Invoices -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'ap_invoice_list,ap_invoice_create,ap_invoice_detail,ap_invoice_edit' and request.resolver_match.namespace == 'finance' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-money-dollar-circle-line"></i>
+                    <span class="menu-text">AP Invoices</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'ap_invoice_list,ap_invoice_create,ap_invoice_detail,ap_invoice_edit' and request.resolver_match.namespace == 'finance' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:ap_invoice_list' %}" class="menu-link {% if request.resolver_match.url_name == 'ap_invoice_list' or request.resolver_match.url_name == 'ap_invoice_detail' or request.resolver_match.url_name == 'ap_invoice_edit' %}{% if request.resolver_match.namespace == 'finance' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Invoices</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:ap_invoice_create' %}" class="menu-link {% if request.resolver_match.url_name == 'ap_invoice_create' and request.resolver_match.namespace == 'finance' %}active{% endif %}">
+                            <span class="menu-text">New Invoice</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- AP Payments -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'ap_payment_list,ap_payment_create,ap_payment_detail' and request.resolver_match.namespace == 'finance' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-bank-card-line"></i>
+                    <span class="menu-text">AP Payments</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'ap_payment_list,ap_payment_create,ap_payment_detail' and request.resolver_match.namespace == 'finance' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:ap_payment_list' %}" class="menu-link {% if request.resolver_match.url_name == 'ap_payment_list' or request.resolver_match.url_name == 'ap_payment_detail' %}{% if request.resolver_match.namespace == 'finance' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Payments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:ap_payment_create' %}" class="menu-link {% if request.resolver_match.url_name == 'ap_payment_create' and request.resolver_match.namespace == 'finance' %}active{% endif %}">
+                            <span class="menu-text">New Payment</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- AR Invoices -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'ar_invoice_list,ar_invoice_create,ar_invoice_detail,ar_invoice_edit' and request.resolver_match.namespace == 'finance' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-hand-coin-line"></i>
+                    <span class="menu-text">AR Invoices</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'ar_invoice_list,ar_invoice_create,ar_invoice_detail,ar_invoice_edit' and request.resolver_match.namespace == 'finance' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:ar_invoice_list' %}" class="menu-link {% if request.resolver_match.url_name == 'ar_invoice_list' or request.resolver_match.url_name == 'ar_invoice_detail' or request.resolver_match.url_name == 'ar_invoice_edit' %}{% if request.resolver_match.namespace == 'finance' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Invoices</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:ar_invoice_create' %}" class="menu-link {% if request.resolver_match.url_name == 'ar_invoice_create' and request.resolver_match.namespace == 'finance' %}active{% endif %}">
+                            <span class="menu-text">New Invoice</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- AR Payments -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'ar_payment_list,ar_payment_create,ar_payment_detail' and request.resolver_match.namespace == 'finance' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-wallet-3-line"></i>
+                    <span class="menu-text">AR Payments</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'ar_payment_list,ar_payment_create,ar_payment_detail' and request.resolver_match.namespace == 'finance' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:ar_payment_list' %}" class="menu-link {% if request.resolver_match.url_name == 'ar_payment_list' or request.resolver_match.url_name == 'ar_payment_detail' %}{% if request.resolver_match.namespace == 'finance' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Payments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:ar_payment_create' %}" class="menu-link {% if request.resolver_match.url_name == 'ar_payment_create' and request.resolver_match.namespace == 'finance' %}active{% endif %}">
+                            <span class="menu-text">New Payment</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Landed Costs -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'landed_cost_list,landed_cost_create,landed_cost_detail,landed_cost_edit' and request.resolver_match.namespace == 'finance' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-ship-line"></i>
+                    <span class="menu-text">Landed Costs</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'landed_cost_list,landed_cost_create,landed_cost_detail,landed_cost_edit' and request.resolver_match.namespace == 'finance' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:landed_cost_list' %}" class="menu-link {% if request.resolver_match.url_name == 'landed_cost_list' or request.resolver_match.url_name == 'landed_cost_detail' or request.resolver_match.url_name == 'landed_cost_edit' %}{% if request.resolver_match.namespace == 'finance' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Sheets</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:landed_cost_create' %}" class="menu-link {% if request.resolver_match.url_name == 'landed_cost_create' and request.resolver_match.namespace == 'finance' %}active{% endif %}">
+                            <span class="menu-text">New Sheet</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Budgets -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'budget_list,budget_create,budget_detail,budget_edit' and request.resolver_match.namespace == 'finance' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-pie-chart-line"></i>
+                    <span class="menu-text">Budgets</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'budget_list,budget_create,budget_detail,budget_edit' and request.resolver_match.namespace == 'finance' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:budget_list' %}" class="menu-link {% if request.resolver_match.url_name == 'budget_list' or request.resolver_match.url_name == 'budget_detail' or request.resolver_match.url_name == 'budget_edit' %}{% if request.resolver_match.namespace == 'finance' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Budgets</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:budget_create' %}" class="menu-link {% if request.resolver_match.url_name == 'budget_create' and request.resolver_match.namespace == 'finance' %}active{% endif %}">
+                            <span class="menu-text">New Budget</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Tax Rates -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'tax_rate_list,tax_rate_create,tax_rate_detail,tax_rate_edit' and request.resolver_match.namespace == 'finance' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-percent-line"></i>
+                    <span class="menu-text">Tax Rates</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'tax_rate_list,tax_rate_create,tax_rate_detail,tax_rate_edit' and request.resolver_match.namespace == 'finance' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:tax_rate_list' %}" class="menu-link {% if request.resolver_match.url_name == 'tax_rate_list' or request.resolver_match.url_name == 'tax_rate_detail' or request.resolver_match.url_name == 'tax_rate_edit' %}{% if request.resolver_match.namespace == 'finance' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Rates</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:tax_rate_create' %}" class="menu-link {% if request.resolver_match.url_name == 'tax_rate_create' and request.resolver_match.namespace == 'finance' %}active{% endif %}">
+                            <span class="menu-text">New Rate</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Tax Transactions -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'tax_transaction_list,tax_transaction_create,tax_transaction_detail' and request.resolver_match.namespace == 'finance' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-list-3-line"></i>
+                    <span class="menu-text">Tax Transactions</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'tax_transaction_list,tax_transaction_create,tax_transaction_detail' and request.resolver_match.namespace == 'finance' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:tax_transaction_list' %}" class="menu-link {% if request.resolver_match.url_name == 'tax_transaction_list' or request.resolver_match.url_name == 'tax_transaction_detail' %}{% if request.resolver_match.namespace == 'finance' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Transactions</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'finance:tax_transaction_create' %}" class="menu-link {% if request.resolver_match.url_name == 'tax_transaction_create' and request.resolver_match.namespace == 'finance' %}active{% endif %}">
+                            <span class="menu-text">New Transaction</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Contract &amp; Compliance <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Contract Repository -->
