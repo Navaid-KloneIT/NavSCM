@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Client Inventory{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>Client Inventory</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">3PL Management</li>
+            <li class="breadcrumb-item active">Client Inventory</li>
+        </ol>
+    </nav>
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'tpl:client_inventory_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Client</label>
+                            <select class="form-select" name="client">
+                                <option value="">All</option>
+                                {% for c in clients %}
+                                    <option value="{{ c.pk }}" {% if request.GET.client == c.pk|stringformat:"d" %}selected{% endif %}>{{ c }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Zone</label>
+                            <select class="form-select" name="zone">
+                                <option value="">All</option>
+                                {% for z in zones %}
+                                    <option value="{{ z.pk }}" {% if request.GET.zone == z.pk|stringformat:"d" %}selected{% endif %}>{{ z }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'tpl:client_inventory_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Item</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Client Inventory</h5>
+                <span class="text-muted">{{ items|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Tracking #</th>
+                                <th>Item Name</th>
+                                <th>SKU</th>
+                                <th>Client</th>
+                                <th>Zone</th>
+                                <th>Qty</th>
+                                <th>Weight</th>
+                                <th>Received Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in items %}
+                            <tr>
+                                <td><a href="{% url 'tpl:client_inventory_detail' i.pk %}" class="fw-medium">{{ i.tracking_number }}</a></td>
+                                <td>{{ i.item_name|truncatewords:5 }}</td>
+                                <td>{{ i.sku|default:"-" }}</td>
+                                <td>{{ i.client }}</td>
+                                <td>{{ i.storage_zone.zone_name|default:"-" }}</td>
+                                <td>{{ i.quantity }}</td>
+                                <td>{{ i.weight }} {{ i.get_weight_unit_display }}</td>
+                                <td>{{ i.received_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'tpl:client_inventory_detail' i.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        <a href="{% url 'tpl:client_inventory_edit' i.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                        <form method="POST" action="{% url 'tpl:client_inventory_delete' i.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this inventory item?')"><i class="ri-delete-bin-line"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-archive-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No inventory items found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.client or request.GET.zone %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by adding your first client inventory item.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
