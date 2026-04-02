@@ -1891,6 +1891,176 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">3PL Management <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- 3PL Clients -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'client_list,client_create,client_detail,client_edit' and request.resolver_match.namespace == 'tpl' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-user-star-line"></i>
+                    <span class="menu-text">Clients</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'client_list,client_create,client_detail,client_edit' and request.resolver_match.namespace == 'tpl' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:client_list' %}" class="menu-link {% if request.resolver_match.url_name == 'client_list' or request.resolver_match.url_name == 'client_detail' or request.resolver_match.url_name == 'client_edit' %}{% if request.resolver_match.namespace == 'tpl' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Clients</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:client_create' %}" class="menu-link {% if request.resolver_match.url_name == 'client_create' and request.resolver_match.namespace == 'tpl' %}active{% endif %}">
+                            <span class="menu-text">New Client</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Billing Rates -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'billing_rate_list,billing_rate_create,billing_rate_detail,billing_rate_edit' and request.resolver_match.namespace == 'tpl' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-price-tag-3-line"></i>
+                    <span class="menu-text">Billing Rates</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'billing_rate_list,billing_rate_create,billing_rate_detail,billing_rate_edit' and request.resolver_match.namespace == 'tpl' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:billing_rate_list' %}" class="menu-link {% if request.resolver_match.url_name == 'billing_rate_list' or request.resolver_match.url_name == 'billing_rate_detail' or request.resolver_match.url_name == 'billing_rate_edit' %}{% if request.resolver_match.namespace == 'tpl' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Rates</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:billing_rate_create' %}" class="menu-link {% if request.resolver_match.url_name == 'billing_rate_create' and request.resolver_match.namespace == 'tpl' %}active{% endif %}">
+                            <span class="menu-text">New Rate</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Billing Invoices -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'billing_invoice_list,billing_invoice_create,billing_invoice_detail,billing_invoice_edit' and request.resolver_match.namespace == 'tpl' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-money-dollar-box-line"></i>
+                    <span class="menu-text">Invoices</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'billing_invoice_list,billing_invoice_create,billing_invoice_detail,billing_invoice_edit' and request.resolver_match.namespace == 'tpl' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:billing_invoice_list' %}" class="menu-link {% if request.resolver_match.url_name == 'billing_invoice_list' or request.resolver_match.url_name == 'billing_invoice_detail' or request.resolver_match.url_name == 'billing_invoice_edit' %}{% if request.resolver_match.namespace == 'tpl' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Invoices</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:billing_invoice_create' %}" class="menu-link {% if request.resolver_match.url_name == 'billing_invoice_create' and request.resolver_match.namespace == 'tpl' %}active{% endif %}">
+                            <span class="menu-text">New Invoice</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Storage Zones -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'storage_zone_list,storage_zone_create,storage_zone_detail,storage_zone_edit' and request.resolver_match.namespace == 'tpl' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-stack-line"></i>
+                    <span class="menu-text">Storage Zones</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'storage_zone_list,storage_zone_create,storage_zone_detail,storage_zone_edit' and request.resolver_match.namespace == 'tpl' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:storage_zone_list' %}" class="menu-link {% if request.resolver_match.url_name == 'storage_zone_list' or request.resolver_match.url_name == 'storage_zone_detail' or request.resolver_match.url_name == 'storage_zone_edit' %}{% if request.resolver_match.namespace == 'tpl' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Zones</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:storage_zone_create' %}" class="menu-link {% if request.resolver_match.url_name == 'storage_zone_create' and request.resolver_match.namespace == 'tpl' %}active{% endif %}">
+                            <span class="menu-text">New Zone</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Client Inventory -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'client_inventory_list,client_inventory_create,client_inventory_detail,client_inventory_edit' and request.resolver_match.namespace == 'tpl' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-archive-line"></i>
+                    <span class="menu-text">Client Inventory</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'client_inventory_list,client_inventory_create,client_inventory_detail,client_inventory_edit' and request.resolver_match.namespace == 'tpl' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:client_inventory_list' %}" class="menu-link {% if request.resolver_match.url_name == 'client_inventory_list' or request.resolver_match.url_name == 'client_inventory_detail' or request.resolver_match.url_name == 'client_inventory_edit' %}{% if request.resolver_match.namespace == 'tpl' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Items</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:client_inventory_create' %}" class="menu-link {% if request.resolver_match.url_name == 'client_inventory_create' and request.resolver_match.namespace == 'tpl' %}active{% endif %}">
+                            <span class="menu-text">New Item</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- SLAs -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'sla_list,sla_create,sla_detail,sla_edit' and request.resolver_match.namespace == 'tpl' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-shield-check-line"></i>
+                    <span class="menu-text">SLA Management</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'sla_list,sla_create,sla_detail,sla_edit' and request.resolver_match.namespace == 'tpl' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:sla_list' %}" class="menu-link {% if request.resolver_match.url_name == 'sla_list' or request.resolver_match.url_name == 'sla_detail' or request.resolver_match.url_name == 'sla_edit' %}{% if request.resolver_match.namespace == 'tpl' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All SLAs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:sla_create' %}" class="menu-link {% if request.resolver_match.url_name == 'sla_create' and request.resolver_match.namespace == 'tpl' %}active{% endif %}">
+                            <span class="menu-text">New SLA</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Client Integrations -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'integration_list,integration_create,integration_detail,integration_edit' and request.resolver_match.namespace == 'tpl' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-link"></i>
+                    <span class="menu-text">Integrations</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'integration_list,integration_create,integration_detail,integration_edit' and request.resolver_match.namespace == 'tpl' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:integration_list' %}" class="menu-link {% if request.resolver_match.url_name == 'integration_list' or request.resolver_match.url_name == 'integration_detail' or request.resolver_match.url_name == 'integration_edit' %}{% if request.resolver_match.namespace == 'tpl' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Integrations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:integration_create' %}" class="menu-link {% if request.resolver_match.url_name == 'integration_create' and request.resolver_match.namespace == 'tpl' %}active{% endif %}">
+                            <span class="menu-text">New Integration</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Rental Agreements -->
+            <li class="nav-item has-submenu {% if request.resolver_match.url_name in 'rental_list,rental_create,rental_detail,rental_edit' and request.resolver_match.namespace == 'tpl' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-home-gear-line"></i>
+                    <span class="menu-text">Rental Agreements</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.url_name in 'rental_list,rental_create,rental_detail,rental_edit' and request.resolver_match.namespace == 'tpl' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:rental_list' %}" class="menu-link {% if request.resolver_match.url_name == 'rental_list' or request.resolver_match.url_name == 'rental_detail' or request.resolver_match.url_name == 'rental_edit' %}{% if request.resolver_match.namespace == 'tpl' %}active{% endif %}{% endif %}">
+                            <span class="menu-text">All Agreements</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'tpl:rental_create' %}" class="menu-link {% if request.resolver_match.url_name == 'rental_create' and request.resolver_match.namespace == 'tpl' %}active{% endif %}">
+                            <span class="menu-text">New Agreement</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Contract &amp; Compliance <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Contract Repository -->
