@@ -694,6 +694,6 @@ A high-level overview of planned modules for the NavSCM platform. Each module wi
 | 15 | **Labor Management** | Labor planning, time & attendance, task assignment, performance tracking, payroll integration | Done |
 | 16 | **Cold Chain Management** | Temperature monitoring (IoT), excursion management, cold storage inventory, compliance reporting, reefer maintenance | Done |
 | 17 | **Customer Portal** | Order tracking, account management, document retrieval, support ticketing, catalog browsing | Done |
-| 18 | **3PL Management** | Client billing, inventory segregation, SLA management, client integration, warehouse rental | Planned |
+| 18 | **3PL Management** | Client billing, inventory segregation, SLA management, client integration, warehouse rental | Done |
 | 19 | **Finance & Accounting Integration** | Accounts payable/receivable, landed cost calculation, budgeting, tax management | Planned |
 | 20 | **Integration & API Gateway** | ERP connectors (SAP, Oracle), e-commerce integration, IoT gateway, EDI, webhooks | Planned |
