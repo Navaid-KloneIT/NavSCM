@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}New Tax Transaction{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>New Tax Transaction</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Finance &amp; Accounting</li>
+            <li class="breadcrumb-item"><a href="{% url 'finance:tax_transaction_list' %}">Tax Transactions</a></li>
+            <li class="breadcrumb-item active">New Transaction</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Transaction Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tax Rate *</label>
+                            {{ form.tax_rate }}
+                            {% if form.tax_rate.errors %}<div class="text-danger small">{{ form.tax_rate.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Transaction Type *</label>
+                            {{ form.transaction_type }}
+                            {% if form.transaction_type.errors %}<div class="text-danger small">{{ form.transaction_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Taxable Amount *</label>
+                            {{ form.taxable_amount }}
+                            {% if form.taxable_amount.errors %}<div class="text-danger small">{{ form.taxable_amount.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tax Amount *</label>
+                            {{ form.tax_amount }}
+                            {% if form.tax_amount.errors %}<div class="text-danger small">{{ form.tax_amount.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Transaction Date *</label>
+                            {{ form.transaction_date }}
+                            {% if form.transaction_date.errors %}<div class="text-danger small">{{ form.transaction_date.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reference Type</label>
+                            {{ form.reference_type }}
+                            {% if form.reference_type.errors %}<div class="text-danger small">{{ form.reference_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reference #</label>
+                            {{ form.reference_number }}
+                            {% if form.reference_number.errors %}<div class="text-danger small">{{ form.reference_number.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Transaction</button>
+                    <a href="{% url 'finance:tax_transaction_list' %}" class="btn btn-light w-100">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
