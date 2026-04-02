@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'apps.labor',
     'apps.portal',
     'apps.cold_chain',
+    'apps.tpl',
 ]
 
 # ==============================================================================
