@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Payment: {{ payment.payment_number }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ payment.payment_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Finance &amp; Accounting</li>
+            <li class="breadcrumb-item"><a href="{% url 'finance:ar_payment_list' %}">AR Payments</a></li>
+            <li class="breadcrumb-item active">{{ payment.payment_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Payment Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Payment #</th><td>{{ payment.payment_number }}</td></tr>
+                            <tr><th class="ps-3">Invoice</th><td><a href="{% url 'finance:ar_invoice_detail' payment.invoice.pk %}">{{ payment.invoice.invoice_number }}</a></td></tr>
+                            <tr><th class="ps-3">Customer</th><td>{{ payment.invoice.customer.name }}</td></tr>
+                            <tr><th class="ps-3">Payment Date</th><td>{{ payment.payment_date|date:"M d, Y" }}</td></tr>
+                            <tr><th class="ps-3">Amount</th><td>{{ payment.amount }}</td></tr>
+                            <tr><th class="ps-3">Payment Method</th><td>{{ payment.get_payment_method_display }}</td></tr>
+                            <tr><th class="ps-3">Reference Number</th><td>{{ payment.reference_number|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ payment.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ payment.created_by.get_full_name|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ payment.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'finance:ar_payment_delete' payment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-soft-danger w-100 mb-2" onclick="return confirm('Are you sure you want to delete this payment?')">
+                        <i class="ri-delete-bin-line me-1"></i> Delete
+                    </button>
+                </form>
+                <a href="{% url 'finance:ar_payment_list' %}" class="btn btn-light w-100">
+                    <i class="ri-arrow-left-line me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
