@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Client Integrations{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>Client Integrations</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">3PL Management</li>
+            <li class="breadcrumb-item active">Integrations</li>
+        </ol>
+    </nav>
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'tpl:integration_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All</option>
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Client</label>
+                            <select class="form-select" name="client">
+                                <option value="">All</option>
+                                {% for c in clients %}
+                                    <option value="{{ c.pk }}" {% if request.GET.client == c.pk|stringformat:"d" %}selected{% endif %}>{{ c }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100"><i class="ri-filter-3-line me-1"></i> Filter</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'tpl:integration_create' %}" class="btn btn-success w-100"><i class="ri-add-line me-1"></i> New Integration</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Client Integrations</h5>
+                <span class="text-muted">{{ integrations|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Config #</th>
+                                <th>Integration Name</th>
+                                <th>Client</th>
+                                <th>Sync Direction</th>
+                                <th>Frequency</th>
+                                <th>Last Sync</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in integrations %}
+                            <tr>
+                                <td><a href="{% url 'tpl:integration_detail' i.pk %}" class="fw-medium">{{ i.config_number }}</a></td>
+                                <td>{{ i.integration_name }}</td>
+                                <td>{{ i.client }}</td>
+                                <td>{{ i.get_sync_direction_display }}</td>
+                                <td>{{ i.get_sync_frequency_display }}</td>
+                                <td>{{ i.last_sync|date:"M d, Y H:i"|default:"-" }}</td>
+                                <td>
+                                    {% if i.status == 'draft' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> Draft</span>
+                                    {% elif i.status == 'active' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> Active</span>
+                                    {% elif i.status == 'paused' %}
+                                        <span class="status-badge badge-soft-info"><span class="status-dot bg-info"></span> Paused</span>
+                                    {% elif i.status == 'error' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> Error</span>
+                                    {% elif i.status == 'disabled' %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> Disabled</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ i.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'tpl:integration_detail' i.pk %}" class="btn btn-sm btn-soft-primary" title="View"><i class="ri-eye-line"></i></a>
+                                        {% if i.status == 'draft' %}
+                                            <a href="{% url 'tpl:integration_edit' i.pk %}" class="btn btn-sm btn-soft-warning" title="Edit"><i class="ri-pencil-line"></i></a>
+                                            <form method="POST" action="{% url 'tpl:integration_delete' i.pk %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Delete this integration?')"><i class="ri-delete-bin-line"></i></button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-link" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No integrations found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.q or request.GET.status or request.GET.client %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by creating your first client integration.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
