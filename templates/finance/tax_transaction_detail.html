@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Transaction: {{ transaction.transaction_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ transaction.transaction_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">Finance &amp; Accounting</li>
+            <li class="breadcrumb-item"><a href="{% url 'finance:tax_transaction_list' %}">Tax Transactions</a></li>
+            <li class="breadcrumb-item active">{{ transaction.transaction_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Transaction Information</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th class="ps-3">Transaction #</th><td>{{ transaction.transaction_number }}</td></tr>
+                            <tr><th class="ps-3">Tax Rate</th><td>{{ transaction.tax_rate.name|default:"-" }}</td></tr>
+                            <tr>
+                                <th class="ps-3">Type</th>
+                                <td>
+                                    {% if transaction.transaction_type == 'collected' %}
+                                        <span class="status-badge badge-soft-success"><span class="status-dot bg-success"></span> {{ transaction.get_transaction_type_display }}</span>
+                                    {% elif transaction.transaction_type == 'paid' %}
+                                        <span class="status-badge badge-soft-warning"><span class="status-dot bg-warning"></span> {{ transaction.get_transaction_type_display }}</span>
+                                    {% elif transaction.transaction_type == 'refund' %}
+                                        <span class="status-badge badge-soft-danger"><span class="status-dot bg-danger"></span> {{ transaction.get_transaction_type_display }}</span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-secondary"><span class="status-dot bg-secondary"></span> {{ transaction.get_transaction_type_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th class="ps-3">Taxable Amount</th><td>{{ transaction.taxable_amount }}</td></tr>
+                            <tr><th class="ps-3">Tax Amount</th><td>{{ transaction.tax_amount }}</td></tr>
+                            <tr><th class="ps-3">Date</th><td>{{ transaction.transaction_date|date:"M d, Y" }}</td></tr>
+                            <tr><th class="ps-3">Reference Type</th><td>{{ transaction.reference_type|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Reference #</th><td>{{ transaction.reference_number|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Notes</th><td>{{ transaction.notes|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created By</th><td>{{ transaction.created_by.get_full_name|default:"-" }}</td></tr>
+                            <tr><th class="ps-3">Created</th><td>{{ transaction.created_at|date:"M d, Y H:i" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>Actions</h5></div>
+            <div class="card-body">
+                <a href="{% url 'finance:tax_transaction_list' %}" class="btn btn-light w-100">
+                    <i class="ri-arrow-left-line me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
