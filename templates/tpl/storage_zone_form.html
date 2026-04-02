@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavSCM</a></li>
+            <li class="breadcrumb-item">3PL Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'tpl:storage_zone_list' %}">Storage Zones</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5>Zone Details</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Client *</label>
+                            {{ form.client }}
+                            {% if form.client.errors %}<div class="text-danger small">{{ form.client.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Warehouse *</label>
+                            {{ form.warehouse }}
+                            {% if form.warehouse.errors %}<div class="text-danger small">{{ form.warehouse.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Zone Name *</label>
+                            {{ form.zone_name }}
+                            {% if form.zone_name.errors %}<div class="text-danger small">{{ form.zone_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Zone Type *</label>
+                            {{ form.zone_type }}
+                            {% if form.zone_type.errors %}<div class="text-danger small">{{ form.zone_type.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Location Description</label>
+                            {{ form.location_description }}
+                            {% if form.location_description.errors %}<div class="text-danger small">{{ form.location_description.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Capacity *</label>
+                            {{ form.capacity }}
+                            {% if form.capacity.errors %}<div class="text-danger small">{{ form.capacity.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Capacity Unit *</label>
+                            {{ form.capacity_unit }}
+                            {% if form.capacity_unit.errors %}<div class="text-danger small">{{ form.capacity_unit.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mt-4">
+                                {{ form.is_active }}
+                                <label class="form-check-label">Active</label>
+                                {% if form.is_active.errors %}<div class="text-danger small">{{ form.is_active.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="ri-save-line me-1"></i> Save Zone</button>
+                    {% if zone %}
+                        <a href="{% url 'tpl:storage_zone_detail' zone.pk %}" class="btn btn-light w-100">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'tpl:storage_zone_list' %}" class="btn btn-light w-100">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
