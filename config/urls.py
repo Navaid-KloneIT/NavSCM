@@ -28,6 +28,7 @@ urlpatterns = [
     path('portal/', include('apps.portal.urls', namespace='portal')),
     path('cold-chain/', include('apps.cold_chain.urls', namespace='cold_chain')),
     path('3pl/', include('apps.tpl.urls', namespace='tpl')),
+    path('finance/', include('apps.finance.urls', namespace='finance')),
     path('', include('apps.dashboard.urls')),
 ]
 
